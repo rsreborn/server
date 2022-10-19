@@ -1,7 +1,6 @@
 import { ByteBuffer, logger } from '@runejs/common';
 import { Player } from '../world/player';
-import { getMapCoord } from '../world/coord';
-import { buffer } from 'stream/consumers';
+import { getMapCoord } from '../world';
 
 export const INBOUND_PACKET_SIZES = [
     0, 0, 0, 1, -1, 0, 0, 0, 0, 0, //0
@@ -71,7 +70,7 @@ export const sendSideBarWidget = (player: Player, sideBarId: number, widgetId: n
 };
 
 export const sendSystemUpdate = (player: Player, time: number): void => {
-    const buffer = new ByteBuffer(2)
+    const buffer = new ByteBuffer(2);
     buffer.put(time, 'short');
     writePacket(player, 103, buffer);
 };
