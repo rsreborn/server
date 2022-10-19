@@ -1,6 +1,7 @@
 import { createServer, Server } from 'net';
 import { logger } from '@runejs/common';
 import { connectionCreated } from './connection';
+import { openWorld, World } from '../world';
 
 export interface SocketOptions {
     noDelay?: boolean;
@@ -14,6 +15,7 @@ export interface ServerInstance {
     port: number;
     socketOptions?: SocketOptions;
     server: Server;
+    world: World;
 }
 
 let serverSingleton: ServerInstance;
@@ -22,6 +24,7 @@ export const startServer = (
     serverName: string,
     hostName: string,
     port: number,
+    worldId: number,
     socketOptions?: SocketOptions,
 ): ServerInstance => {
     const server = createServer(
@@ -30,12 +33,15 @@ export const startServer = (
 
     logger.info(`${ serverName } listening @ ${ hostName }:${ port }.`);
 
+    const world = openWorld(worldId);
+
     return {
         serverName,
         hostName,
         port,
         socketOptions,
         server,
+        world,
     };
 };
 

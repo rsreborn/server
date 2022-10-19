@@ -1,6 +1,6 @@
-import { Client } from '../net/client';
-import { Coord } from './coord';
-import { sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket } from '../net/packets';
+import { Client } from '../../net/client';
+import { Coord } from '../coord';
+import { sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket } from '../../net/packets';
 
 export enum PlayerRights {
     USER = 0,
