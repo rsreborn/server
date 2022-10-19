@@ -3,39 +3,11 @@ import { ByteBuffer, logger } from '@runejs/common';
 import BigInteger from 'bigi';
 import { SocketOptions } from './server';
 import { Isaac } from './isaac';
-import { handlePacket, Player, PlayerRights } from '../world/player';
+import { Player, playerLogin, PlayerRights } from '../world/player';
+import { handleInboundPacket, InboundPacket, INBOUND_PACKET_SIZES } from './packets';
 
 const RSA_EXPONENT = BigInteger('85749236153780929917924872511187713651124617292658988978182063731979923800090977664547424642067377984001222110909310620040899943594191124988795815431638577479242072599794149649824942794144264088097130432112910214560183536387949202712729964914726145231993678948421001368196284315651219252190430508607437712749');
 const RSA_MODULUS = BigInteger('85851413706447406835286856960321868491021158946959045519533110967212579875747603892534938950597622190034801837526749417278303359405620369366942839883641648688111135276342550236485518612241524546375576253238379707601227775510104577557183947475438430283206434950768729692944226445159468674814615586984703672433');
-
-const PACKET_SIZES = [
-    0, 0, 0, 1, -1, 0, 0, 0, 0, 0, //0
-    0, 0, 0, 0, 8, 0, 6, 2, 2, 0,  //10
-    0, 2, 0, 6, 0, 12, 0, 0, 0, 0, //20
-    0, 0, 0, 0, 0, 8, 4, 0, 0, 2,  //30
-    2, 6, 0, 6, 0, -1, 0, 0, 0, 0, //40
-    0, 0, 0, 12, 0, 0, 0, 0, 8, 0, //50
-    0, 8, 0, 0, 0, 0, 0, 0, 0, 0,  //60
-    6, 0, 2, 2, 8, 6, 0, -1, 0, 6, //70
-    0, 0, 0, 0, 0, 1, 4, 6, 0, 0,  //80
-    0, 0, 0, 0, 0, 3, 0, 0, -1, 0, //90
-    0, 13, 0, -1, 0, 0, 0, 0, 0, 0,//100
-    0, 0, 0, 0, 0, 0, 0, 6, 0, 0,  //110
-    1, 0, 6, 0, 0, 0, -1, 0, 2, 6, //120
-    0, 4, 6, 8, 0, 6, 0, 0, 0, 2,  //130
-    0, 0, 0, 0, 0, 6, 0, 0, 0, 0,  //140
-    0, 0, 1, 2, 0, 2, 6, 0, 0, 0,  //150
-    0, 0, 0, 0, -1, -1, 0, 0, 0, 0,//160
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  //170
-    0, 8, 0, 3, 0, 2, 0, 0, 8, 1,  //180
-    0, 0, 12, 0, 0, 0, 0, 0, 0, 0, //190
-    2, 0, 0, 0, 0, 0, 0, 0, 4, 0,  //200
-    4, 0, 0, 0, 7, 8, 0, 0, 10, 0, //210
-    0, 0, 0, 0, 0, 0, -1, 0, 6, 0, //220
-    1, 0, 0, 0, 6, 0, 6, 8, 1, 0,  //230
-    0, 4, 0, 0, 0, 0, -1, 0, -1, 4,//240
-    0, 0, 6, 6, 0, 0, 0            //250
-];
 
 export enum ConnectionType {
     GAME = 14,
@@ -48,12 +20,6 @@ export enum ConnectionState {
     LOGGED_IN = 'logged_in',
 }
 
-export interface Packet {
-    opcode: number | null;
-    size: number | null;
-    buffer: ByteBuffer;
-}
-
 export interface Connection {
     socket: Socket;
     connectionType?: ConnectionType;
@@ -62,7 +28,7 @@ export interface Connection {
     clientKey1?: number;
     clientKey2?: number;
     player?: Player;
-    packet?: Packet;
+    packet?: InboundPacket;
 }
 
 const dataReceived = (connection: Connection, data: Buffer): void => {
@@ -200,6 +166,7 @@ const dataReceived = (connection: Connection, data: Buffer): void => {
 
             connection.connectionState = ConnectionState.LOGGED_IN;
 
+            playerLogin(connection.player);
             logger.info(`Player ${username} has logged in.`);
         } else if (connectionState === ConnectionState.LOGGED_IN) {
             // Packet data received
@@ -237,7 +204,7 @@ const dataReceived = (connection: Connection, data: Buffer): void => {
 
                 packet.opcode = packet.buffer.get('byte', 'u');
                 packet.opcode = (packet.opcode - inCipher.rand()) & 0xff;
-                packet.size = PACKET_SIZES[packet.opcode];
+                packet.size = INBOUND_PACKET_SIZES[packet.opcode];
             }
 
             if (packet.size === -1) {
@@ -263,7 +230,7 @@ const dataReceived = (connection: Connection, data: Buffer): void => {
                 packet.buffer.readerIndex += packet.size;
             }
 
-            handlePacket(connection.player, packet.opcode, packetData);
+            handleInboundPacket(connection.player, packet.opcode, packetData);
 
             // Reset the pending packet in preparation for another one
             delete connection.packet;

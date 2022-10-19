@@ -1,5 +1,6 @@
 import { Client } from '../net/client';
-import { ByteBuffer, logger } from '@runejs/common';
+import { Coord } from './coord';
+import { sendUpdateMapRegionPacket } from '../net/packets';
 
 export enum PlayerRights {
     USER = 0,
@@ -13,8 +14,15 @@ export interface Player {
     password: string;
     rights: PlayerRights;
     client: Client;
+    position?: Coord;
 }
 
-export const handlePacket = (player: Player, opcode: number, data: ByteBuffer | null): void => {
-    logger.info(`Packet ${opcode} received with size of ${data?.length ?? 0}.`);
+export const playerLogin = (player: Player): void => {
+    player.position = {
+        x: 3222,
+        y: 3222,
+        plane: 0,
+    };
+
+    sendUpdateMapRegionPacket(player); // @todo move to player sync when available - Kat 18/Oct/22
 };
