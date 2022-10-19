@@ -1,6 +1,7 @@
 import { ByteBuffer, logger } from '@runejs/common';
 import { Player } from '../world/player';
 import { getMapCoord } from '../world/coord';
+import { buffer } from 'stream/consumers';
 
 export const INBOUND_PACKET_SIZES = [
     0, 0, 0, 1, -1, 0, 0, 0, 0, 0, //0
@@ -60,4 +61,17 @@ export const sendUpdateMapRegionPacket = (player: Player): void => {
     buffer.put(mapCoord.y, 'short', 'le');
 
     writePacket(player, 228, buffer);
+};
+
+export const sendSideBarWidget = (player: Player, sideBarId: number, widgetId: number): void => {
+    const buffer = new ByteBuffer(3);
+    buffer.put(widgetId, 'short');
+    buffer.put(sideBarId - 128, 'byte'); // @todo Subtracting 128 because this is a byteA, need to refactor out A, S, and C from the client buffer. - Brian 10-19-22
+    writePacket(player, 229, buffer);
+};
+
+export const sendSystemUpdate = (player: Player, time: number): void => {
+    const buffer = new ByteBuffer(2)
+    buffer.put(time, 'short');
+    writePacket(player, 103, buffer);
 };
