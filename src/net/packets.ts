@@ -64,7 +64,7 @@ export const writePacket = (player: Player, opcode: number, packetBuffer: ByteBu
 
 export const sendChatboxMessage = (player: Player, message: string): void => {
     const buffer = new ByteBuffer(message.length + 1);
-    buffer.putString(message);
+    buffer.putString(message, 10);
     writePacket(player, 50, buffer, PacketType.VAR_BYTE);
 };
 
