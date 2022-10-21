@@ -66,12 +66,13 @@ export const playerLogin = (player: Player): boolean => {
 
     sendUpdateMapRegionPacket(player); // @todo move to player sync when available - Kat 18/Oct/22
     sendSystemUpdate(player, 100);
+
+    sendChatboxMessage(player, "Welcome to Funscape 319!");
     
     player.widgetState.sideBarData.forEach((id, index) => {
         sendSideBarWidget(player, index, id);
     });
 
-    sendChatboxMessage(player, "Welcome to Funscape 319!");
 
     return addPlayer(player);
 };

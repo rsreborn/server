@@ -49,16 +49,24 @@ export const handleInboundPacket = (player: Player, opcode: number, data: ByteBu
 };
 
 export const writePacket = (player: Player, opcode: number, packetBuffer: ByteBuffer, packetType: PacketType = PacketType.FIXED): void => {
-    let size = packetBuffer.length + packetType + 1;
-    console.log("packetType", packetType)
-    console.log("size", size);
-    let copyStart = 1 + packetType;
-    console.log("copy start", copyStart);
+    let size = packetBuffer.length;
+    let copyStart = 1;
 
-    const buffer = new ByteBuffer(size);
+    if (packetType !== PacketType.FIXED) {
+        size += packetType;
+    }
+
+    const buffer = new ByteBuffer(size + 1);
     buffer.put((opcode + player.client.outCipher.rand()) & 0xff);
-    packetBuffer.copy(buffer, copyStart, 0, size);
 
+    if (packetType === PacketType.VAR_BYTE) {
+        buffer.put(size, 'byte');
+        copyStart += packetType
+    } else if (packetType === PacketType.VAR_SHORT) {
+        buffer.put(size, 'short');
+        copyStart += packetType
+    }
+    packetBuffer.copy(buffer, copyStart, 0, size);
     player.client.connection.socket.write(buffer.toNodeBuffer());
 };
 
