@@ -31,6 +31,12 @@ export const INBOUND_PACKET_SIZES = [
     0, 0, 6, 6, 0, 0, 0            //250
 ];
 
+enum PacketType {
+    FIXED = 0,
+    VAR_BYTE = 1,
+    VAR_SHORT = 2
+}
+
 export interface InboundPacket {
     opcode: number | null;
     size: number | null;
@@ -42,15 +48,24 @@ export const handleInboundPacket = (player: Player, opcode: number, data: ByteBu
     // @todo - Kat 18/Oct/22
 };
 
-export const writePacket = (player: Player, opcode: number, packetBuffer: ByteBuffer): void => {
-    const size = packetBuffer.length;
-    const buffer = new ByteBuffer(size + 1);
-    const copyStart = 1; // @todo support var_byte and var_short packet lengths - Kat 18/Oct/22
+export const writePacket = (player: Player, opcode: number, packetBuffer: ByteBuffer, packetType: PacketType = PacketType.FIXED): void => {
+    let size = packetBuffer.length + packetType + 1;
+    console.log("packetType", packetType)
+    console.log("size", size);
+    let copyStart = 1 + packetType;
+    console.log("copy start", copyStart);
 
+    const buffer = new ByteBuffer(size);
     buffer.put((opcode + player.client.outCipher.rand()) & 0xff);
     packetBuffer.copy(buffer, copyStart, 0, size);
 
     player.client.connection.socket.write(buffer.toNodeBuffer());
+};
+
+export const sendChatboxMessage = (player: Player, message: string): void => {
+    const buffer = new ByteBuffer(message.length + 1);
+    buffer.putString(message);
+    writePacket(player, 50, buffer, PacketType.VAR_BYTE);
 };
 
 export const sendUpdateMapRegionPacket = (player: Player): void => {
