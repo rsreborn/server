@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket } from '../../net/packets';
+import { sendChatboxMessage, sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 
 export enum PlayerRights {
@@ -70,6 +70,8 @@ export const playerLogin = (player: Player): boolean => {
     player.widgetState.sideBarData.forEach((id, index) => {
         sendSideBarWidget(player, index, id);
     });
+
+    sendChatboxMessage(player, "Welcome to Funscape 319!");
 
     return addPlayer(player);
 };
