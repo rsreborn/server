@@ -1,6 +1,6 @@
 import { Socket } from 'net';
 import { queue } from 'async';
-import { ByteBuffer, logger } from '@runejs/common';
+import { ByteBuffer } from '@runejs/common';
 import { getFileData } from '@runejs/cache';
 import { getCache } from '../../cache';
 

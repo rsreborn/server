@@ -3,6 +3,7 @@ import { logger } from '@runejs/common';
 import { connectionCreated } from './connection';
 import { closeWorld, openWorld, World } from '../world';
 import { loadCache } from '../cache';
+import { getFileServer, startFileServer } from './file-server';
 
 export interface SocketOptions {
     noDelay?: boolean;
@@ -10,7 +11,7 @@ export interface SocketOptions {
     timeout?: number;
 }
 
-export interface ServerInstance {
+export interface GameServer {
     serverName: string;
     hostName: string;
     port: number;
@@ -19,7 +20,7 @@ export interface ServerInstance {
     world: World;
 }
 
-let serverSingleton: ServerInstance;
+let gameServer: GameServer;
 let running: boolean = false;
 
 const shutdownEvents = [
@@ -40,7 +41,9 @@ shutdownEvents.forEach(signal => process.on(signal as any, () => {
 
     closeWorld();
 
-    serverSingleton?.server?.close();
+    gameServer?.server?.close();
+    getFileServer()?.jaggrabServer?.close();
+    getFileServer()?.webServer?.close();
 
     logger.info(`Server shut down.`);
     process.exit(0);
@@ -51,21 +54,26 @@ export const startServer = async (
     hostName: string,
     port: number,
     worldId: number,
+    jaggrabPort: number,
+    webPort: number,
     socketOptions?: SocketOptions,
-): Promise<ServerInstance> => {
+    fileServerSocketOptions?: SocketOptions,
+): Promise<GameServer> => {
+    await loadCache(319);
+
+    startFileServer(hostName, jaggrabPort, webPort, fileServerSocketOptions);
+
     const server = createServer(
         socket => connectionCreated(socket, socketOptions)
     ).listen(port, hostName);
 
-    await loadCache(319);
-
     const world = openWorld(worldId);
 
-    logger.info(`${ serverName } listening @ ${ hostName }:${ port }.`);
+    logger.info(`${ serverName } listening @ ${ hostName }:${ port }`);
 
     running = true;
 
-    return {
+    gameServer = {
         serverName,
         hostName,
         port,
@@ -73,12 +81,14 @@ export const startServer = async (
         server,
         world,
     };
+
+    return gameServer;
 };
 
-export const getServer = (): ServerInstance => {
-    if (!serverSingleton) {
-        throw new Error(`Server not yet initialized!`);
+export const getGameServer = (): GameServer => {
+    if (!gameServer) {
+        throw new Error(`Game Server not yet initialized!`);
     }
 
-    return serverSingleton;
+    return gameServer;
 };

@@ -1,8 +1,15 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { packedCacheFileName, readFileCache, DataFile, IndexFile } from '@runejs/cache';
+import { ByteBuffer, logger } from '@runejs/common';
+import { Crc32 } from '@runejs/common/crc32';
+import {
+    packedCacheFileName,
+    readFileCache,
+    DataFile,
+    IndexFile,
+    getFileData
+} from '@runejs/cache';
 import { getOpenRS2CacheFilesByBuild } from './open-rs2';
-import { logger } from '@runejs/common';
 
 export interface FileCache {
     dataFile: DataFile;
@@ -10,6 +17,26 @@ export interface FileCache {
 }
 
 let cache: FileCache | null = null;
+let archives: { [key: string]: ByteBuffer };
+let crcTable: ByteBuffer;
+
+const loadArchives = (): { [key: string]: ByteBuffer } => {
+    const dataFile = cache.dataFile;
+    const indexFile = cache.indexFiles[0];
+
+    archives = {
+        'title': getFileData(dataFile, indexFile, 1),
+        'config': getFileData(dataFile, indexFile, 2),
+        'interface': getFileData(dataFile, indexFile, 3),
+        'media': getFileData(dataFile, indexFile, 4),
+        'versionlist': getFileData(dataFile, indexFile, 5),
+        'textures': getFileData(dataFile, indexFile, 6),
+        'wordenc': getFileData(dataFile, indexFile, 7),
+        'sounds': getFileData(dataFile, indexFile, 8),
+    };
+
+    return archives;
+};
 
 export const loadCache = async (buildNumber: number): Promise<FileCache> => {
     const cachePath = join('.', 'cache');
@@ -43,7 +70,43 @@ export const loadCache = async (buildNumber: number): Promise<FileCache> => {
     }
 
     cache = readFileCache(packedCacheFiles);
+    loadArchives();
+    getCrcTable(buildNumber);
     return cache;
+};
+
+export const getCrcTable = (buildNumber: number): ByteBuffer => {
+    if (crcTable) {
+        return crcTable;
+    }
+
+    Crc32.init();
+    const checksums: number[] = new Array(9);
+
+    checksums[0] = buildNumber;
+
+    const indexFile = cache.indexFiles[0];
+
+    for (let i = 1; i < checksums.length; i++) {
+        const fileData = getFileData(cache.dataFile, indexFile, i);
+        checksums[i] = Crc32.update(0, fileData.length, fileData);
+    }
+
+    let hash = 1234;
+
+    for (let i = 0; i < checksums.length; i++) {
+        hash = (hash << 1) + checksums[i];
+    }
+
+    const buffer = new ByteBuffer(4 * (checksums.length + 1));
+    for (let i = 0; i < checksums.length; i++) {
+        buffer.put(checksums[i], 'int');
+    }
+
+    buffer.put(hash, 'int');
+
+    crcTable = buffer;
+    return crcTable;
 };
 
 export const getCache = (): FileCache => {
@@ -53,3 +116,11 @@ export const getCache = (): FileCache => {
 
     return cache;
 };
+
+export const getArchives = (): { [key: string]: ByteBuffer } => {
+    if (!archives) {
+        throw new Error(`Archives not yet loaded!`);
+    }
+
+    return archives;
+}
