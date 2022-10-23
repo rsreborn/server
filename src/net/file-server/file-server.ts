@@ -91,7 +91,7 @@ export const startFileServer = (
         } else {
             res.writeHead(404);
         }
-    });//.listen(webPort, hostName);
+    }).listen(webPort, hostName);
 
     logger.info(`Web file server listening @ ${ hostName }:${ webPort }`);
 
