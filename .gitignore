@@ -1,7 +1,7 @@
 node_modules
 .DS_Store
 .env
-cache
+main_file_cache.*
 
 # Log files
 npm-debug.log*
