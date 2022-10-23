@@ -2,6 +2,7 @@ import { createServer, Server } from 'net';
 import { logger } from '@runejs/common';
 import { connectionCreated } from './connection';
 import { closeWorld, openWorld, World } from '../world';
+import { loadCache } from '../cache';
 
 export interface SocketOptions {
     noDelay?: boolean;
@@ -45,20 +46,22 @@ shutdownEvents.forEach(signal => process.on(signal as any, () => {
     process.exit(0);
 }));
 
-export const startServer = (
+export const startServer = async (
     serverName: string,
     hostName: string,
     port: number,
     worldId: number,
     socketOptions?: SocketOptions,
-): ServerInstance => {
+): Promise<ServerInstance> => {
     const server = createServer(
         socket => connectionCreated(socket, socketOptions)
     ).listen(port, hostName);
 
-    logger.info(`${ serverName } listening @ ${ hostName }:${ port }.`);
+    await loadCache(319);
 
     const world = openWorld(worldId);
+
+    logger.info(`${ serverName } listening @ ${ hostName }:${ port }.`);
 
     running = true;
 

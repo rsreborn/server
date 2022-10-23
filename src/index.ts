@@ -1,3 +1,5 @@
 import { startServer } from './net/server';
 
-startServer('319 Server', '0.0.0.0', 43594, 1);
+(async () => {
+    await startServer('319 Server', '0.0.0.0', 43594, 1);
+})();
