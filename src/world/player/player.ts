@@ -2,6 +2,7 @@ import { Client } from '../../net/client';
 import { Coord } from '../coord';
 import { sendChatboxMessage, sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
+import { ByteBuffer } from '@runejs/common';
 
 export enum PlayerRights {
     USER = 0,
@@ -13,6 +14,25 @@ export interface WidgetState {
     sideBarData: number[];
 }
 
+export enum SyncFlags {
+    FACE_COORDS = 1,
+    APPEARANCE_UPDATE = 2,
+    PLAY_ANIMATION = 4,
+    FACE_ENTITY = 8,
+    FORCE_CHAT = 0x10,
+    DAMAGE_TYPE_1 = 0x20,
+    CHAT = 0x80,
+    FORCED_MOVEMENT = 0x100,
+    DAMAGE_TYPE_2 = 0x200,
+    PLAY_SPOT_ANIM = 0x400,
+}
+
+export interface PlayerSyncState {
+    flags?: SyncFlags;
+    mapRegion?: boolean;
+    appearanceData?: ByteBuffer;
+}
+
 export interface Player {
     uid: number;
     username: string;
@@ -22,6 +42,7 @@ export interface Player {
     position?: Coord;
     worldIndex?: number;
     widgetState?: WidgetState;
+    sync?: PlayerSyncState;
 }
 
 export const playerTick = async (player: Player): Promise<void> => {
@@ -37,6 +58,7 @@ export const playerSync = async (player: Player): Promise<void> => {
     // We wrap this in a promise so that all player syncs can be run
     // in parallel using Promise.all()
     // @todo this also needs to run NPC syncs specific to this Player - Kat 19/Oct/22
+    // 76 is the opcode for the player sync packet
     return new Promise<void>(resolve => {
         // @todo - Kat 19/Oct/22
         resolve();
