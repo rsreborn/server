@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendChatboxMessage, sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket } from '../../net/packets';
+import { sendChatboxMessage, sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -49,6 +49,9 @@ export const playerTickCleanup = async (player: Player): Promise<void> => {
         player.sync.walkDir = -1;
         player.sync.mapRegion = false;
         player.sync.appearanceData = undefined;
+
+        writePackets(player);
+
         resolve();
     });
 };

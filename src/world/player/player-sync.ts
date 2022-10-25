@@ -1,7 +1,7 @@
 import { ByteBuffer } from '@runejs/common';
 import { Player } from './player';
 import { getLocalCoord } from '../coord';
-import { PacketType, writePacket } from '../../net/packets';
+import { PacketType, queuePacket } from '../../net/packets';
 import { encodeBase37Username } from '../../util/base37';
 
 export enum SyncFlags {
@@ -218,7 +218,7 @@ export const playerSync = async (player: Player): Promise<void> => {
     // 76 is the opcode for the player sync packet
     return new Promise<void>(resolve => {
         const packetData = constructPlayerSyncPacket(player);
-        writePacket(player, 76, packetData, PacketType.VAR_SHORT);
+        queuePacket(player, 76, packetData, PacketType.VAR_SHORT, 'update');
         resolve();
     });
 };

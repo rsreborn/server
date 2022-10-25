@@ -48,34 +48,59 @@ export const handleInboundPacket = (player: Player, opcode: number, data: ByteBu
     // @todo - Kat 18/Oct/22
 };
 
-export const writePacket = (player: Player, opcode: number, packetBuffer: ByteBuffer, packetType: PacketType = PacketType.FIXED): void => {
-    let size = packetBuffer.length;
+export const queuePacket = (
+    player: Player,
+    opcode: number,
+    packetData: ByteBuffer,
+    packetType: PacketType = PacketType.FIXED,
+    queueType: 'packet' | 'update' = 'packet',
+): void => {
+    let size = packetData.length;
 
     if (packetType !== PacketType.FIXED) {
         size += packetType;
     }
 
-    const buffer = new ByteBuffer(size + 1);
-    buffer.put((opcode + player.client.outCipher.rand()) & 0xff);
+    const packet = new ByteBuffer(size + 1);
+    packet.put((opcode + player.client.outCipher.rand()) & 0xff);
 
     let copyStart = 1;
 
     if (packetType === PacketType.VAR_BYTE) {
-        buffer.put(packetBuffer.length, 'byte');
+        packet.put(packetData.length, 'byte');
         copyStart = 2;
     } else if (packetType === PacketType.VAR_SHORT) {
-        buffer.put(packetBuffer.length, 'short');
+        packet.put(packetData.length, 'short');
         copyStart = 3;
     }
 
-    packetBuffer.copy(buffer, copyStart, 0, size);
-    player.client.connection.socket.write(buffer.toNodeBuffer());
+    packetData.copy(packet, copyStart, 0, size);
+
+    if (queueType === 'packet') {
+        player.client.outboundPacketQueue.push(packet.toNodeBuffer());
+    } else if (queueType === 'update') {
+        player.client.outboundUpdateQueue.push(packet.toNodeBuffer());
+    }
+};
+
+export const writePackets = (player: Player): void => {
+    const buffer = Buffer.concat([
+        ...player.client.outboundPacketQueue,
+        ...player.client.outboundUpdateQueue,
+    ]);
+
+    if (buffer.length !== 0) {
+        player.client.connection.socket.write(buffer);
+    }
+
+    player.client.outboundPacketQueue = [];
+    player.client.outboundUpdateQueue = [];
 };
 
 export const sendChatboxMessage = (player: Player, message: string): void => {
     const buffer = new ByteBuffer(message.length + 1);
     buffer.putString(message, 10);
-    writePacket(player, 50, buffer, PacketType.VAR_BYTE);
+    queuePacket(player, 50, buffer, PacketType.VAR_BYTE);
 };
 
 export const sendUpdateMapRegionPacket = (player: Player): void => {
@@ -84,18 +109,18 @@ export const sendUpdateMapRegionPacket = (player: Player): void => {
     buffer.put(mapCoord.x, 'short');
     buffer.put(mapCoord.y, 'short', 'le');
 
-    writePacket(player, 228, buffer);
+    queuePacket(player, 228, buffer);
 };
 
 export const sendSideBarWidget = (player: Player, sideBarId: number, widgetId: number): void => {
     const buffer = new ByteBuffer(3);
     buffer.put(widgetId, 'short');
     buffer.put(sideBarId - 128, 'byte'); // @todo Subtracting 128 because this is a byteA, need to refactor out A, S, and C from the client buffer. - Brian 10-19-22
-    writePacket(player, 229, buffer);
+    queuePacket(player, 229, buffer);
 };
 
 export const sendSystemUpdate = (player: Player, time: number): void => {
     const buffer = new ByteBuffer(2);
     buffer.put(time, 'short');
-    writePacket(player, 103, buffer);
+    queuePacket(player, 103, buffer);
 };
