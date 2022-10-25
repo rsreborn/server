@@ -115,7 +115,7 @@ export const sendUpdateMapRegionPacket = (player: Player): void => {
 export const sendSideBarWidget = (player: Player, sideBarId: number, widgetId: number): void => {
     const buffer = new ByteBuffer(3);
     buffer.put(widgetId, 'short');
-    buffer.put(sideBarId - 128, 'byte'); // @todo Subtracting 128 because this is a byteA, need to refactor out A, S, and C from the client buffer. - Brian 10-19-22
+    buffer.put(sideBarId, 'byte');
     queuePacket(player, 229, buffer);
 };
 
