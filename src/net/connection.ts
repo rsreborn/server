@@ -29,7 +29,6 @@ export interface Connection {
     clientKey1?: number;
     clientKey2?: number;
     player?: Player;
-    packet?: InboundPacket;
 }
 
 const dataReceived = (connection: Connection, data: Buffer): void => {
@@ -162,6 +161,8 @@ const dataReceived = (connection: Connection, data: Buffer): void => {
                     inCipher,
                     outCipher,
                     connection,
+                    outboundPacketQueue: [],
+                    outboundUpdateQueue: [],
                 },
             };
 
@@ -171,10 +172,10 @@ const dataReceived = (connection: Connection, data: Buffer): void => {
             logger.info(`Player ${username} has logged in.`);
         } else if (connectionState === ConnectionState.LOGGED_IN) {
             // Packet data received
-            let packet = connection.packet;
+            let packet = connection.player.client.inboundPacket;
 
             if (!packet) {
-                packet = connection.packet = {
+                packet = connection.player.client.inboundPacket = {
                     opcode: null,
                     size: null,
                     buffer: new ByteBuffer(buffer),
@@ -234,7 +235,7 @@ const dataReceived = (connection: Connection, data: Buffer): void => {
             handleInboundPacket(connection.player, packet.opcode, packetData);
 
             // Reset the pending packet in preparation for another one
-            delete connection.packet;
+            delete connection.player.client.inboundPacket;
         } else {
             logger.error(`Unhandled connection state ${connectionState} encountered.`);
         }

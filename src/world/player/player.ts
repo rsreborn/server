@@ -1,7 +1,9 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendChatboxMessage, sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket } from '../../net/packets';
+import { sendChatboxMessage, sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
+import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync';
+import { Appearance, defaultAppearance } from './appearance';
 
 export enum PlayerRights {
     USER = 0,
@@ -19,24 +21,16 @@ export interface Player {
     password: string;
     rights: PlayerRights;
     client: Client;
-    position?: Coord;
+    coords?: Coord;
     worldIndex?: number;
     widgetState?: WidgetState;
+    sync?: PlayerSyncState;
+    appearance?: Appearance;
 }
 
 export const playerTick = async (player: Player): Promise<void> => {
     // We wrap this in a promise so that all player ticks can be run
     // in parallel using Promise.all()
-    return new Promise<void>(resolve => {
-        // @todo - Kat 19/Oct/22
-        resolve();
-    });
-};
-
-export const playerSync = async (player: Player): Promise<void> => {
-    // We wrap this in a promise so that all player syncs can be run
-    // in parallel using Promise.all()
-    // @todo this also needs to run NPC syncs specific to this Player - Kat 19/Oct/22
     return new Promise<void>(resolve => {
         // @todo - Kat 19/Oct/22
         resolve();
@@ -49,12 +43,26 @@ export const playerTickCleanup = async (player: Player): Promise<void> => {
     return new Promise<void>(resolve => {
         // @todo - Kat 19/Oct/22
         // @todo send queued outgoing packets - Kat 19/Oct/22
+        player.sync.flags = 0;
+        player.sync.teleporting = false;
+        player.sync.runDir = -1;
+        player.sync.walkDir = -1;
+        player.sync.mapRegion = false;
+        player.sync.appearanceData = undefined;
+
+        writePackets(player);
+
         resolve();
     });
 };
 
 export const playerLogin = (player: Player): boolean => {
-    player.position = {
+    player.sync = createPlayerSyncState();
+    player.appearance = defaultAppearance();
+
+    player.sync.flags |= SyncFlags.APPEARANCE_UPDATE;
+
+    player.coords = {
         x: 3222,
         y: 3222,
         plane: 0,
