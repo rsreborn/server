@@ -31,7 +31,7 @@ export const INBOUND_PACKET_SIZES = [
     0, 0, 6, 6, 0, 0, 0            //250
 ];
 
-enum PacketType {
+export enum PacketType {
     FIXED = 0,
     VAR_BYTE = 1,
     VAR_SHORT = 2
@@ -50,7 +50,6 @@ export const handleInboundPacket = (player: Player, opcode: number, data: ByteBu
 
 export const writePacket = (player: Player, opcode: number, packetBuffer: ByteBuffer, packetType: PacketType = PacketType.FIXED): void => {
     let size = packetBuffer.length;
-    let copyStart = 1;
 
     if (packetType !== PacketType.FIXED) {
         size += packetType;
@@ -59,13 +58,16 @@ export const writePacket = (player: Player, opcode: number, packetBuffer: ByteBu
     const buffer = new ByteBuffer(size + 1);
     buffer.put((opcode + player.client.outCipher.rand()) & 0xff);
 
+    let copyStart = 1;
+
     if (packetType === PacketType.VAR_BYTE) {
-        buffer.put(size, 'byte');
-        copyStart += packetType
+        buffer.put(packetBuffer.length, 'byte');
+        copyStart = 2;
     } else if (packetType === PacketType.VAR_SHORT) {
-        buffer.put(size, 'short');
-        copyStart += packetType
+        buffer.put(packetBuffer.length, 'short');
+        copyStart = 3;
     }
+
     packetBuffer.copy(buffer, copyStart, 0, size);
     player.client.connection.socket.write(buffer.toNodeBuffer());
 };
@@ -78,7 +80,7 @@ export const sendChatboxMessage = (player: Player, message: string): void => {
 
 export const sendUpdateMapRegionPacket = (player: Player): void => {
     const buffer = new ByteBuffer(4);
-    const mapCoord = getMapCoord(player.position);
+    const mapCoord = getMapCoord(player.coords);
     buffer.put(mapCoord.x, 'short');
     buffer.put(mapCoord.y, 'short', 'le');
 

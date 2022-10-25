@@ -18,7 +18,7 @@ const tick = async (): Promise<void> => {
 
     const startTime = Date.now();
 
-    const activePlayers = worldSingleton.players;
+    const activePlayers = worldSingleton.players.filter(p => p !== null);
 
     if (activePlayers.length !== 0) {
         // Run Player and NPC ticks
@@ -45,22 +45,24 @@ const tick = async (): Promise<void> => {
 };
 
 export const addPlayer = (player: Player): boolean => {
-    if (worldSingleton.players.find(p => p.uid === player.uid)) {
+    if (worldSingleton.players.find(p => p?.uid === player.uid)) {
         logger.error(`Player ${player.username} (${player.uid}) is already online!`);
         return false;
     }
 
-    // @todo check available world slots - Kat 19/Oct/22
+    const worldIndex = worldSingleton.players.findIndex(p => p === null);
+    if (worldIndex === -1) {
+        return false; // World is full
+    }
+
+    player.worldIndex = worldIndex;
+    worldSingleton.players[worldIndex] = player;
+
     return true;
 };
 
 export const removePlayer = (player: Player): boolean => {
-    if (worldSingleton.players.find(p => p.uid === player.uid)) {
-        logger.error(`Player ${player.username} (${player.uid}) is not online!`);
-        return false;
-    }
-
-    // @todo reset player world slot - Kat 19/Oct/22
+    worldSingleton.players[player.worldIndex] = null;
     return true;
 };
 
@@ -69,7 +71,7 @@ export const openWorld = (
 ): World => {
     worldSingleton = {
         worldId,
-        players: [],
+        players: new Array(2000).fill(null),
     };
 
     logger.info(`World ${worldId} opened.`);
