@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendChatboxMessage, sendFriendsList, sendLogout, sendSideBarWidget, sendUpdateMapRegionPacket, writePackets } from '../../net/packets';
+import { sendChatboxMessage, sendFriendsList, sendLogout, sendSideBarWidget, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -74,12 +74,21 @@ export const playerLogin = (player: Player): boolean => {
 
     sendUpdateMapRegionPacket(player); // @todo move to player sync when available - Kat 18/Oct/22
     
+    sendWelcomeScreen(player);
+
     player.widgetState.sideBarData.forEach((id, index) => {
         sendSideBarWidget(player, index, id);
     });
 
     sendChatboxMessage(player, "Welcome to RS-Reborn #319!");
     sendFriendsList(player, 2);
+    for (let i = 0; i < 20; i++) {
+        if (i === 3) {
+            sendSkill(player, i, 10, 1154);
+        } else {
+            sendSkill(player, i, 1, 0);
+        }
+    }
 
     return addPlayer(player);
 };

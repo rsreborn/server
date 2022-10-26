@@ -192,7 +192,7 @@ export const sendLogout = (player: Player): void => {
 export const sendWelcomeScreen = (player: Player): void => {
     const buffer = new ByteBuffer(10);
     buffer.put(0, 'short');
-    buffer.put(77777, 'int', 'me2'); // @todo Need to either switch this from int me2 in the client or add int me2 to the common buffer - Brian 10-26-22
+    buffer.put(77777, 'int');
     buffer.put(0, 'byte');
     buffer.put(0, 'byte');
     buffer.put(0, 'short', 'le');
@@ -203,4 +203,12 @@ export const sendFriendsList = (player: Player, friendListStatus: number): void 
     const buffer = new ByteBuffer(1);
     buffer.put(friendListStatus, 'byte');
     queuePacket(player, 78, buffer);
+}
+
+export const sendSkill = (player: Player, skillId: number, skillLevel: number, skillExperience: number): void => {
+    const buffer = new ByteBuffer(6);
+    buffer.put(skillExperience, 'int');
+    buffer.put(skillLevel, 'byte');
+    buffer.put(skillId, 'byte');
+    queuePacket(player, 211, buffer);
 }
