@@ -72,7 +72,7 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     packetData.openBitBuffer();
 
     const npcs = getWorld().npcs;
-    console.log(npcs.length);
+    console.log(npcs.length, JSON.stringify(npcs[0]));
     packetData.putBits(8, npcs.length);
 
     npcs.forEach(npc => {
@@ -99,7 +99,6 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     } else {
         packetData.closeBitBuffer();
     }
-
     return packetData.flipWriter();
 }
 

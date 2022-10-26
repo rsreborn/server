@@ -1,6 +1,6 @@
 import { logger } from '@runejs/common';
 import { Coord } from './coord';
-import { createNpcSyncState, Npc, npcSync } from './npc';
+import { createNpcSyncState, Npc, npcSync, npcTick, npcTickCleanup } from './npc';
 import { Player, playerTickCleanup, playerTick, playerSync } from './player';
 
 export const TICK_LENGTH = 600;
@@ -27,18 +27,20 @@ const tick = async (): Promise<void> => {
     if (activePlayers.length !== 0) {
         // Run Player and NPC ticks
         await Promise.all([
-            ...activePlayers.map(async player => playerTick(player))
-        ]); // @todo NPC tick should go here as well - Kat 19/Oct/22
+            ...activePlayers.map(async player => playerTick(player)),
+            ...activeNpcs.map(async npc => npcTick(npc))
+        ]);
 
         // Run Player and NPC syncs
         await Promise.all(
-            activePlayers.map(async player => (playerSync(player), npcSync(player))),
+            activePlayers.map(async player => [playerSync(player), npcSync(player)]),
         );
 
         // Run Player and NPC post-tick cleanups
         await Promise.all([
-            ...activePlayers.map(async player => playerTickCleanup(player))
-        ]); // @todo NPC post-tick cleanup should go here as well - Kat 19/Oct/22
+            ...activePlayers.map(async player => playerTickCleanup(player)),
+            ...activeNpcs.map(async npc => npcTickCleanup(npc))
+        ]);
     }
 
     const endTime = Date.now();
