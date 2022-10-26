@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendChatboxMessage, sendSideBarWidget, sendSystemUpdate, sendUpdateMapRegionPacket, writePackets } from '../../net/packets';
+import { sendChatboxMessage, sendLogout, sendSideBarWidget, sendUpdateMapRegionPacket, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -73,7 +73,6 @@ export const playerLogin = (player: Player): boolean => {
     };
 
     sendUpdateMapRegionPacket(player); // @todo move to player sync when available - Kat 18/Oct/22
-    sendSystemUpdate(player, 100);
     
     player.widgetState.sideBarData.forEach((id, index) => {
         sendSideBarWidget(player, index, id);
@@ -86,5 +85,6 @@ export const playerLogin = (player: Player): boolean => {
 
 export const playerLogout = (player: Player): boolean => {
     // @todo logout packet - Kat 19/Oct/22
+    sendLogout(player);
     return removePlayer(player);
 };
