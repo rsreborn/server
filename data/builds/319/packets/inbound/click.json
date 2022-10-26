@@ -1,0 +1,6 @@
+{
+    "opcode": 76,
+    "data": [
+        [ "hash", "u_int_le" ]
+    ]
+}
