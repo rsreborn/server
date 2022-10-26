@@ -198,3 +198,9 @@ export const sendWelcomeScreen = (player: Player): void => {
     buffer.put(0, 'short', 'le');
     queuePacket(player, 178, buffer);
 }
+
+export const sendFriendsList = (player: Player, friendListStatus: number): void => {
+    const buffer = new ByteBuffer(1);
+    buffer.put(friendListStatus, 'byte');
+    queuePacket(player, 78, buffer);
+}

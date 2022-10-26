@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendChatboxMessage, sendLogout, sendSideBarWidget, sendUpdateMapRegionPacket, writePackets } from '../../net/packets';
+import { sendChatboxMessage, sendFriendsList, sendLogout, sendSideBarWidget, sendUpdateMapRegionPacket, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -79,6 +79,7 @@ export const playerLogin = (player: Player): boolean => {
     });
 
     sendChatboxMessage(player, "Welcome to RS-Reborn #319!");
+    sendFriendsList(player, 2);
 
     return addPlayer(player);
 };
