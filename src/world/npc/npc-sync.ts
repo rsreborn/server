@@ -58,9 +58,9 @@ const appendAddNpc = (npc: Npc, index: number, player: Player, data: ByteBuffer)
     const updateRequired = npc.sync.flags !== 0;
 
     data.putBits(14, index);
-    data.putBits(5, x);
-    data.putBits(1, updateRequired ? 1 : 0);
     data.putBits(5, y);
+    data.putBits(1, updateRequired ? 1 : 0);
+    data.putBits(5, x);
     data.putBits(12, npc.id);
     data.putBits(1, 0);
 }
@@ -73,7 +73,7 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
 
     const npcs = getWorld().npcs;
     console.log(npcs.length, JSON.stringify(npcs[0]));
-    packetData.putBits(8, npcs.length);
+    packetData.putBits(8, npcs.length); // Using the count of npcs causes a T2.
 
     npcs.forEach(npc => {
         if (npc && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
@@ -86,6 +86,11 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     });
        
     npcs.forEach((npc, idx) => {
+        console.log(idx);
+        if (npcs.length >= 255) {
+            return;
+        }
+
         if (npc) {
             appendAddNpc(npc, idx, player, packetData);
             appendUpdateMasks(npc, updateMaskData);

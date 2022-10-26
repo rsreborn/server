@@ -80,15 +80,24 @@ export const openWorld = (
     worldSingleton = {
         worldId,
         players: new Array(2000).fill(null),
-        npcs: new Array(1).fill({
+        npcs: [{
             id: 50,
             coords: {
                 x: 3223,
-                y: 3222,
+                y: 3223,
                 plane: 0
-            } as Coord,
+            },
             sync: createNpcSyncState()
-        } as Npc),
+        },
+        {
+            id: 5,
+            coords: {
+                x: 3223,
+                y: 3223,
+                plane: 0
+            },
+            sync: createNpcSyncState()
+        }],
     };
 
     logger.info(`World ${worldId} opened.`);
