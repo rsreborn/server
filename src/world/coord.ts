@@ -15,3 +15,11 @@ export const getLocalCoord = (coord: Coord): Coord => ({
     y: coord.y - 8 * ((coord.y >> 3) - 6),
     plane: coord.plane,
 });
+
+export const isWithinDistance = (position1: Coord, position2: Coord): boolean => {
+    if (position1.plane !== position2.plane) {
+        return false;
+    }
+    let deltaX = position1.x - position2.x, deltaY = position1.y - position2.y;
+    return deltaX <= 14 && deltaX >= -15 && deltaY <= 14 && deltaY >= -15;
+}
