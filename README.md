@@ -1,7 +1,3 @@
-[![RuneJS Discord Server](https://img.shields.io/discord/678751302297059336?label=RuneJS%20Discord&logo=discord)](https://discord.gg/5P74nSh)
+RS-Reborn
 
-[![RuneJS](https://i.imgur.com/QSXNzwC.png)](https://github.com/runejs/)
-
-# FunScape
-
-That's all anyone needs to know; it's FunScape.
+Back and the same as ever, RS-Reborn promises to bring you the server of all time. Staffed by three professional developers and a mechanic, RS-Reborn aims to produce a runnable, open-source, multi-revision server that is production ready™. We promise to be relatively active for at least 2 hours per week to produce the most grandiose updates for the end users. Expect some amount of updates over a period of time. 

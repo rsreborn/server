@@ -79,7 +79,7 @@ export const playerLogin = (player: Player): boolean => {
         sendSideBarWidget(player, index, id);
     });
 
-    sendChatboxMessage(player, "Welcome to Funscape 319!");
+    sendChatboxMessage(player, "Welcome to RS-Reborn #319!");
 
     return addPlayer(player);
 };
