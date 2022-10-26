@@ -157,7 +157,7 @@ export const sendWidgetString = (player: Player, widgetId: number, message: stri
     const buffer = new ByteBuffer(message.length + 3);
     buffer.putString(message, 10);
     buffer.put(widgetId, 'short');
-    queuePacket(player, 127, buffer, PacketType.VAR_SHORT);
+    queuePacket(player, 127, buffer, PacketSize.VAR_SHORT);
 }
 
 export const sendCloseWidgets = (player: Player): void => {
