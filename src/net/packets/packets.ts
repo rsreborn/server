@@ -115,6 +115,56 @@ export const sendUpdateMapRegionPacket = (player: Player): void => {
     queuePacket(player, 228, buffer);
 };
 
+export const sendWidget = (player: Player, widgetId: number): void => {
+    const buffer = new ByteBuffer(2);
+    buffer.put(widgetId, 'short', 'le');
+    queuePacket(player, 188, buffer);
+}
+
+export const sendChatboxWidget = (player: Player, widgetId: number): void => {
+    const buffer = new ByteBuffer(2);
+    buffer.put(widgetId, 'short');
+    queuePacket(player, 200, buffer);
+}
+
+export const sendSideBarWidgetWithDisabledTabs = (player: Player, widgetId: number): void => {
+    const buffer = new ByteBuffer(2);
+    buffer.put(widgetId, 'short', 'le');
+    queuePacket(player, 253, buffer);
+}
+
+export const sendAnimateWidget = (player: Player, widgetId: number, animationId: number): void => {
+    const buffer = new ByteBuffer(4);
+    buffer.put(widgetId, 'short');
+    buffer.put(animationId, 'short');
+    queuePacket(player, 95, buffer);
+}
+
+export const sendWidgetPlayerHead = (player: Player, widgetId: number): void => {
+    const buffer = new ByteBuffer(2);
+    buffer.put(widgetId, 'short', 'le');
+    queuePacket(player, 252, buffer);
+}
+
+export const sendWidgetNpcHead = (player: Player, widgetId: number, npcId: number): void => {
+    const buffer = new ByteBuffer(4);
+    buffer.put(widgetId, 'short');
+    buffer.put(widgetId, 'short', 'le');
+    queuePacket(player, 157, buffer);
+}
+
+export const sendWidgetString = (player: Player, widgetId: number, message: string): void => {
+    const buffer = new ByteBuffer(message.length + 3);
+    buffer.putString(message, 10);
+    buffer.put(widgetId, 'short');
+    queuePacket(player, 127, buffer, PacketSize.VAR_SHORT);
+}
+
+export const sendCloseWidgets = (player: Player): void => {
+    const buffer = new ByteBuffer(0);
+    queuePacket(player, 143, buffer);
+}
+
 export const sendSideBarWidget = (player: Player, sideBarId: number, widgetId: number): void => {
     const buffer = new ByteBuffer(3);
     buffer.put(widgetId, 'short');
@@ -122,8 +172,43 @@ export const sendSideBarWidget = (player: Player, sideBarId: number, widgetId: n
     queuePacket(player, 229, buffer);
 };
 
+export const sendFlashSideBarIcon = (player: Player, sideBarId: number): void => {
+    const buffer = new ByteBuffer(1);
+    buffer.put(sideBarId, 'byte');
+    queuePacket(player, 168, buffer);
+}
+
 export const sendSystemUpdate = (player: Player, time: number): void => {
     const buffer = new ByteBuffer(2);
     buffer.put(time, 'short');
     queuePacket(player, 103, buffer);
 };
+
+export const sendLogout = (player: Player): void => {
+    const buffer = new ByteBuffer(0);
+    queuePacket(player, 49, buffer);
+}
+
+export const sendWelcomeScreen = (player: Player): void => {
+    const buffer = new ByteBuffer(10);
+    buffer.put(0, 'short');
+    buffer.put(77777, 'int');
+    buffer.put(0, 'byte');
+    buffer.put(0, 'byte');
+    buffer.put(0, 'short', 'le');
+    queuePacket(player, 178, buffer);
+}
+
+export const sendFriendsList = (player: Player, friendListStatus: number): void => {
+    const buffer = new ByteBuffer(1);
+    buffer.put(friendListStatus, 'byte');
+    queuePacket(player, 78, buffer);
+}
+
+export const sendSkill = (player: Player, skillId: number, skillLevel: number, skillExperience: number): void => {
+    const buffer = new ByteBuffer(6);
+    buffer.put(skillExperience, 'int');
+    buffer.put(skillLevel, 'byte');
+    buffer.put(skillId, 'byte');
+    queuePacket(player, 211, buffer);
+}
