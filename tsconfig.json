@@ -8,14 +8,17 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "sourceMap": true,
-        "baseUrl": "./src",
+        "baseUrl": "./",
         "allowJs": true,
         "declaration": true,
         "outDir": "./dist",
         "types": [
             "node"
-        ]
+        ],
+        "paths": {
+            "src": ["src/*"]
+        }
     },
-    "include": [ "src/" ],
-    "exclude": [ "!src/" ]
+    "include": [ "src/", "data/" ],
+    "exclude": [ "!src/", "!data/" ]
 }
