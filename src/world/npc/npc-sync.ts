@@ -28,6 +28,7 @@ export const createNpcSyncState = (): npcSyncState => {
 
 const appendUpdateMasks = (npc: Npc, data: ByteBuffer): void => {
     if (npc.sync.flags === 0) {
+        console.log("just bailing out here");
         return;
     }
     console.log("Pretty sure nothing should happen here...");
@@ -54,13 +55,16 @@ const appendMovement = (npc: Npc, data: ByteBuffer): void => {
 
 const appendAddNpc = (npc: Npc, index: number, player: Player, data: ByteBuffer): void => {
     const x = npc.coords.x - player.coords.x;
+    console.log("x", x, JSON.stringify(npc.coords), JSON.stringify(player.coords));
     const y = npc.coords.y - player.coords.y;
+    console.log("y", y);
     const updateRequired = npc.sync.flags !== 0;
 
+    console.log("NPC Info", index, JSON.stringify(npc));
     data.putBits(14, index);
-    data.putBits(5, y);
-    data.putBits(1, updateRequired ? 1 : 0);
     data.putBits(5, x);
+    data.putBits(1, updateRequired ? 1 : 0);
+    data.putBits(5, y);
     data.putBits(12, npc.id);
     data.putBits(1, 0);
 }
@@ -77,9 +81,11 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
 
     npcs.forEach(npc => {
         if (npc && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
+            console.log("We do get in here.");
             appendMovement(npc, packetData);
             appendUpdateMasks(npc, updateMaskData);
         } else {
+            console.log("Making sure we don't else.");
             packetData.putBits(1, 1);
             packetData.putBits(2, 3);
         }
@@ -87,9 +93,6 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
        
     npcs.forEach((npc, idx) => {
         console.log(idx);
-        if (npcs.length >= 255) {
-            return;
-        }
 
         if (npc) {
             appendAddNpc(npc, idx, player, packetData);

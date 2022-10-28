@@ -88,15 +88,6 @@ export const openWorld = (
                 plane: 0
             },
             sync: createNpcSyncState()
-        },
-        {
-            id: 5,
-            coords: {
-                x: 3223,
-                y: 3223,
-                plane: 0
-            },
-            sync: createNpcSyncState()
         }],
     };
 
