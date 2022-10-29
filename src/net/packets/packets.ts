@@ -1,9 +1,6 @@
 import { ByteBuffer, logger } from '@runejs/common';
 import { Player } from '../../world/player';
 import { getMapCoord } from '../../world';
-import ClickPacketHandler from './inbound-packets/click-packet';
-import ButtonPacketHandler from './inbound-packets/button-packet';
-import { decodePacket, packetStructures, PacketType } from './packet-pipeline-protocol-multiplexer';
 
 export enum PacketSize {
     FIXED = 0,
@@ -34,18 +31,6 @@ export const handleInboundPacket = (
     // Junk packets
     if (opcode === 25 || opcode === 63 || opcode === 226) {
         return true;
-    }
-
-    const inboundHandlers = [ClickPacketHandler, ButtonPacketHandler];
-
-    const packetStructure = packetStructures.find(p => p.opcode === opcode && p.type === PacketType.INBOUND);
-    if (packetStructure) {
-        const inboundHandler = inboundHandlers.find(h => h.name === packetStructure.name);
-        if (inboundHandler) {
-            const decodedData = decodePacket(packetStructure.name, PacketType.INBOUND, data);
-            inboundHandler.handler(player, decodedData);
-            return true;
-        }
     }
 
     return false;

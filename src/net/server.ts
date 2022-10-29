@@ -4,7 +4,7 @@ import { connectionCreated } from './connection';
 import { closeWorld, openWorld, World } from '../world';
 import { loadCache } from '../cache';
 import { getFileServer, startFileServer } from './file-server';
-import { readPacketFiles } from './packets';
+import { loadPackets } from './packets';
 
 export interface SocketOptions {
     noDelay?: boolean;
@@ -62,7 +62,7 @@ export const startServer = async (
 ): Promise<GameServer> => {
     await loadCache(319);
 
-    readPacketFiles(319);
+    await loadPackets(319);
 
     startFileServer(hostName, jaggrabPort, webPort, fileServerSocketOptions);
 

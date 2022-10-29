@@ -1,134 +1,64 @@
 import { existsSync, readdirSync, readFileSync } from 'fs';
-import { join } from 'path';
-import { BYTE_LENGTH, ByteBuffer, DataType, Endianness, Signedness } from '@runejs/common';
+import { join, resolve } from 'path';
+import { BYTE_LENGTH, ByteBuffer, DataType, Endianness, logger, Signedness } from '@runejs/common';
+import { getFiles, watchForChanges } from '../../util/files';
 
-export enum PacketType {
-    INBOUND = 'inbound',
-    OUTBOUND = 'outbound',
-}
-
-export type PacketData = [ string, string ];
-
-export interface PacketDataField {
-    name: string;
-    dataType: DataType;
-    signedness?: Signedness;
-    endianness?: Endianness;
-}
-
-export interface PacketStructure {
-    opcode: number;
-    data: PacketData[];
-    fields?: PacketDataField[];
-    name?: string;
+export interface PacketStructure<T = any> {
+    opcodes: number | number[];
     size?: number;
-    type?: PacketType;
+    decoder?: (opcode: number, size: number, data: ByteBuffer) => T;
 }
 
-export const packetStructures: PacketStructure[] = [];
+export const BUILDS_DIR = join('.', 'dist', 'data', 'builds');
 
-const parsePacketData = (data: PacketData[]): {
-    fields: PacketDataField[];
-    size: number;
-} => {
-    const fields: PacketDataField[] = [];
-    let size = 0;
+const inboundPackets: Map<number, PacketStructure[]> = new Map();
+const outboundPackets: Map<number, PacketStructure[]> = new Map();
 
-    for (let [ fieldName, dataTypeStr ] of data) {
-        dataTypeStr = dataTypeStr.toLowerCase();
-        const parts = dataTypeStr.split('_');
-        let dataType: DataType;
-        let signedness: Signedness = undefined;
-        let endianness: Endianness = undefined;
-        if (parts.length === 1) {
-            dataType = parts[0] as DataType;
-        } else if (parts.length === 2) {
-            if (parts[0] === 'u' || parts[0] === 's') {
-                signedness = parts[0] as Signedness;
-                dataType = parts[1] as DataType;
-            } else {
-                dataType = parts[0] as DataType;
-                endianness = parts[1] as Endianness;
-            }
-        } else {
-            signedness = parts[0] as Signedness;
-            dataType = parts[1] as DataType;
-            endianness = parts[2] as Endianness;
+export const loadPackets = async (buildNumber: number): Promise<void> => {
+    inboundPackets.set(buildNumber, []);
+    outboundPackets.set(buildNumber, []);
+
+    const PACKET_DIRECTORY = join(BUILDS_DIR, String(buildNumber), 'packets');
+    const INBOUND_DIRECTORY = join(PACKET_DIRECTORY, 'inbound');
+    const OUTBOUND_DIRECTORY = join(PACKET_DIRECTORY, 'outbound');
+
+    if (existsSync(INBOUND_DIRECTORY)) {
+        for await (const path of getFiles(INBOUND_DIRECTORY, [ '.js' ], true)) {
+            const location = join('..', '..', '..', 'data', 'builds', String(buildNumber), 'packets', 'inbound', path.substring(INBOUND_DIRECTORY.length).replace('.js', ''));
+            const packet = require(location).default;
+            inboundPackets.get(buildNumber).push(packet);
         }
 
-        size += BYTE_LENGTH[dataType] ?? 0;
-
-        fields.push({
-            name: fieldName,
-            dataType,
-            signedness,
-            endianness,
-        });
+        // @todo fix this - Kat 29/Oct/22
+        // watchForChanges(INBOUND_DIRECTORY, /[/\\]inbound[/\\]/);
+    } else {
+        logger.error(`No inbound packet configuration files located for build ${buildNumber}!`);
     }
 
-    return { fields, size };
-};
-
-const readPacketDir = (dir: string, packetType: PacketType): void => {
-    const packetDir = join(dir, packetType);
-
-    if (!existsSync(packetDir)) {
-        throw new Error(`Packet directory ${packetDir} was not found!`);
-    }
-
-    const packetFileNameList = readdirSync(packetDir);
-
-    for (const packetFileName of packetFileNameList) {
-        if (!packetFileName.endsWith('.json')) {
-            continue;
+    if (existsSync(OUTBOUND_DIRECTORY)) {
+        for await (const path of getFiles(OUTBOUND_DIRECTORY, ['.js'], true)) {
+            const location = join('..', '..', '..', 'data', 'builds', String(buildNumber), 'packets', 'outbound', path.substring(OUTBOUND_DIRECTORY.length).replace('.js', ''));
+            const packet = require(location).default;
+            outboundPackets.get(buildNumber).push(packet);
         }
 
-        const filePath = join(packetDir, packetFileName);
-        const name = packetFileName.replace('.json', '');
-        const fileData = JSON.parse(readFileSync(filePath, 'utf-8'));
-
-        const packet: PacketStructure = {
-            name,
-            type: packetType,
-            ...fileData,
-            ...parsePacketData(fileData.data),
-        };
-
-        packetStructures.push(packet);
+        // @todo fix this - Kat 29/Oct/22
+        // watchForChanges(OUTBOUND_DIRECTORY, /[/\\]outbound[/\\]/);
+    } else {
+        logger.error(`No outbound packet configuration files located for build ${buildNumber}!`);
     }
 };
 
-export const readPacketFiles = (buildNumber: number): void => {
-    const packetDir = join('.', 'data', 'builds', String(buildNumber), 'packets');
-
-    if (!existsSync(packetDir)) {
-        throw new Error(`Packet directory ${packetDir} was not found!`);
-    }
-
-    readPacketDir(packetDir, PacketType.INBOUND);
-    readPacketDir(packetDir, PacketType.OUTBOUND);
+export const getInboundPacket = (
+    buildNumber: number,
+    opcode: number,
+): PacketStructure | null => {
+    return null;
 };
 
-export const decodePacket = (
-    name: string,
-    type: PacketType,
-    data: ByteBuffer | null,
-): { [key: string]: any } => {
-    if (!data?.length) {
-        return [];
-    }
-
-    const packet = packetStructures.find(p => p.name === name && p.type === type);
-    if (!packet) {
-        return [];
-    }
-
-    const decodedFields: { [key: string]: any } = {};
-
-    for (const { name, dataType, signedness, endianness } of packet.fields) {
-        console.log(name, dataType, signedness, endianness);
-        decodedFields[name] = data.get(dataType, signedness, endianness);
-    }
-
-    return decodedFields;
+export const getOutboundPacket = (
+    buildNumber: number,
+    opcode: number,
+): PacketStructure | null => {
+    return null;
 };

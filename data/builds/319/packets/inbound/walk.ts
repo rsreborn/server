@@ -1,5 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
-import { coord, Coord } from 'src/world';
+import { coord, Coord } from '../../../../../src/world';
 
 export default {
     opcodes: [ 155, 178, 191 ],

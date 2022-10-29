@@ -16,7 +16,8 @@
             "node"
         ],
         "paths": {
-            "src": ["src/*"]
+            "src": ["src/*"],
+            "data": ["data/*"]
         }
     },
     "include": [ "src/", "data/" ],
