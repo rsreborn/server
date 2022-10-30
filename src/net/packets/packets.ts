@@ -72,18 +72,6 @@ export const handleInboundPacket = (
         return true;
     }
 
-    /*const inboundHandlers = [ClickPacketHandler, ButtonPacketHandler];
-
-    const packetStructure = packetStructures.find(p => p.opcode === opcode && p.type === PacketType.INBOUND);
-    if (packetStructure) {
-        const inboundHandler = inboundHandlers.find(h => h.name === packetStructure.name);
-        if (inboundHandler) {
-            const decodedData = decodePacket(packetStructure.name, PacketType.INBOUND, data);
-            inboundHandler.handler(player, decodedData);
-            return true;
-        }
-    }*/
-
     logger.info(`Unhandled packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
 
     const knownPacket = INBOUND_PACKET_SIZES[String(opcode)] !== undefined;

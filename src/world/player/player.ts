@@ -4,6 +4,7 @@ import { sendChatboxMessage, sendFriendsList, sendLogout, sendSideBarWidget, sen
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
+import { createMovementQueue, MovementQueue, resetMovementQueue } from '../movement-queue';
 
 export enum PlayerRights {
     USER = 0,
@@ -26,6 +27,7 @@ export interface Player {
     widgetState?: WidgetState;
     sync?: PlayerSyncState;
     appearance?: Appearance;
+    movementQueue?: MovementQueue;
 }
 
 export const playerTick = async (player: Player): Promise<void> => {
@@ -52,6 +54,9 @@ export const playerTickCleanup = async (player: Player): Promise<void> => {
 
         writePackets(player);
 
+        // @todo temporary to debug movement - Kat 30/Oct/22
+        resetMovementQueue(player);
+
         resolve();
     });
 };
@@ -61,6 +66,8 @@ export const playerLogin = (player: Player): boolean => {
     player.appearance = defaultAppearance();
 
     player.sync.flags |= SyncFlags.APPEARANCE_UPDATE;
+
+    player.movementQueue = createMovementQueue();
 
     player.coords = {
         x: 3222,
