@@ -74,7 +74,7 @@ const handleInboundPacketData = (
 
         packet.opcode = packet.buffer.get('byte', 'u');
         packet.opcode = (packet.opcode - inCipher.rand()) & 0xff;
-        packet.size = INBOUND_PACKET_SIZES[packet.opcode] ?? -3;
+        packet.size = INBOUND_PACKET_SIZES[String(packet.opcode)] ?? -3;
     }
 
     // Variable length packet

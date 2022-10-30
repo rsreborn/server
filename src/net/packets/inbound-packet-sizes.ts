@@ -77,5 +77,6 @@ export const INBOUND_PACKET_SIZES = {
     77: 8,
     69: 1,
     173: 0,
-    199: 0
+    199: 0,
+    177: -1,
 };

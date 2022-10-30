@@ -3,6 +3,7 @@ import { Player } from '../../world/player';
 import { getMapCoord } from '../../world';
 import inboundPackets from './inbound-packets';
 import { getGameServer } from '../server';
+import { INBOUND_PACKET_SIZES } from './inbound-packet-sizes';
 
 export enum PacketSize {
     FIXED = 0,
@@ -85,7 +86,13 @@ export const handleInboundPacket = (
 
     logger.info(`Unhandled packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
 
-    return false;
+    const knownPacket = INBOUND_PACKET_SIZES[String(opcode)] !== undefined;
+    if (!knownPacket) {
+        logger.warn(`Unknown packet ${ opcode } encountered!`);
+        return false;
+    }
+
+    return true;
 };
 
 export const queuePacket = (
