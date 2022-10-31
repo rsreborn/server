@@ -1,9 +1,9 @@
 import { ByteBuffer, logger } from '@runejs/common';
 import { Player } from '../../world/player';
 import { getMapCoord } from '../../world';
-import ClickPacketHandler from './inbound-packets/click-packet';
-import ButtonPacketHandler from './inbound-packets/button-packet';
-import { decodePacket, packetStructures, PacketType } from './packet-pipeline-protocol-multiplexer';
+import inboundPackets from './inbound-packets';
+import { getGameServer } from '../server';
+import { INBOUND_PACKET_SIZES } from './inbound-packet-sizes';
 
 export enum PacketSize {
     FIXED = 0,
@@ -11,24 +11,33 @@ export enum PacketSize {
     VAR_SHORT = 2
 }
 
-export interface InboundPacket {
+export interface Packet {
     opcode: number | null;
     size: number | null;
     buffer: ByteBuffer;
 }
 
-export type InboundPacketHandler = (
+export type PacketOpcodeMap = { [key: number ]: number | number[] };
+export type PacketDecoderMap<T = any> = { [key: number]: PacketDecoder<T> };
+export type PacketDecoder<T = any> = (opcode: number, data: ByteBuffer) => T;
+
+export type PacketHandler<T = any> = (
     player: Player,
-    data: any
+    data: T,
 ) => void;
+
+export interface InboundPacket<T = any> {
+    name: string;
+    handler: PacketHandler<T>;
+    opcodes: PacketOpcodeMap;
+    decoders: PacketDecoderMap<T>;
+}
 
 export const handleInboundPacket = (
     player: Player,
     opcode: number,
     data: ByteBuffer | null,
 ): boolean => {
-    logger.info(`Packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
-
     // @todo the below is all test code until we have an auto-importer for everything in inbound-packets/impl/* - Kat 25/Oct/22
 
     // Junk packets
@@ -36,19 +45,42 @@ export const handleInboundPacket = (
         return true;
     }
 
-    const inboundHandlers = [ClickPacketHandler, ButtonPacketHandler];
+    const buildNumber = getGameServer().buildNumber;
+    let inboundPacket: InboundPacket;
 
-    const packetStructure = packetStructures.find(p => p.opcode === opcode && p.type === PacketType.INBOUND);
-    if (packetStructure) {
-        const inboundHandler = inboundHandlers.find(h => h.name === packetStructure.name);
-        if (inboundHandler) {
-            const decodedData = decodePacket(packetStructure.name, PacketType.INBOUND, data);
-            inboundHandler.handler(player, decodedData);
-            return true;
+    for (const packet of inboundPackets) {
+        const opcodes = packet.opcodes[String(buildNumber)];
+        if (!opcodes) {
+            continue;
         }
+
+        const packetOpcodes: number[] = Array.isArray(opcodes) ?
+            opcodes as number[] : [ opcodes as number ];
+
+        if (packetOpcodes.indexOf(opcode) === -1) {
+            continue;
+        }
+
+        inboundPacket = packet;
+        break;
     }
 
-    return false;
+    if (inboundPacket) {
+        const decoder = inboundPacket.decoders[String(buildNumber)];
+        const packetData = decoder(opcode, data);
+        inboundPacket.handler(player, packetData);
+        return true;
+    }
+
+    logger.info(`Unhandled packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
+
+    const knownPacket = INBOUND_PACKET_SIZES[String(opcode)] !== undefined;
+    if (!knownPacket) {
+        logger.warn(`Unknown packet ${ opcode } encountered!`);
+        return false;
+    }
+
+    return true;
 };
 
 export const queuePacket = (

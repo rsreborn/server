@@ -2,6 +2,7 @@ node_modules
 .DS_Store
 .env
 main_file_cache.*
+dist
 
 # Log files
 npm-debug.log*

@@ -1,16 +1,26 @@
+import { ByteBuffer } from '@runejs/common';
 import { Player } from '../../../world/player';
-import { InboundPacketHandler } from '../packets';
+import { InboundPacket } from '../packets';
 
-const handler: InboundPacketHandler = (
-    player: Player,
-    data: {
-        hash: number;
-    },
-): void => {
-    console.log(`click packet handler ${data.hash}`);
-};
+interface ClickPacketData {
+    hash: number;
+}
 
-export default {
+export const clickPacket: InboundPacket<ClickPacketData> = {
     name: 'click',
-    handler,
+    handler: (
+        player: Player,
+        data: ClickPacketData,
+    ): void => {
+        console.log(`click packet handler ${data.hash}`);
+    },
+    opcodes: {
+        319: 76
+    },
+    decoders: {
+        319: (opcode: number, data: ByteBuffer) => {
+            const hash = data.get('int', 'u', 'le');
+            return { hash };
+        }
+    },
 };
