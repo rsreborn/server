@@ -16,6 +16,7 @@ export interface GameServer {
     serverName: string;
     hostName: string;
     port: number;
+    buildNumber: number; // @todo make this player based with the server supporting any - Kat 29/Oct/22
     socketOptions?: SocketOptions;
     server: Server;
     world: World;
@@ -57,12 +58,11 @@ export const startServer = async (
     worldId: number,
     jaggrabPort: number,
     webPort: number,
+    buildNumber: number = 319,
     socketOptions?: SocketOptions,
     fileServerSocketOptions?: SocketOptions,
 ): Promise<GameServer> => {
-    await loadCache(319);
-
-    readPacketFiles(319);
+    await loadCache(buildNumber);
 
     startFileServer(hostName, jaggrabPort, webPort, fileServerSocketOptions);
 
@@ -80,6 +80,7 @@ export const startServer = async (
         serverName,
         hostName,
         port,
+        buildNumber,
         socketOptions,
         server,
         world,

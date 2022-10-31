@@ -1,6 +1,6 @@
 import { Isaac } from './isaac';
 import { Connection } from './connection';
-import { InboundPacket } from './packets';
+import { Packet } from './packets';
 
 export interface Client {
     gameBuild: number;
@@ -10,5 +10,5 @@ export interface Client {
     connection: Connection;
     outboundPacketQueue: Buffer[];
     outboundUpdateQueue: Buffer[];
-    inboundPacket?: InboundPacket;
+    inboundPacket?: Packet;
 }
