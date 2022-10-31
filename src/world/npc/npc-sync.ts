@@ -6,8 +6,9 @@ import { Npc } from "./npc";
 import { isWithinDistance } from "../coord";
 
 export enum SyncFlags {
+    APPEARANCE = 1,
     FOCE_CHAT = 2,
-    FACE_ENTITY = 0x10
+    FACE_ENTITY = 0x10,
 }
 
 export interface npcSyncState {
@@ -61,7 +62,7 @@ const appendAddNpc = (npc: Npc, index: number, player: Player, data: ByteBuffer)
     const updateRequired = npc.sync.flags !== 0;
 
     console.log("NPC Info", index, JSON.stringify(npc));
-    data.putBits(14, index);
+    data.putBits(14, index + 1);
     data.putBits(5, x);
     data.putBits(1, updateRequired ? 1 : 0);
     data.putBits(5, y);
@@ -76,11 +77,12 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     packetData.openBitBuffer();
 
     const npcs = getWorld().npcs;
+    const trackedNpcs = player.trackedNpcs;
     console.log(npcs.length, JSON.stringify(npcs[0]));
-    packetData.putBits(8, npcs.length); // Using the count of npcs causes a T2.
+    packetData.putBits(8, trackedNpcs.length);
 
-    npcs.forEach(npc => {
-        if (npc && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
+    trackedNpcs.forEach(npc => {
+        if (npcs.includes(npc) && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
             console.log("We do get in here.");
             appendMovement(npc, packetData);
             appendUpdateMasks(npc, updateMaskData);
@@ -94,6 +96,12 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     npcs.forEach((npc, idx) => {
         console.log(idx);
 
+        if (player.trackedNpcs.length === 255) {
+            return;
+        }
+
+        player.trackedNpcs.push(npc);
+
         if (npc) {
             appendAddNpc(npc, idx, player, packetData);
             appendUpdateMasks(npc, updateMaskData);
@@ -101,6 +109,7 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     });
    
     if (updateMaskData.writerIndex !== 0) {
+        console.log("Shouldn't be putting the stuf fbecause the updateMaskData should be empty");
         packetData.putBits(14, 16383);
         packetData.closeBitBuffer();
         packetData.putBytes(updateMaskData.flipWriter());

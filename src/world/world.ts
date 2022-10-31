@@ -81,7 +81,7 @@ export const openWorld = (
         worldId,
         players: new Array(2000).fill(null),
         npcs: [{
-            id: 50,
+            id: 1,
             coords: {
                 x: 3223,
                 y: 3223,
