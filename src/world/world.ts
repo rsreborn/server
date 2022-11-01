@@ -47,8 +47,7 @@ const tick = async (): Promise<void> => {
     const duration = endTime - startTime;
     const delay = Math.max(TICK_LENGTH - duration, 0);
 
-    // logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick
-    // in ${delay} ms.`);
+    //logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
     tickTimeout = setTimeout(async () => tick(), delay);
 };
 
@@ -77,11 +76,12 @@ export const removePlayer = (player: Player): boolean => {
 
 export const npcs = (): Npc[] => {
     let npcs = [];
-    for (let i =0; i < 256; i++) {
+    for (let i = 0; i < 5; i++) {
     let random = Math.floor(Math.random() * 15);
     let random2 = Math.floor(Math.random() * 15);
+    let random3 = Math.floor(Math.random() * 2000);
         npcs.push({
-            id: i,
+            id: random3,
             index: i,
             coords: {
                 x: 3217 + random,
