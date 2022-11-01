@@ -73,7 +73,7 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
 
     const npcs = getWorld().npcs;
     const trackedNpcs = player.trackedNpcs;
-    console.log(npcs.length, JSON.stringify(npcs[0]));
+
     packetData.putBits(8, trackedNpcs.length);
 
     trackedNpcs.forEach(npc => {
@@ -85,22 +85,23 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
             packetData.putBits(2, 3);
         }
     });
-       
-    npcs.forEach((npc, idx) => {
+    
+    if (player.trackedNpcs.length < 255) {
+        npcs.forEach((npc, idx) => {
 
-        if (player.trackedNpcs.length === 255
-            || player.trackedNpcs.includes(npc)
-            || !isWithinDistance(player?.coords, npc.coords)) {
-            return;
-        }
-       
-        player.trackedNpcs.push(npc);
-
-        if (npc) {
-            appendAddTrackedNpc(npc, idx, player, packetData);
-            appendUpdateMasks(npc, updateMaskData);
-        }
-    });
+            if (player.trackedNpcs.includes(npc)
+                || !isWithinDistance(player?.coords, npc.coords)) {
+                return;
+            }
+           
+            player.trackedNpcs.push(npc);
+    
+            if (npc) {
+                appendAddTrackedNpc(npc, idx, player, packetData);
+                appendUpdateMasks(npc, updateMaskData);
+            }
+        });
+    }
    
     if (updateMaskData.writerIndex !== 0) {
         packetData.putBits(14, 16383);

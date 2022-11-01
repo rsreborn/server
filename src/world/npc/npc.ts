@@ -1,4 +1,4 @@
-import { Coord } from "world/coord";
+import { Coord } from "../coord";
 import { npcSyncState } from "./npc-sync";
 
 export interface Npc {
@@ -22,5 +22,6 @@ export const npcTickCleanup = async (npc: Npc): Promise<void> => {
         npc.sync.teleporting = false;
         npc.sync.runDir = -1;
         npc.sync.walkDir = -1;
+        resolve();
     });
 };
