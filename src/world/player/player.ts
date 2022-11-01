@@ -5,6 +5,7 @@ import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
 import { createMovementQueue, MovementQueue, resetMovementQueue } from '../movement-queue';
+import { Npc } from '../npc';
 
 export enum PlayerRights {
     USER = 0,
@@ -28,6 +29,7 @@ export interface Player {
     sync?: PlayerSyncState;
     appearance?: Appearance;
     movementQueue?: MovementQueue;
+    trackedNpcs?: Npc[];
 }
 
 export const playerTick = async (player: Player): Promise<void> => {
@@ -68,6 +70,8 @@ export const playerLogin = (player: Player): boolean => {
     player.sync.flags |= SyncFlags.APPEARANCE_UPDATE;
 
     player.movementQueue = createMovementQueue();
+
+    player.trackedNpcs = [];
 
     player.coords = {
         x: 3222,

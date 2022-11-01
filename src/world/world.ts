@@ -1,4 +1,6 @@
 import { logger } from '@runejs/common';
+import { Coord } from './coord';
+import { createNpcSyncState, Npc, npcSync, npcTick, npcTickCleanup } from './npc';
 import { Player, playerTickCleanup, playerTick, playerSync } from './player';
 
 export const TICK_LENGTH = 600;
@@ -6,6 +8,7 @@ export const TICK_LENGTH = 600;
 export interface World {
     worldId: number;
     players: Player[];
+    npcs: Npc[];
 }
 
 let worldSingleton: World;
@@ -19,28 +22,32 @@ const tick = async (): Promise<void> => {
     const startTime = Date.now();
 
     const activePlayers = worldSingleton.players.filter(p => p !== null);
+    const activeNpcs = worldSingleton.npcs.filter(n => n !== null);
 
     if (activePlayers.length !== 0) {
         // Run Player and NPC ticks
         await Promise.all([
-            ...activePlayers.map(async player => playerTick(player))
-        ]); // @todo NPC tick should go here as well - Kat 19/Oct/22
+            ...activePlayers.map(async player => playerTick(player)),
+            ...activeNpcs.map(async npc => npcTick(npc))
+        ]);
 
         // Run Player and NPC syncs
-        await Promise.all(activePlayers.map(async player => playerSync(player)));
+        await Promise.all(
+            activePlayers.map(async player => [playerSync(player), npcSync(player)]),
+        );
 
         // Run Player and NPC post-tick cleanups
         await Promise.all([
-            ...activePlayers.map(async player => playerTickCleanup(player))
-        ]); // @todo NPC post-tick cleanup should go here as well - Kat 19/Oct/22
+            ...activePlayers.map(async player => playerTickCleanup(player)),
+            ...activeNpcs.map(async npc => npcTickCleanup(npc))
+        ]);
     }
 
     const endTime = Date.now();
     const duration = endTime - startTime;
     const delay = Math.max(TICK_LENGTH - duration, 0);
 
-    // logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick
-    // in ${delay} ms.`);
+    //logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
     tickTimeout = setTimeout(async () => tick(), delay);
 };
 
@@ -66,12 +73,34 @@ export const removePlayer = (player: Player): boolean => {
     return true;
 };
 
+
+export const npcs = (): Npc[] => {
+    let npcs = [];
+    for (let i = 0; i < 5; i++) {
+    let random = Math.floor(Math.random() * 15);
+    let random2 = Math.floor(Math.random() * 15);
+    let random3 = Math.floor(Math.random() * 2000);
+        npcs.push({
+            id: random3,
+            index: i,
+            coords: {
+                x: 3217 + random,
+                y: 3217 + random2,
+                plane: 0
+            },
+            sync: createNpcSyncState()
+        })
+    }
+    return npcs;
+}
+
 export const openWorld = (
     worldId: number,
 ): World => {
     worldSingleton = {
         worldId,
         players: new Array(2000).fill(null),
+        npcs: npcs(),
     };
 
     logger.info(`World ${worldId} opened.`);
