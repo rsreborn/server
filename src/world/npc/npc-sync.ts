@@ -11,14 +11,14 @@ export enum SyncFlags {
     FACE_ENTITY = 0x10,
 }
 
-export interface npcSyncState {
+export interface NpcSyncState {
     flags: number;
     walkDir: number;
     runDir: number;
     teleporting: boolean;
 }
 
-export const createNpcSyncState = (): npcSyncState => {
+export const createNpcSyncState = (): NpcSyncState => {
     return {
         flags: 0,
         walkDir: -1,
