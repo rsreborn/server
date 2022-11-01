@@ -52,12 +52,12 @@ const appendMovement = (npc: Npc, data: ByteBuffer): void => {
     }
 }
 
-const appendAddTrackedNpc = (npc: Npc, index: number, player: Player, data: ByteBuffer): void => {
+const appendAddTrackedNpc = (npc: Npc, player: Player, data: ByteBuffer): void => {
     const x = npc.coords.x - player.coords.x;
     const y = npc.coords.y - player.coords.y;
     const updateRequired = npc.sync.flags !== 0;
 
-    data.putBits(14, index + 1);
+    data.putBits(14, npc.index);
     data.putBits(5, x);
     data.putBits(1, updateRequired ? 1 : 0);
     data.putBits(5, y);
@@ -86,21 +86,22 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
         }
     });
     
-    if (player.trackedNpcs.length < 255) {
-        npcs.forEach((npc, idx) => {
+    for(const npc of npcs) {
+        if (player.trackedNpcs.length === 255) {
+            break;
+        }
 
-            if (player.trackedNpcs.includes(npc)
-                || !isWithinDistance(player?.coords, npc.coords)) {
-                return;
-            }
-           
-            player.trackedNpcs.push(npc);
-    
-            if (npc) {
-                appendAddTrackedNpc(npc, idx, player, packetData);
-                appendUpdateMasks(npc, updateMaskData);
-            }
-        });
+        if (player.trackedNpcs.includes(npc)
+            || !isWithinDistance(player?.coords, npc.coords)) {
+            continue;
+        }
+
+        player.trackedNpcs.push(npc);
+
+        if (npc) {
+            appendAddTrackedNpc(npc, player, packetData);
+            appendUpdateMasks(npc, updateMaskData);
+        }
     }
    
     if (updateMaskData.writerIndex !== 0) {

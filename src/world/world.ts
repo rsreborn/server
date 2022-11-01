@@ -74,21 +74,33 @@ export const removePlayer = (player: Player): boolean => {
     return true;
 };
 
+
+export const npcs = (): Npc[] => {
+    let npcs = [];
+    for (let i =0; i < 256; i++) {
+    let random = Math.floor(Math.random() * 15);
+    let random2 = Math.floor(Math.random() * 15);
+        npcs.push({
+            id: i,
+            index: i,
+            coords: {
+                x: 3217 + random,
+                y: 3217 + random2,
+                plane: 0
+            },
+            sync: createNpcSyncState()
+        })
+    }
+    return npcs;
+}
+
 export const openWorld = (
     worldId: number,
 ): World => {
     worldSingleton = {
         worldId,
         players: new Array(2000).fill(null),
-        npcs: [{
-            id: 1,
-            coords: {
-                x: 3223,
-                y: 3223,
-                plane: 0
-            },
-            sync: createNpcSyncState()
-        }],
+        npcs: npcs(),
     };
 
     logger.info(`World ${worldId} opened.`);

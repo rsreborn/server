@@ -3,6 +3,7 @@ import { NpcSyncState } from "./npc-sync";
 
 export interface Npc {
     id: number;
+    index: number;
     coords: Coord;
     sync: NpcSyncState;
 }
