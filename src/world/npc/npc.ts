@@ -1,10 +1,10 @@
 import { Coord } from "../coord";
-import { npcSyncState } from "./npc-sync";
+import { NpcSyncState } from "./npc-sync";
 
 export interface Npc {
     id: number;
     coords: Coord;
-    sync: npcSyncState;
+    sync: NpcSyncState;
 }
 
 export const npcTick = async (npc: Npc): Promise<void> => {
