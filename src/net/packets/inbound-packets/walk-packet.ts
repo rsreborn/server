@@ -15,7 +15,7 @@ export const walkPacket: InboundPacket<WalkPacketData> = {
         player: Player,
         data: WalkPacketData,
     ): void => {
-        queuePath(player, data.path, data.forceRun);
+        queuePath(player, data.path, true, data.forceRun);
     },
     opcodes: {
         319: [ 155, 178, 191 ]
