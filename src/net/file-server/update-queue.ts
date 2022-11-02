@@ -8,6 +8,7 @@ export interface UpdateTask {
     cacheIndex: number;
     fileNumber: number;
     priority: number;
+    buildNumber: number;
     socket: Socket;
 }
 
@@ -19,21 +20,22 @@ export const handleUpdateRequests = (
         const cacheIndex = request.get('byte', 'u') + 1;
         const fileNumber = request.get('short', 'u');
         const priority = request.get('byte', 'u');
+        const buildNumber = 319; // @todo how can we get this from the update server connection? - Kat 2/Nov/22
 
         // priority 0 = standard (queued?)
         // priority 1 = not logged in
         // priority 2 = mandatory
 
         updateQueue.push({
-            cacheIndex, fileNumber, priority, socket,
+            cacheIndex, fileNumber, priority, buildNumber, socket,
         });
     }
 };
 
 export const updateQueue = queue<UpdateTask>((task, completed) => {
     // @todo handle different file priorities - Kat 22/Oct/22
-    const { cacheIndex, fileNumber, priority, socket } = task;
-    const cache = getCache();
+    const { cacheIndex, fileNumber, priority, buildNumber, socket } = task;
+    const cache = getCache(buildNumber);
 
     // logger.info(`Handling update server task: cache[${cacheIndex}] file[${fileNumber}]
     // priority[${priority}]`);

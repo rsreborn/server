@@ -16,30 +16,75 @@ export interface FileCache {
     indexFiles: IndexFile[];
 }
 
-let cache: FileCache | null = null;
-let archives: { [key: string]: ByteBuffer };
-let crcTable: ByteBuffer;
+export interface Archive {
+    archiveNumber: number;
+    checksum: number;
+    data: ByteBuffer;
+}
 
-const loadArchives = (): { [key: string]: ByteBuffer } => {
+Crc32.init();
+const caches: Map<number, FileCache> = new Map<number, FileCache>();
+const archives: Map<number, { [key: string]: Archive }> = new Map<number, {[p: string]: Archive}>();
+const crcTables: Map<number, ByteBuffer> = new Map<number, ByteBuffer>();
+
+const readArchive = (
+    cache: FileCache,
+    archiveNumber: number,
+): Archive => {
     const dataFile = cache.dataFile;
     const indexFile = cache.indexFiles[0];
+    const data = getFileData(dataFile, indexFile, archiveNumber);
+    const checksum = Crc32.update(0, data.length, data);
+    return { archiveNumber, checksum, data };
+};
 
-    archives = {
-        'title': getFileData(dataFile, indexFile, 1),
-        'config': getFileData(dataFile, indexFile, 2),
-        'interface': getFileData(dataFile, indexFile, 3),
-        'media': getFileData(dataFile, indexFile, 4),
-        'versionlist': getFileData(dataFile, indexFile, 5),
-        'textures': getFileData(dataFile, indexFile, 6),
-        'wordenc': getFileData(dataFile, indexFile, 7),
-        'sounds': getFileData(dataFile, indexFile, 8),
-    };
+export const archiveNames = [
+    'title',
+    'config',
+    'interface',
+    'media',
+    'versionlist',
+    'textures',
+    'wordenc',
+    'sounds',
+];
 
-    return archives;
+const loadArchives = (): void => {
+    for (const [ build, cache ] of caches) {
+        archives.set(build, {
+            'title': readArchive(cache, 1),
+            'config': readArchive(cache, 2),
+            'interface': readArchive(cache, 3),
+            'media': readArchive(cache, 4),
+            'versionlist': readArchive(cache, 5),
+            'textures': readArchive(cache, 6),
+            'wordenc': readArchive(cache, 7),
+            'sounds': readArchive(cache, 8),
+        });
+    }
+};
+
+export const findArchive = (
+    archiveName: string,
+    checksum: number,
+): Archive | null => {
+    for (const [ , archiveMap ] of archives) {
+        if (archiveMap[archiveName].checksum === checksum) {
+            return archiveMap[archiveName];
+        }
+    }
+
+    return null;
+};
+
+export const loadCaches = async (buildNumbers: number[]): Promise<void> => {
+    for (const build of buildNumbers) {
+        await loadCache(build);
+    }
 };
 
 export const loadCache = async (buildNumber: number): Promise<FileCache> => {
-    const cachePath = join('.', 'cache');
+    const cachePath = join('.', 'cache', String(buildNumber));
     let packedCacheFiles: { [key: string]: Buffer };
 
     if (existsSync(cachePath)) {
@@ -56,7 +101,7 @@ export const loadCache = async (buildNumber: number): Promise<FileCache> => {
     }
 
     if (!packedCacheFiles || !Object.keys(packedCacheFiles).length) {
-        logger.info(`Fetching game file cache...`);
+        logger.info(`Fetching game file cache for build ${buildNumber}...`);
         packedCacheFiles = await getOpenRS2CacheFilesByBuild(buildNumber);
         mkdirSync(cachePath, { recursive: true });
         const fileNames = Object.keys(packedCacheFiles).filter(fileName => fileName?.startsWith(packedCacheFileName));;
@@ -66,30 +111,30 @@ export const loadCache = async (buildNumber: number): Promise<FileCache> => {
     }
 
     if (!packedCacheFiles || !Object.keys(packedCacheFiles).length) {
-        throw new Error(`Packed cache files not found, please ensure the ./cache directory exists and contains a valid game file cache.`);
+        throw new Error(`Packed cache files for build ${buildNumber} not found, please ensure the ./cache directory exists and contains a valid game file cache.`);
     }
 
-    cache = readFileCache(packedCacheFiles);
+    caches.set(buildNumber, readFileCache(packedCacheFiles));
     loadArchives();
     getCrcTable(buildNumber);
-    return cache;
+    return caches.get(buildNumber);
 };
 
 export const getCrcTable = (buildNumber: number): ByteBuffer => {
-    if (crcTable) {
-        return crcTable;
+    if (crcTables.has(buildNumber)) {
+        return crcTables.get(buildNumber);
     }
 
-    Crc32.init();
     const checksums: number[] = new Array(9);
 
     checksums[0] = buildNumber;
 
-    const indexFile = cache.indexFiles[0];
+    const archiveMap = archives.get(buildNumber);
+    const archiveList = Object.values(archiveMap);
 
     for (let i = 1; i < checksums.length; i++) {
-        const fileData = getFileData(cache.dataFile, indexFile, i);
-        checksums[i] = Crc32.update(0, fileData.length, fileData);
+        const archive = archiveList.find(a => a.archiveNumber === i);
+        checksums[i] = archive.checksum;
     }
 
     let hash = 1234;
@@ -105,22 +150,22 @@ export const getCrcTable = (buildNumber: number): ByteBuffer => {
 
     buffer.put(hash, 'int');
 
-    crcTable = buffer;
-    return crcTable;
+    crcTables.set(buildNumber, buffer);
+    return crcTables.get(buildNumber);
 };
 
-export const getCache = (): FileCache => {
-    if (!cache) {
-        throw new Error(`A file cache is not yet loaded!`);
+export const getCache = (buildNumber: number): FileCache => {
+    if (!caches.has(buildNumber)) {
+        throw new Error(`File cache ${buildNumber} is not yet loaded!`);
     }
 
-    return cache;
+    return caches.get(buildNumber);
 };
 
-export const getArchives = (): { [key: string]: ByteBuffer } => {
-    if (!archives) {
-        throw new Error(`Archives not yet loaded!`);
+export const getArchives = (buildNumber: number): { [key: string]: Archive } => {
+    if (!archives.has(buildNumber)) {
+        throw new Error(`Archives for cache ${buildNumber} are not yet loaded!`);
     }
 
-    return archives;
+    return archives.get(buildNumber);
 }

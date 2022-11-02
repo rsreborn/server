@@ -8,6 +8,7 @@ export interface Client {
     inCipher: Isaac;
     outCipher: Isaac;
     connection: Connection;
+    buildNumber: number;
     outboundPacketQueue: Buffer[];
     outboundUpdateQueue: Buffer[];
     inboundPacket?: Packet;

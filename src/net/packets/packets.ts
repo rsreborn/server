@@ -45,7 +45,7 @@ export const handleInboundPacket = (
         return true;
     }
 
-    const buildNumber = getGameServer().buildNumber;
+    const buildNumber = player.client.buildNumber;
     let inboundPacket: InboundPacket;
 
     for (const packet of inboundPackets) {

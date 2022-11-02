@@ -2,12 +2,7 @@ import { createServer, Server, Socket } from 'net';
 import { createServer as createWebServer } from 'http';
 import { ByteBuffer, logger } from '@runejs/common';
 import { SocketOptions } from '../server';
-import { getArchives, getCrcTable } from '../../cache';
-
-export enum FileServerConnectionType {
-    JAGGRAB = 'JAGGRAB',
-    WEB = 'WEB',
-}
+import { archiveNames, findArchive, getCrcTable } from '../../cache';
 
 export interface FileServer {
     hostName: string;
@@ -19,21 +14,30 @@ export interface FileServer {
 }
 
 export interface FileServerConnection {
-    socket: Socket;
+    socket?: Socket;
 }
 
 let fileServer: FileServer;
 
-const handleRequest = (request: string): ByteBuffer => {
-    if (request.startsWith('/crc')) {
-        return getCrcTable(319);
-    } else {
-        const archives = getArchives();
-        const archiveNames = Object.keys(archives);
+const handleRequest = (
+    request: string,
+): ByteBuffer => {
+    logger.info(`File request ${request} received.`);
 
+    if (request.startsWith('/crc')) {
+        try {
+            const parts = request.split('-');
+            const buildNumber = parseInt(parts[parts.length - 1], 10);
+            return getCrcTable(buildNumber);
+        } catch (e) {
+            logger.error(e);
+            return null;
+        }
+    } else {
         for (const archiveName of archiveNames) {
             if (request.startsWith(`/${archiveName}`)) {
-                return archives[archiveName];
+                const checksum = parseInt(request.substring(archiveName.length + 1), 10);
+                return findArchive(archiveName, checksum)?.data || null;
             }
         }
 
@@ -41,9 +45,11 @@ const handleRequest = (request: string): ByteBuffer => {
     }
 };
 
-const jaggrabDataReceived = (connection: FileServerConnection, data: Buffer): void => {
+const jaggrabDataReceived = (
+    connection: FileServerConnection,
+    data: Buffer,
+): void => {
     const str = data.toString().trim();
-    logger.info(str);
     const fileRequest = str.replace('JAGGRAB ', '');
     const fileData = handleRequest(fileRequest);
     if (fileData?.length) {
@@ -83,7 +89,6 @@ export const startFileServer = (
     socketOptions?: SocketOptions,
 ): FileServer => {
     const webServer = createWebServer((req, res) => {
-        logger.info(`${req.method} ${req.url}`);
         const fileData = handleRequest(req.url);
         if (fileData?.length) {
             res.writeHead(200, { 'Content-Type': 'application/octect-stream' });

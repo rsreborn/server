@@ -186,10 +186,13 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             }
 
             const gameBuild = buffer.get('short', 'u');
+            // @todo ensure build is supported - Kat 2/Nov/22
+
             const lowMemory = buffer.get('byte', 'u') === 1;
 
             // Cache checksums
             for (let i = 0; i < 9; i++) {
+                // @todo verify these against the cache - Kat 2/Nov/22
                 buffer.get('int');
             }
 
@@ -262,6 +265,7 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
                     connection,
                     outboundPacketQueue: [],
                     outboundUpdateQueue: [],
+                    buildNumber: gameBuild,
                 },
             };
 

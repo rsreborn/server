@@ -1,5 +1,11 @@
-// What has my life become??
-export const INBOUND_PACKET_SIZES = {
+// @todo make this automatic via the packet files - Kat 2/Nov/22
+export const INBOUND_PACKET_SIZES: { [key: number]: { [key: number]: number }} = {};
+
+INBOUND_PACKET_SIZES[377] = {
+
+};
+
+INBOUND_PACKET_SIZES[317] = {
     64: 8,
     33: 6,
     46: 2,
