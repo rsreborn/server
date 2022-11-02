@@ -3,8 +3,8 @@ import { Player } from "../player";
 
 export interface Chunk { // 8 x 8 more tities
     // objects: RSObject[];
-    npcs: Npc[];
-    players: Player[];
+    npcs: number[];
+    players: number[];
     // triggers:
 }
 

@@ -21,35 +21,20 @@ export interface RegionCoord {
     regionChunkTileLocalY: number,
 }
 
-export const addPlayerToChunk = (player: Player): boolean => {
-    const chunk = getChunk(getChunkId(player.coords));
-    let players = chunk.players;
-
-    if (players[player.worldIndex] === null) {
-        players[player.worldIndex] = player;
-    }
-    return true;
+export const removePlayerFromChunk = (player: Player): void => {
+    getChunkByCoords(player.coords).players.splice(player.worldIndex, 1);
 }
 
-export const addNpcToChunk = (npc: Npc): boolean => {
-    const chunk = getChunk(getChunkId(npc.coords));
-    let npcs = chunk.npcs;
-
-    if (npcs[npc.worldIndex] === null) {
-        npcs[npc.worldIndex] = npc;
-    }
-    return true;
+export const removeNpcFromChunk = (npc: Npc): void => {
+    getChunkByCoords(npc.coords).npcs.splice(npc.worldIndex, 1);
 }
 
-export const removeEntityFromChunk = (entity: Player | Npc): boolean => {
-
-    return false;
+export const addPlayerToChunk = (player: Player): void => {
+    getChunkByCoords(player.coords).players[player.worldIndex] = player.worldIndex;
 }
 
-
-export const updateEntity = (entity: Player | Npc): boolean => {
-    
-    return false;
+export const addNpcToChunk = (npc: Npc): void => {
+    getChunkByCoords(npc.coords).npcs[npc.worldIndex] = npc.worldIndex;
 }
 
 export const getRegionId = (coord: Coord): number => (((coord.x >> 3) / 8) << 8) + ((coord.y >> 3) / 8);
@@ -79,6 +64,8 @@ export const getRegionCoords = (coord: Coord): RegionCoord => {
         regionChunkTileLocalY,
     }
 };
+
+export const getChunkByCoords = (coord: Coord): Chunk =>  getChunk(getChunkId(coord));
 
 export const getChunk = (chunkId: number): Chunk => {
 
