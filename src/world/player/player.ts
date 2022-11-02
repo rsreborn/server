@@ -30,6 +30,7 @@ export interface Player {
     appearance?: Appearance;
     movementQueue?: MovementQueue;
     trackedNpcs?: Npc[];
+    lastChunkId?: number;
 }
 
 export const playerTick = async (player: Player): Promise<void> => {

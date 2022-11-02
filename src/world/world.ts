@@ -2,7 +2,7 @@ import { logger } from '@runejs/common';
 import { Coord } from './coord';
 import { createNpcSyncState, Npc, npcSync, npcTick, npcTickCleanup } from './npc';
 import { Player, playerTickCleanup, playerTick, playerSync } from './player';
-import { ChunkManager } from './region';
+import { ChunkManager, addPlayerToChunk, removePlayerFromChunk, addNpcToChunk, removeNpcFromChunk } from './region';
 
 export const TICK_LENGTH = 600;
 
@@ -67,17 +67,20 @@ export const addPlayer = (player: Player): boolean => {
     player.worldIndex = worldIndex;
     worldSingleton.players[worldIndex] = player;
 
+    addPlayerToChunk(player)
+
     return true;
 };
 
 export const removePlayer = (player: Player): boolean => {
+    removePlayerFromChunk(player)
     worldSingleton.players[player.worldIndex] = null;
     return true;
 };
 
 export const npcs = (): Npc[] => {
     let npcs = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 16000; i++) {
     let random = Math.floor(Math.random() * 15);
     let random2 = Math.floor(Math.random() * 15);
     let random3 = Math.floor(Math.random() * 2000);

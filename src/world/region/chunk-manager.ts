@@ -30,11 +30,31 @@ export const removeNpcFromChunk = (npc: Npc): void => {
 }
 
 export const addPlayerToChunk = (player: Player): void => {
-    getChunkByCoords(player.coords).players[player.worldIndex] = player.worldIndex;
+    const chunkId = getChunkId(player.coords)
+    player.lastChunkId = chunkId
+    getChunk(chunkId).players[player.worldIndex] = player.worldIndex;
 }
 
 export const addNpcToChunk = (npc: Npc): void => {
-    getChunkByCoords(npc.coords).npcs[npc.worldIndex] = npc.worldIndex;
+    const chunkId = getChunkId(npc.coords)
+    npc.lastChunkId = chunkId
+    getChunk(chunkId).npcs[npc.worldIndex] = npc.worldIndex;
+}
+
+export const updatePlayerChunk = (player: Player): void => {
+    const chunkId = getChunkId(player.coords)
+    if (player.lastChunkId !== chunkId) {
+        getChunk(player.lastChunkId).players.splice(player.worldIndex, 1);
+        addPlayerToChunk(player)
+    }
+}
+
+export const updateNpcChunk = (npc: Npc): void => {
+    const chunkId = getChunkId(npc.coords)
+    if (npc.lastChunkId !== chunkId) {
+        getChunk(npc.lastChunkId).npcs.splice(npc.worldIndex, 1);
+        addNpcToChunk(npc)
+    }
 }
 
 export const getRegionId = (coord: Coord): number => (((coord.x >> 3) / 8) << 8) + ((coord.y >> 3) / 8);
@@ -84,5 +104,6 @@ export const getChunk = (chunkId: number): Chunk => {
 
 export const getChunkId = (coord: Coord): number => {
     const regionCoords = getRegionCoords(coord);
+
     return getRegionId(coord) | regionCoords.regionChunkLocalX >> 4 | regionCoords.regionChunkLocalY >> 6; // Todo keep the 8th bit for the plane when we add support - Brian 11/1/2022
 }
