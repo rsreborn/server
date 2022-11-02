@@ -31,5 +31,6 @@ export const isWithinDistance = (position1: Coord, position2: Coord): boolean =>
         return false;
     }
     let deltaX = position1.x - position2.x, deltaY = position1.y - position2.y;
+
     return deltaX <= 14 && deltaX >= -15 && deltaY <= 14 && deltaY >= -15;
 }

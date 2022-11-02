@@ -2,6 +2,7 @@ import { logger } from '@runejs/common';
 import { Coord } from './coord';
 import { createNpcSyncState, Npc, npcSync, npcTick, npcTickCleanup } from './npc';
 import { Player, playerTickCleanup, playerTick, playerSync } from './player';
+import { ChunkManager } from './region';
 
 export const TICK_LENGTH = 600;
 
@@ -9,6 +10,7 @@ export interface World {
     worldId: number;
     players: Player[];
     npcs: Npc[];
+    chunkManager: ChunkManager;
 }
 
 let worldSingleton: World;
@@ -51,6 +53,26 @@ const tick = async (): Promise<void> => {
     tickTimeout = setTimeout(async () => tick(), delay);
 };
 
+
+// TODO Add object support one day for all these three - Brian 11-1-2022
+export const addEntity = (entity: Player | Npc): boolean => {
+
+    return false;
+}
+
+export const removeEntity = (entity: Player | Npc): boolean => {
+
+    return false;
+}
+
+
+export const updateEntity = (entity: Player | Npc): boolean => {
+    
+    return false;
+}
+
+
+
 export const addPlayer = (player: Player): boolean => {
     if (worldSingleton.players.find(p => p?.uid === player.uid)) {
         logger.error(`Player ${player.username} (${player.uid}) is already online!`);
@@ -72,7 +94,6 @@ export const removePlayer = (player: Player): boolean => {
     worldSingleton.players[player.worldIndex] = null;
     return true;
 };
-
 
 export const npcs = (): Npc[] => {
     let npcs = [];
@@ -99,8 +120,11 @@ export const openWorld = (
 ): World => {
     worldSingleton = {
         worldId,
-        players: new Array(2000).fill(null),
+        players: new Array(2048).fill(null),
         npcs: npcs(),
+        chunkManager: {
+            activeChunks: new Array(1).fill(null),
+        }
     };
 
     logger.info(`World ${worldId} opened.`);

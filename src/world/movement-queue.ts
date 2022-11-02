@@ -27,7 +27,6 @@ export const queuePath = (player: Player, path: Coord[], forceRun: boolean): voi
     console.log(path);
 
     let lastCoords = getLastCoords(player);
-
     for (const coord of path) {
         let diffX = coord.x - lastCoords.x;
         let diffY = coord.y - lastCoords.y;
