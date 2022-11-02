@@ -20,12 +20,6 @@ export const getLocalCoord = (coord: Coord): Coord => ({
     plane: coord.plane ?? 0,
 });
 
-export const getRegionId = (coord: Coord): Coord => ({
-    x: coord.x - 8 * ((coord.x >> 3) - 6),
-    y: coord.y - 8 * ((coord.y >> 3) - 6),
-    plane: coord.plane ?? 0,
-});
-
 export const isWithinDistance = (position1: Coord, position2: Coord): boolean => {
     if (position1.plane !== position2.plane) {
         return false;

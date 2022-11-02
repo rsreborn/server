@@ -53,26 +53,6 @@ const tick = async (): Promise<void> => {
     tickTimeout = setTimeout(async () => tick(), delay);
 };
 
-
-// TODO Add object support one day for all these three - Brian 11-1-2022
-export const addEntity = (entity: Player | Npc): boolean => {
-
-    return false;
-}
-
-export const removeEntity = (entity: Player | Npc): boolean => {
-
-    return false;
-}
-
-
-export const updateEntity = (entity: Player | Npc): boolean => {
-    
-    return false;
-}
-
-
-
 export const addPlayer = (player: Player): boolean => {
     if (worldSingleton.players.find(p => p?.uid === player.uid)) {
         logger.error(`Player ${player.username} (${player.uid}) is already online!`);
@@ -103,7 +83,7 @@ export const npcs = (): Npc[] => {
     let random3 = Math.floor(Math.random() * 2000);
         npcs.push({
             id: random3,
-            index: i,
+            worldIndex: i,
             coords: {
                 x: 3217 + random,
                 y: 3217 + random2,

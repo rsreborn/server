@@ -57,7 +57,7 @@ const appendAddTrackedNpc = (npc: Npc, player: Player, data: ByteBuffer): void =
     const y = npc.coords.y - player.coords.y;
     const updateRequired = npc.sync.flags !== 0;
 
-    data.putBits(14, npc.index);
+    data.putBits(14, npc.worldIndex);
     data.putBits(5, x);
     data.putBits(1, updateRequired ? 1 : 0);
     data.putBits(5, y);
