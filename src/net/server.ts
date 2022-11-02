@@ -69,11 +69,11 @@ export const startServer = async (
         socket => connectionCreated(socket, socketOptions)
     ).listen(port, hostName);
 
+    running = true;
+
     const world = openWorld(worldId);
 
     logger.info(`${ serverName } listening @ ${ hostName }:${ port }`);
-
-    running = true;
 
     gameServer = {
         serverName,
@@ -94,4 +94,8 @@ export const getGameServer = (): GameServer => {
     }
 
     return gameServer;
+};
+
+export const serverRunning = (): boolean => {
+    return running;
 };

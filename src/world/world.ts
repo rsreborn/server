@@ -2,6 +2,7 @@ import { logger } from '@runejs/common';
 import { Coord } from './coord';
 import { createNpcSyncState, Npc, npcSync, npcTick, npcTickCleanup } from './npc';
 import { Player, playerTickCleanup, playerTick, playerSync } from './player';
+import { serverRunning } from '../net/server';
 
 export const TICK_LENGTH = 600;
 
@@ -17,6 +18,10 @@ let tickTimeout: NodeJS.Timeout;
 const tick = async (): Promise<void> => {
     if (!worldSingleton) {
         throw new Error(`World is not open!`);
+    }
+
+    if (!serverRunning()) {
+        return;
     }
 
     const startTime = Date.now();
