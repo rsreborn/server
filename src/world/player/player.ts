@@ -4,7 +4,7 @@ import { sendChatboxMessage, sendFriendsList, sendLogout, sendSideBarWidget, sen
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
-import { createMovementQueue, MovementQueue, resetMovementQueue } from '../movement-queue';
+import { createMovementQueue, MovementQueue, movementTick, resetMovementQueue } from '../movement-queue';
 import { Npc } from '../npc';
 
 export enum PlayerRights {
@@ -36,7 +36,7 @@ export const playerTick = async (player: Player): Promise<void> => {
     // We wrap this in a promise so that all player ticks can be run
     // in parallel using Promise.all()
     return new Promise<void>(resolve => {
-        // @todo - Kat 19/Oct/22
+        movementTick(player);
         resolve();
     });
 };
@@ -55,9 +55,6 @@ export const playerTickCleanup = async (player: Player): Promise<void> => {
         player.sync.appearanceData = undefined;
 
         writePackets(player);
-
-        // @todo temporary to debug movement - Kat 30/Oct/22
-        resetMovementQueue(player);
 
         resolve();
     });
