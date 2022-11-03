@@ -3,39 +3,38 @@ import { queue } from 'async';
 import { ByteBuffer } from '@runejs/common';
 import { getFileData } from '@runejs/cache';
 import { getCache } from '../../cache';
+import { Connection } from '../connection';
 
 export interface UpdateTask {
     cacheIndex: number;
     fileNumber: number;
     priority: number;
-    buildNumber: number;
-    socket: Socket;
+    connection: Connection;
 }
 
 export const handleUpdateRequests = (
-    socket: Socket,
+    connection: Connection,
     request: ByteBuffer,
 ): void => {
     while (request.readable >= 4) {
         const cacheIndex = request.get('byte', 'u') + 1;
         const fileNumber = request.get('short', 'u');
         const priority = request.get('byte', 'u');
-        const buildNumber = 319; // @todo how can we get this from the update server connection? - Kat 2/Nov/22
 
         // priority 0 = standard (queued?)
         // priority 1 = not logged in
         // priority 2 = mandatory
 
         updateQueue.push({
-            cacheIndex, fileNumber, priority, buildNumber, socket,
+            cacheIndex, fileNumber, priority, connection,
         });
     }
 };
 
 export const updateQueue = queue<UpdateTask>((task, completed) => {
     // @todo handle different file priorities - Kat 22/Oct/22
-    const { cacheIndex, fileNumber, priority, buildNumber, socket } = task;
-    const cache = getCache(buildNumber);
+    const { cacheIndex, fileNumber, priority, connection } = task;
+    const cache = getCache(connection.buildNumber);
 
     // logger.info(`Handling update server task: cache[${cacheIndex}] file[${fileNumber}]
     // priority[${priority}]`);
@@ -67,7 +66,7 @@ export const updateQueue = queue<UpdateTask>((task, completed) => {
         packet.putBytes(file, written, written + blockSize);
 
         written += blockSize;
-        socket.write(packet.toNodeBuffer());
+        connection.socket.write(packet.toNodeBuffer());
     }
 
     completed();

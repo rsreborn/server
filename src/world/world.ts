@@ -37,9 +37,9 @@ const tick = async (): Promise<void> => {
         ]);
 
         // Run Player and NPC syncs
-        await Promise.all(
-            activePlayers.map(async player => [playerSync(player), npcSync(player)]),
-        );
+        // await Promise.all(
+        //     activePlayers.map(async player => [playerSync(player), npcSync(player)]),
+        // );
 
         // Run Player and NPC post-tick cleanups
         await Promise.all([

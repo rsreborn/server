@@ -1,47 +1,55 @@
 import { ByteBuffer } from '@runejs/common';
-import { Player } from './player';
-import { getLocalCoord } from '../coord';
-import { PacketQueueType, PacketSize, queuePacket } from '../../net/packets';
-import { encodeBase37Username } from '../../util/base37';
+import { OutboundPacket, PacketQueueType, PacketSize } from '../packets';
+import { Player, SyncFlags } from '../../../world/player';
+import { getLocalCoord } from '../../../world';
+import { encodeBase37Username } from '../../../util/base37';
 
-export enum SyncFlags {
-    FACE_COORDS = 0x1,
-    APPEARANCE_UPDATE = 0x2,
-    PLAY_ANIMATION = 0x4,
-    FACE_ENTITY = 0x8,
-    FORCE_CHAT = 0x10,
-    DAMAGE_TYPE_1 = 0x20,
-    CHAT = 0x80,
-    FORCED_MOVEMENT = 0x100,
-    DAMAGE_TYPE_2 = 0x200,
-    PLAY_SPOT_ANIM = 0x400,
-}
+const updateMaskEncoders: { [key: number]: (player: Player, data: ByteBuffer, forceAppearanceUpdate: boolean) => void } = {
+    319: (player, data, forceAppearanceUpdate) => {
+        let flags = player.sync.flags;
 
-export interface PlayerSyncState {
-    flags: number;
-    mapRegion: boolean;
-    walkDir: number;
-    runDir: number;
-    teleporting: boolean;
-    appearanceData?: ByteBuffer;
-}
+        if (flags >= 0x100) {
+            flags |= 0x40;
+            data.put(flags & 0xff);
+            data.put(flags >> 8);
+        } else {
+            data.put(flags);
+        }
 
-export const createPlayerSyncState = (): PlayerSyncState => {
-    return {
-        flags: 0,
-        mapRegion: true,
-        walkDir: -1,
-        runDir: -1,
-        teleporting: false,
-    };
+        if (flags & SyncFlags.APPEARANCE_UPDATE || forceAppearanceUpdate) {
+            appendAppearanceData(player, data);
+        }
+    },
+};
+
+const mapRegionUpdateEncoders: { [key: number]: (player: Player, data: ByteBuffer) => void } = {
+    319: (player, data) => {
+        const localCoord = getLocalCoord(player.coords);
+
+        // Map region update required
+        data.putBits(1, 1);
+        // Map region changed (movement type - 0=none, 1=walk, 2=run, 3=mapchange
+        data.putBits(2, 3);
+
+        // Local X coord
+        data.putBits(7, localCoord.x);
+        // Local plane coord
+        data.putBits(2, localCoord.plane);
+        // Local Y coord
+        data.putBits(7, localCoord.y);
+        // Whether the client should discard the current walking queue (1 if teleporting, 0 if not)
+        data.putBits(1, player.sync.teleporting ? 1 : 0);
+        // Whether an update flag block follows
+        data.putBits(1, player.sync.flags !== 0 ? 1 : 0);
+    },
 };
 
 const appendNewlyTrackedPlayers = (data: ByteBuffer) => {
-    // @todo multiplayer support - Kat 25/Oct/22
+    // @todo multiplayer support - Kat 3/Nov/22
 };
 
 const appendTrackedPlayers = (data: ByteBuffer) => {
-    // @todo multiplayer support - Kat 25/Oct/22
+    // @todo multiplayer support - Kat 3/Nov/22
     data.putBits(8, 0);
 };
 
@@ -108,47 +116,17 @@ const appendUpdateMasks = (
     data: ByteBuffer,
     forceAppearanceUpdate?: boolean,
 ): void => {
-    let flags = player.sync.flags;
-
     if (player.sync.flags === 0 && !forceAppearanceUpdate) {
         return;
     }
 
-    if(flags >= 0x100) {
-        flags |= 0x40;
-        data.put(flags & 0xff);
-        data.put(flags >> 8);
-    } else {
-        data.put(flags);
-    }
-
-    if (flags & SyncFlags.APPEARANCE_UPDATE || forceAppearanceUpdate) {
-        appendAppearanceData(player, data);
-    }
+    updateMaskEncoders[String(player.client.connection.buildNumber)]?.(player, data, forceAppearanceUpdate);
 };
 
 const appendMapRegionUpdate = (
     player: Player,
     data: ByteBuffer,
-): void => {
-    const localCoord = getLocalCoord(player.coords);
-
-    // Map region update required
-    data.putBits(1, 1);
-    // Map region changed (movement type - 0=none, 1=walk, 2=run, 3=mapchange
-    data.putBits(2, 3);
-
-    // Local X coord
-    data.putBits(7, localCoord.x);
-    // Local plane coord
-    data.putBits(2, localCoord.plane);
-    // Local Y coord
-    data.putBits(7, localCoord.y);
-    // Whether the client should discard the current walking queue (1 if teleporting, 0 if not)
-    data.putBits(1, player.sync.teleporting ? 1 : 0);
-    // Whether an update flag block follows
-    data.putBits(1, player.sync.flags !== 0 ? 1 : 0);
-};
+): void => mapRegionUpdateEncoders[String(player.client.connection.buildNumber)]?.(player, data);
 
 const appendMovement = (
     player: Player,
@@ -211,14 +189,14 @@ const constructPlayerSyncPacket = (player: Player): ByteBuffer => {
     return packetData.flipWriter();
 };
 
-export const playerSync = async (player: Player): Promise<void> => {
-    // We wrap this in a promise so that all player syncs can be run
-    // in parallel using Promise.all()
-    // @todo this also needs to run NPC syncs specific to this Player - Kat 19/Oct/22
-    // 76 is the opcode for the player sync packet
-    return new Promise<void>(resolve => {
-        const packetData = constructPlayerSyncPacket(player);
-        queuePacket(player, 76, packetData, PacketSize.VAR_SHORT, PacketQueueType.SYNC);
-        resolve();
-    });
+export const playerSyncPacket: OutboundPacket = {
+    name: 'playerSync',
+    size: PacketSize.VAR_SHORT,
+    queue: PacketQueueType.SYNC,
+    opcodes: {
+        319: 76
+    },
+    encoders: {
+        319: constructPlayerSyncPacket,
+    },
 };

@@ -1,7 +1,7 @@
 import { ByteBuffer } from "@runejs/common";
 import { Player } from "../player";
 import { getWorld } from "../world";
-import { PacketSize, queuePacket } from '../../net/packets';
+import { PacketQueueType, PacketSize, queuePacket } from '../../net/packets';
 import { Npc } from "./npc";
 import { isWithinDistance } from "../coord";
 
@@ -117,7 +117,7 @@ export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
 export const npcSync = async (player: Player): Promise<void> => {
     return new Promise<void>(resolve => {
         const packetData = constructNpcSyncPacket(player);
-        queuePacket(player, 249, packetData, PacketSize.VAR_SHORT, 'update');
+        queuePacket(player, 249, packetData, PacketSize.VAR_SHORT, PacketQueueType.SYNC);
         resolve();
     });
 }
