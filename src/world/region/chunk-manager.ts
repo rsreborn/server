@@ -1,5 +1,5 @@
-import { Coord } from "../coord";
-import { getWorld } from "world/world";
+import { Coord, coord } from "../coord";
+import { getWorld } from "../world";
 import { Npc } from "../npc";
 import { Player } from "../player";
 import { Chunk } from "./region";
@@ -30,34 +30,66 @@ export const removeNpcFromChunk = (npc: Npc): void => {
 }
 
 export const addPlayerToChunk = (player: Player): void => {
-    const chunkId = getChunkId(player.coords)
-    player.lastChunkId = chunkId
+    const chunkId = getChunkId(player.coords);
+    console.log('addPlayerToChunk - chunkId: ', chunkId);
+    player.lastChunkId = chunkId;
     getChunk(chunkId).players[player.worldIndex] = player.worldIndex;
 }
 
 export const addNpcToChunk = (npc: Npc): void => {
-    const chunkId = getChunkId(npc.coords)
-    npc.lastChunkId = chunkId
+    const chunkId = getChunkId(npc.coords);
+    npc.lastChunkId = chunkId;
     getChunk(chunkId).npcs[npc.worldIndex] = npc.worldIndex;
 }
 
 export const updatePlayerChunk = (player: Player): void => {
-    const chunkId = getChunkId(player.coords)
+    const chunkId = getChunkId(player.coords);
+    console.log('updatePlayerChunk - chunkId: ', chunkId);
     if (player.lastChunkId !== chunkId) {
+        console.log('updatePlayerChunk - updating player: ', player);
         getChunk(player.lastChunkId).players.splice(player.worldIndex, 1);
-        addPlayerToChunk(player)
+        addPlayerToChunk(player);
     }
 }
 
 export const updateNpcChunk = (npc: Npc): void => {
-    const chunkId = getChunkId(npc.coords)
+    const chunkId = getChunkId(npc.coords);
     if (npc.lastChunkId !== chunkId) {
         getChunk(npc.lastChunkId).npcs.splice(npc.worldIndex, 1);
-        addNpcToChunk(npc)
+        addNpcToChunk(npc);
     }
 }
 
-export const getRegionId = (coord: Coord): number => (((coord.x >> 3) / 8) << 8) + ((coord.y >> 3) / 8);
+export const getLocalChunkIds = (entityCoord: Coord, distance: number = 14): number[] => {
+    const regionCoords = getRegionCoords(entityCoord);
+    const chunkIds: number[] = [];
+    const offset = Math.ceil(distance / 8) * 8;
+    const baseX = regionCoords.regionBaseX + regionCoords.localRegionX;
+    const baseY = regionCoords.regionBaseY + regionCoords.localRegionY;
+    for (let x = baseX - offset; x < baseX + offset; x += 8) {
+        for (let y = baseY - offset; y < baseY + offset; y += 8) {
+            chunkIds.push(
+                getChunkId(
+                    coord(
+                        x,
+                        y,
+                        entityCoord.plane
+                    )
+                )
+            );
+        }
+    }
+
+    return chunkIds;
+}
+
+export const getLocalPlayerIds = (entityCoord: Coord, distance: number = 14): number[] => {
+    const playerIds: number[] = [];
+    const chunkIds = getLocalChunkIds(entityCoord);
+    const chunks = chunkIds.map(id => getWorld().chunkManager.activeChunks[id]);
+
+    return chunks.map();
+}
 
 export const getRegionCoords = (coord: Coord): RegionCoord => {
     const regionBaseX = (coord.x >> 6) << 6
@@ -105,5 +137,9 @@ export const getChunk = (chunkId: number): Chunk => {
 export const getChunkId = (coord: Coord): number => {
     const regionCoords = getRegionCoords(coord);
 
-    return getRegionId(coord) | regionCoords.regionChunkLocalX >> 4 | regionCoords.regionChunkLocalY >> 6; // Todo keep the 8th bit for the plane when we add support - Brian 11/1/2022
+    return (coord.plane << 24)
+      | (regionCoords.regionChunkLocalY << 20)
+      | (regionCoords.regionChunkLocalX << 16)
+      | (regionCoords.regionX << 8)
+      | regionCoords.regionY;
 }

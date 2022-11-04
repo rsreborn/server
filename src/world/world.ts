@@ -95,6 +95,7 @@ export const npcs = (): Npc[] => {
             sync: createNpcSyncState()
         })
     }
+
     return npcs;
 }
 
@@ -106,7 +107,7 @@ export const openWorld = (
         players: new Array(2048).fill(null),
         npcs: npcs(),
         chunkManager: {
-            activeChunks: new Array(1).fill(null),
+            activeChunks: new Array(0),
         }
     };
 
