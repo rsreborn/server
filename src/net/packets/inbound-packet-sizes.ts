@@ -87,7 +87,7 @@ INBOUND_PACKET_SIZES[357] = {
     91: -1,
 };
 
-INBOUND_PACKET_SIZES[317] = {
+INBOUND_PACKET_SIZES[319] = {
     64: 8,
     33: 6,
     46: 2,

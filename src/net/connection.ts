@@ -75,7 +75,7 @@ const handleInboundPacketData = (
 
         packet.opcode = packet.buffer.get('byte', 'u');
         packet.opcode = (packet.opcode - inCipher.rand()) & 0xff;
-        packet.size = INBOUND_PACKET_SIZES[String(packet.opcode)] ?? -3;
+        packet.size = INBOUND_PACKET_SIZES[String(player.client.connection.buildNumber)]?.[String(packet.opcode)] ?? -3;
     }
 
     // Variable length packet
@@ -161,7 +161,7 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
         } else if (connectionType === ConnectionType.UPDATE) {
             if (buffer.readable >= 2) {
                 connection.buildNumber = buffer.get('short', 'u');
-                logger.info(`On demand build ${connection.buildNumber}`);
+                logger.info(`On demand build ${connection.buildNumber}.`);
             }
             socket.write(RESPONSE_OK);
             connection.connectionState = ConnectionState.UPDATE;
