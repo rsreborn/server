@@ -84,11 +84,14 @@ export const getLocalChunkIds = (entityCoord: Coord, distance: number = 14): num
 }
 
 export const getLocalPlayerIds = (entityCoord: Coord, distance: number = 14): number[] => {
-    const playerIds: number[] = [];
-    const chunkIds = getLocalChunkIds(entityCoord);
+    const chunkIds = getLocalChunkIds(entityCoord, distance);
     const chunks = chunkIds.map(id => getWorld().chunkManager.activeChunks[id]);
 
-    return chunks.map();
+    // TODO
+    // Only pull player in range
+    // Start on coords chunk and work our way out
+
+    return chunks.map(chunk => chunk.players).flat();
 }
 
 export const getRegionCoords = (coord: Coord): RegionCoord => {

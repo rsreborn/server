@@ -92,7 +92,7 @@ export const npcs = (): Npc[] => {
                 y: 3217 + random2,
                 plane: 0
             },
-            sync: createNpcSyncState()
+            sync: createNpcSyncState(),
         })
     }
 
