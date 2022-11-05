@@ -1,5 +1,5 @@
-import { Player } from '../../../../world/player';
 import { ByteBuffer } from '@runejs/common';
+import { Player } from '../../../../world/player';
 
 export interface PlayerSyncEncoder {
     packetOpcode: number;

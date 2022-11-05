@@ -87,12 +87,8 @@ export const resetPlayerSyncState = (player: Player): void => {
 export const playerSync = async (player: Player): Promise<void> => {
     // We wrap this in a promise so that all player syncs can be run
     // in parallel using Promise.all()
-    // @todo this also needs to run NPC syncs specific to this Player - Kat 19/Oct/22
-    // 76 is the opcode for the player sync packet
     return new Promise<void>(resolve => {
         handleOutboundPacket(player, 'playerSync', {});
-        // const packetData = constructPlayerSyncPacket(player);
-        // queuePacket(player, 76, packetData, PacketSize.VAR_SHORT, PacketQueueType.SYNC);
         resolve();
     });
 };

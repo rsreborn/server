@@ -1,9 +1,7 @@
-import { ByteBuffer } from "@runejs/common";
-import { Player } from "../player";
-import { getWorld } from "../world";
-import { PacketQueueType, PacketSize, queuePacket } from '../../net/packets';
-import { Npc } from "./npc";
-import { isWithinDistance } from "../coord";
+import { ByteBuffer } from '@runejs/common';
+import { Player } from '../player';
+import { Npc } from './npc';
+import { handleOutboundPacket } from '../../net/packets';
 
 export enum SyncFlags {
     APPEARANCE = 1,
@@ -12,112 +10,57 @@ export enum SyncFlags {
 }
 
 export interface NpcSyncState {
-    flags: number;
+    appearanceUpdate: boolean;
+    forceChat: boolean;
+    faceEntity: boolean;
     walkDir: number;
     runDir: number;
     teleporting: boolean;
 }
 
+export const npcUpdateRequired = (npc: Npc): boolean => {
+    const {
+        appearanceUpdate,
+        forceChat,
+        faceEntity,
+    } = npc.sync;
+
+    return appearanceUpdate || forceChat || faceEntity;
+};
+
 export const createNpcSyncState = (): NpcSyncState => {
     return {
-        flags: 0,
+        appearanceUpdate: false,
+        forceChat: false,
+        faceEntity: false,
         walkDir: -1,
         runDir: -1,
         teleporting: false
     };
 };
 
-const appendUpdateMasks = (npc: Npc, data: ByteBuffer): void => {
-    if (npc.sync.flags === 0) {
-        return;
-    }
-    data.put(npc.sync.flags, 'byte');
-}
+export const resetNpcSyncState = (npc: Npc): void => {
+    npc.sync = createNpcSyncState();
+};
 
-const appendMovement = (npc: Npc, data: ByteBuffer): void => {
-    const updateBlockRequired = npc.sync.flags !== 0;
-
-    if (npc.sync.walkDir === -1) {
-        if (updateBlockRequired) {
-            data.putBits(1, 1);
-            data.putBits(2, 0);
-        } else {
-            data.putBits(1, 0);
-        }
-    } else {
-        data.putBits(1, 1);
-        data.putBits(2, 1);
-        data.putBits(3, npc.sync.walkDir);
-        data.putBits(1, updateBlockRequired ? 1 : 0);
-    }
-}
-
-const appendAddTrackedNpc = (npc: Npc, player: Player, data: ByteBuffer): void => {
-    const x = npc.coords.x - player.coords.x;
-    const y = npc.coords.y - player.coords.y;
-    const updateRequired = npc.sync.flags !== 0;
-
-    data.putBits(14, npc.index);
-    data.putBits(5, x);
-    data.putBits(1, updateRequired ? 1 : 0);
-    data.putBits(5, y);
-    data.putBits(12, npc.id);
-    data.putBits(1, 0);
-}
-
-export const constructNpcSyncPacket = (player: Player): ByteBuffer => {
-    const packetData = new ByteBuffer(5000);
-    const updateMaskData = new ByteBuffer(5000);
-
-    packetData.openBitBuffer();
-
-    const npcs = getWorld().npcs;
-    const trackedNpcs = player.trackedNpcs;
-
-    packetData.putBits(8, trackedNpcs.length);
-
-    trackedNpcs.forEach(npc => {
-        if (npcs.includes(npc) && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
-            appendMovement(npc, packetData);
-            appendUpdateMasks(npc, updateMaskData);
-        } else {
-            packetData.putBits(1, 1);
-            packetData.putBits(2, 3);
-        }
-    });
-    
-    for(const npc of npcs) {
-        if (player.trackedNpcs.length === 255) {
-            break;
-        }
-
-        if (player.trackedNpcs.includes(npc)
-            || !isWithinDistance(player?.coords, npc.coords)) {
-            continue;
-        }
-
-        player.trackedNpcs.push(npc);
-
-        if (npc) {
-            appendAddTrackedNpc(npc, player, packetData);
-            appendUpdateMasks(npc, updateMaskData);
-        }
-    }
-   
-    if (updateMaskData.writerIndex !== 0) {
-        packetData.putBits(14, 16383);
-        packetData.closeBitBuffer();
-        packetData.putBytes(updateMaskData.flipWriter());
-    } else {
-        packetData.closeBitBuffer();
-    }
-    return packetData.flipWriter();
-}
+// const appendAddTrackedNpc = (npc: Npc, player: Player, data: ByteBuffer): void => {
+//     const x = npc.coords.x - player.coords.x;
+//     const y = npc.coords.y - player.coords.y;
+//     const updateRequired = npc.sync.flags !== 0;
+//
+//     data.putBits(14, npc.index);
+//     data.putBits(5, x);
+//     data.putBits(1, updateRequired ? 1 : 0);
+//     data.putBits(5, y);
+//     data.putBits(12, npc.id);
+//     data.putBits(1, 0);
+// };
 
 export const npcSync = async (player: Player): Promise<void> => {
+    // We wrap this in a promise so that all NPC syncs can be run
+    // in parallel using Promise.all()
     return new Promise<void>(resolve => {
-        const packetData = constructNpcSyncPacket(player);
-        queuePacket(player, 249, packetData, PacketSize.VAR_SHORT, PacketQueueType.SYNC);
+        handleOutboundPacket(player, 'npcSync', {});
         resolve();
     });
-}
+};

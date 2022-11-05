@@ -7,6 +7,7 @@ import { welcomeScreenPacket } from './welcome-screen-packet';
 import { friendsListPacket } from './friends-list-packet';
 import { updateSkillPacket } from './update-skill-packet';
 import { playerSyncPacket } from './player-sync/player-sync-packet';
+import { npcSyncPacket } from './npc-sync/npc-sync-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -17,6 +18,7 @@ const outboundPackets: OutboundPacket[] = [
     friendsListPacket,
     updateSkillPacket,
     playerSyncPacket,
+    npcSyncPacket,
 ];
 
 export default outboundPackets;
