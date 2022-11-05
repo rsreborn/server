@@ -1,5 +1,5 @@
 import { playerSyncEncoders } from './player-sync-encoder';
-import { appendAppearanceData } from './player-appearance-data';
+import { appendAppearanceData } from './player-sync-appearance';
 import { getLocalCoord } from '../../../../world';
 import { playerUpdateRequired } from '../../../../world/player';
 
