@@ -1,7 +1,7 @@
-import { playerSyncEncoders } from './player-sync-encoder';
-import { appendAppearanceData } from './player-sync-appearance';
-import { getLocalCoord } from '../../../../world';
-import { playerUpdateRequired } from '../../../../world/player';
+import { playerSyncEncoders } from '../player-sync-encoder';
+import { appendAppearanceData } from '../player-sync-appearance';
+import { getLocalCoord } from '../../../../../world';
+import { playerUpdateRequired } from '../../../../../world/player';
 
 // @todo finish update flag enum - Kat 3/Nov/22
 enum UpdateFlags {

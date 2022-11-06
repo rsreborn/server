@@ -1,7 +1,7 @@
-import { playerSyncEncoders } from './player-sync-encoder';
-import { appendAppearanceData } from './player-sync-appearance';
-import { getLocalCoord } from '../../../../world';
-import { playerUpdateRequired } from '../../../../world/player';
+import { playerSyncEncoders } from '../player-sync-encoder';
+import { appendAppearanceData } from '../player-sync-appearance';
+import { getLocalCoord } from '../../../../../world';
+import { playerUpdateRequired } from '../../../../../world/player';
 
 enum UpdateFlags {
     FACE_COORDS = 0x1,

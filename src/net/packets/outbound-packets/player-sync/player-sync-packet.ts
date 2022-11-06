@@ -2,8 +2,8 @@ import { ByteBuffer } from '@runejs/common';
 import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '../../packets';
 import { Player, playerUpdateRequired } from '../../../../world/player';
 import { playerSyncEncoders } from './player-sync-encoder';
-import './player-sync-319';
-import './player-sync-357';
+import './builds/player-sync-319';
+import './builds/player-sync-357';
 
 const appendNewlyTrackedPlayers = (data: ByteBuffer) => {
     // @todo multiplayer support - Kat 3/Nov/22

@@ -4,6 +4,8 @@ import { Player } from '../../../../world/player';
 import { getWorld, isWithinDistance } from '../../../../world';
 import { Npc, npcUpdateRequired } from '../../../../world/npc';
 import { npcSyncEncoders } from './npc-sync-encoder';
+import './builds/npc-sync-319';
+import './builds/npc-sync-357';
 
 const appendNewlyTrackedNpcs = (
     player: Player,
@@ -22,8 +24,6 @@ const appendUpdateMasks = (
         return;
     }
 
-    // data.put(npc.sync.flags, 'byte');
-
     npcSyncEncoders[String(player.client.connection.buildNumber)]?.updateMaskEncoder(npc, data);
 };
 
@@ -38,6 +38,7 @@ const appendMovement = (npc: Npc, data: ByteBuffer): void => {
             data.putBits(1, 0);
         }
     } else {
+        // @todo support for running - Kat 6/Nov/22
         data.putBits(1, 1);
         data.putBits(2, 1);
         data.putBits(3, npc.sync.walkDir);
