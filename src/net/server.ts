@@ -57,7 +57,7 @@ export const startServer = async (
     worldId: number,
     jaggrabPort: number,
     webPort: number,
-    buildNumbers: number[] = [319, 357],
+    buildNumbers: number[] = [289, 319, 357],
     socketOptions?: SocketOptions,
     fileServerSocketOptions?: SocketOptions,
 ): Promise<GameServer> => {
