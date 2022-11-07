@@ -44,7 +44,6 @@ export const addNpcToChunk = (npc: Npc): void => {
 
 export const updatePlayerChunk = (player: Player): void => {
     const chunkId = getChunkId(player.coords);
-    console.log('updatePlayerChunk - chunkId: ', chunkId);
     if (player.lastChunkId !== chunkId) {
         console.log('updatePlayerChunk - updating player: ', player);
         getChunk(player.lastChunkId).players.splice(player.worldIndex, 1);

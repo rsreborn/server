@@ -6,6 +6,7 @@ import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync
 import { Appearance, defaultAppearance } from './appearance';
 import { createMovementQueue, MovementQueue, movementTick, resetMovementQueue } from '../movement-queue';
 import { Npc } from '../npc';
+import { updatePlayerChunk } from '../region';
 
 export enum PlayerRights {
     USER = 0,
@@ -38,6 +39,7 @@ export const playerTick = async (player: Player): Promise<void> => {
     // in parallel using Promise.all()
     return new Promise<void>(resolve => {
         movementTick(player);
+        updatePlayerChunk(player);
         resolve();
     });
 };

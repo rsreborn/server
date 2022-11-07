@@ -26,5 +26,5 @@ export const isWithinDistance = (position1: Coord, position2: Coord, distance: n
     }
     let deltaX = position1.x - position2.x, deltaY = position1.y - position2.y;
 
-    return deltaX <= distance && deltaX >= (distance - 1) && deltaY <= distance && deltaY >= (distance - 1);
+    return deltaX <= distance && deltaX >= -(distance + 1) && deltaY <= distance && deltaY >= -(distance + 1);
 }
