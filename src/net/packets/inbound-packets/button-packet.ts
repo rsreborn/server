@@ -21,10 +21,15 @@ export const buttonPacket: InboundPacket<ButtonPacketData> = {
         console.log(`button packet handler ${data.widgetId}`);
     },
     opcodes: {
-        319: 189
+        319: 189,
+        357: 211,
     },
     decoders: {
         319: (opcode: number, data: ByteBuffer) => {
+            const widgetId = data.get('short', 'u');
+            return { widgetId };
+        },
+        357: (opcode: number, data: ByteBuffer) => {
             const widgetId = data.get('short', 'u');
             return { widgetId };
         }

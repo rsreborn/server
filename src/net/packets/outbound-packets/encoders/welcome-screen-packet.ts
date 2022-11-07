@@ -1,5 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket } from '../packets';
+import { OutboundPacket } from '../../packets';
 
 interface WelcomeScreenData {
 }

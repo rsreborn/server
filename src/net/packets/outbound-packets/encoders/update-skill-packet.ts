@@ -1,5 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket } from '../packets';
+import { OutboundPacket } from '../../packets';
 
 interface UpdateSkillData {
     skillId: number;
@@ -10,7 +10,7 @@ interface UpdateSkillData {
 export const updateSkillPacket: OutboundPacket<UpdateSkillData> = {
     name: 'updateSkill',
     opcodes: {
-        319: 211
+        319: 211,
     },
     encoders: {
         319: (player, opcode, data) => {
@@ -19,6 +19,6 @@ export const updateSkillPacket: OutboundPacket<UpdateSkillData> = {
             buffer.put(data.skillLevel, 'byte');
             buffer.put(data.skillId, 'byte');
             return buffer;
-        }
+        }       
     },
 };

@@ -18,7 +18,7 @@ export const walkPacket: InboundPacket<WalkPacketData> = {
         queuePath(player, data.path, true, data.forceRun);
     },
     opcodes: {
-        319: [ 155, 178, 191 ]
+        319: [ 155, 178, 191 ],
     },
     decoders: {
         319: (opcode: number, data: ByteBuffer) => {

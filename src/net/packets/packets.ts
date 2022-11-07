@@ -191,61 +191,52 @@ export const sendUpdateMapRegionPacket = (player: Player): void => {
 };
 
 export const sendWidget = (player: Player, widgetId: number): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(2);
-    buffer.put(widgetId, 'short', 'le');
-    queuePacket(player, 188, buffer);
+    handleOutboundPacket(player, 'widget', {
+        widgetId,
+    }); 
 };
 
 export const sendChatboxWidget = (player: Player, widgetId: number): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(2);
-    buffer.put(widgetId, 'short');
-    queuePacket(player, 200, buffer);
+    handleOutboundPacket(player, 'chatboxWidget', {
+        widgetId,
+    }); 
 };
 
-export const sendSideBarWidgetWithDisabledTabs = (player: Player, widgetId: number): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(2);
-    buffer.put(widgetId, 'short', 'le');
-    queuePacket(player, 253, buffer);
+export const sendSidebarWidgetWithDisabledTabs = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'sidebarDisabledTabs', {
+        widgetId,
+    });
 };
 
 export const sendAnimateWidget = (player: Player, widgetId: number, animationId: number): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(4);
-    buffer.put(widgetId, 'short');
-    buffer.put(animationId, 'short');
-    queuePacket(player, 95, buffer);
+    handleOutboundPacket(player, 'animateWidget', {
+        widgetId,
+        animationId,
+    }); 
 };
 
 export const sendWidgetPlayerHead = (player: Player, widgetId: number): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(2);
-    buffer.put(widgetId, 'short', 'le');
-    queuePacket(player, 252, buffer);
+    handleOutboundPacket(player, 'widgetPlayerHead', {
+        widgetId,
+    });
 };
 
 export const sendWidgetNpcHead = (player: Player, widgetId: number, npcId: number): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(4);
-    buffer.put(widgetId, 'short');
-    buffer.put(widgetId, 'short', 'le');
-    queuePacket(player, 157, buffer);
+    handleOutboundPacket(player, 'widgetNpcHead', {
+        widgetId,
+        npcId,
+    });
 };
 
 export const sendWidgetString = (player: Player, widgetId: number, message: string): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(message.length + 3);
-    buffer.putString(message, 10);
-    buffer.put(widgetId, 'short');
-    queuePacket(player, 127, buffer, PacketSize.VAR_SHORT);
+    handleOutboundPacket(player, 'updateWidgetString', {
+        widgetId,
+        message,
+    });
 };
 
 export const sendCloseWidgets = (player: Player): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(0);
-    queuePacket(player, 143, buffer);
+    handleOutboundPacket(player, 'closeWidgets', {});
 };
 
 export const sendSideBarWidget = (player: Player, sidebarId: number, widgetId: number): void => {
@@ -255,18 +246,16 @@ export const sendSideBarWidget = (player: Player, sidebarId: number, widgetId: n
     });
 };
 
-export const sendFlashSideBarIcon = (player: Player, sideBarId: number): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(1);
-    buffer.put(sideBarId, 'byte');
-    queuePacket(player, 168, buffer);
+export const sendFlashSidebarIcon = (player: Player, sidebarId: number): void => {
+    handleOutboundPacket(player, 'flashSideBarIcon', {
+        sidebarId,
+    });
 };
 
 export const sendSystemUpdate = (player: Player, time: number): void => {
-    // @todo handleOutboundPacket - Kat 3/Nov/22
-    const buffer = new ByteBuffer(2);
-    buffer.put(time, 'short');
-    queuePacket(player, 103, buffer);
+    handleOutboundPacket(player, 'systemUpdate', {
+        time,
+    });
 };
 
 export const sendLogout = (player: Player): void => {
