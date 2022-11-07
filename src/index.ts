@@ -2,7 +2,7 @@ import { startServer } from './net/server';
 
 (async () => {
     await startServer(
-        '319 Server',
+        'RS-Reborn server',
         '0.0.0.0',
         43594,
         1,

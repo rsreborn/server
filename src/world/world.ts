@@ -2,6 +2,7 @@ import { logger } from '@runejs/common';
 import { Coord } from './coord';
 import { createNpcSyncState, Npc, npcSync, npcTick, npcTickCleanup } from './npc';
 import { Player, playerTickCleanup, playerTick, playerSync } from './player';
+import { serverRunning } from '../net/server';
 
 export const TICK_LENGTH = 600;
 
@@ -19,6 +20,10 @@ const tick = async (): Promise<void> => {
         throw new Error(`World is not open!`);
     }
 
+    if (!serverRunning()) {
+        return;
+    }
+
     const startTime = Date.now();
 
     const activePlayers = worldSingleton.players.filter(p => p !== null);
@@ -32,9 +37,10 @@ const tick = async (): Promise<void> => {
         ]);
 
         // Run Player and NPC syncs
-        await Promise.all(
-            activePlayers.map(async player => [playerSync(player), npcSync(player)]),
-        );
+        await Promise.all([
+            ...activePlayers.map(async player => playerSync(player)),
+            ...activePlayers.map(async player => npcSync(player)),
+        ]);
 
         // Run Player and NPC post-tick cleanups
         await Promise.all([

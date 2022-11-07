@@ -6,7 +6,7 @@ import { Isaac } from './isaac';
 import { Player, playerLogin, PlayerRights } from '../world/player';
 import { handleInboundPacket } from './packets';
 import { handleUpdateRequests } from './file-server';
-import { INBOUND_PACKET_SIZES } from './packets/inbound-packet-sizes';
+import INBOUND_PACKET_SIZES from './packets/inbound-packet-sizes';
 
 const RSA_EXPONENT = BigInteger('85749236153780929917924872511187713651124617292658988978182063731979923800090977664547424642067377984001222110909310620040899943594191124988795815431638577479242072599794149649824942794144264088097130432112910214560183536387949202712729964914726145231993678948421001368196284315651219252190430508607437712749');
 const RSA_MODULUS = BigInteger('85851413706447406835286856960321868491021158946959045519533110967212579875747603892534938950597622190034801837526749417278303359405620369366942839883641648688111135276342550236485518612241524546375576253238379707601227775510104577557183947475438430283206434950768729692944226445159468674814615586984703672433');
@@ -29,6 +29,7 @@ export interface Connection {
     serverKey?: bigint;
     clientKey1?: number;
     clientKey2?: number;
+    buildNumber?: number;
     player?: Player;
 }
 
@@ -74,7 +75,7 @@ const handleInboundPacketData = (
 
         packet.opcode = packet.buffer.get('byte', 'u');
         packet.opcode = (packet.opcode - inCipher.rand()) & 0xff;
-        packet.size = INBOUND_PACKET_SIZES[String(packet.opcode)] ?? -3;
+        packet.size = INBOUND_PACKET_SIZES[String(player.client.connection.buildNumber)]?.[String(packet.opcode)] ?? -3;
     }
 
     // Variable length packet
@@ -158,6 +159,10 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             socket.write(response.toNodeBuffer());
             connection.connectionState = ConnectionState.LOGIN;
         } else if (connectionType === ConnectionType.UPDATE) {
+            if (buffer.readable >= 2) {
+                connection.buildNumber = buffer.get('short', 'u');
+                logger.info(`On demand build ${connection.buildNumber}.`);
+            }
             socket.write(RESPONSE_OK);
             connection.connectionState = ConnectionState.UPDATE;
         } else {
@@ -167,7 +172,7 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
         // Post-handshake
         if (connectionState === ConnectionState.UPDATE) {
             // Update server request
-            handleUpdateRequests(socket, buffer);
+            handleUpdateRequests(connection, buffer);
         } else if (connectionState === ConnectionState.LOGIN) {
             // Login type
             const loginOpcode = buffer.get('byte', 'u');
@@ -185,11 +190,14 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
                 return;
             }
 
-            const gameBuild = buffer.get('short', 'u');
+            connection.buildNumber = buffer.get('short', 'u');
+            // @todo ensure build is supported - Kat 2/Nov/22
+
             const lowMemory = buffer.get('byte', 'u') === 1;
 
             // Cache checksums
             for (let i = 0; i < 9; i++) {
+                // @todo verify these against the cache - Kat 2/Nov/22
                 buffer.get('int');
             }
 
@@ -255,13 +263,12 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
                 password,
                 rights,
                 client: {
-                    gameBuild,
                     lowMemory,
                     inCipher,
                     outCipher,
                     connection,
                     outboundPacketQueue: [],
-                    outboundUpdateQueue: [],
+                    outboundSyncQueue: [],
                 },
             };
 
