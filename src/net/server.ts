@@ -2,9 +2,8 @@ import { createServer, Server } from 'net';
 import { logger } from '@runejs/common';
 import { connectionCreated } from './connection';
 import { closeWorld, openWorld, World } from '../world';
-import { loadCache } from '../cache';
+import { loadCaches } from '../cache';
 import { getFileServer, startFileServer } from './file-server';
-import { readPacketFiles } from './packets';
 
 export interface SocketOptions {
     noDelay?: boolean;
@@ -16,7 +15,7 @@ export interface GameServer {
     serverName: string;
     hostName: string;
     port: number;
-    buildNumber: number; // @todo make this player based with the server supporting any - Kat 29/Oct/22
+    buildNumbers: number[];
     socketOptions?: SocketOptions;
     server: Server;
     world: World;
@@ -58,11 +57,11 @@ export const startServer = async (
     worldId: number,
     jaggrabPort: number,
     webPort: number,
-    buildNumber: number = 319,
+    buildNumbers: number[] = [289, 319, 357],
     socketOptions?: SocketOptions,
     fileServerSocketOptions?: SocketOptions,
 ): Promise<GameServer> => {
-    await loadCache(buildNumber);
+    await loadCaches(buildNumbers);
 
     startFileServer(hostName, jaggrabPort, webPort, fileServerSocketOptions);
 
@@ -70,17 +69,17 @@ export const startServer = async (
         socket => connectionCreated(socket, socketOptions)
     ).listen(port, hostName);
 
+    running = true;
+
     const world = openWorld(worldId);
 
     logger.info(`${ serverName } listening @ ${ hostName }:${ port }`);
-
-    running = true;
 
     gameServer = {
         serverName,
         hostName,
         port,
-        buildNumber,
+        buildNumbers,
         socketOptions,
         server,
         world,
@@ -95,4 +94,8 @@ export const getGameServer = (): GameServer => {
     }
 
     return gameServer;
+};
+
+export const serverRunning = (): boolean => {
+    return running;
 };

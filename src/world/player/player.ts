@@ -1,10 +1,10 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendChatboxMessage, sendFriendsList, sendLogout, sendSideBarWidget, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, writePackets } from '../../net/packets';
+import { sendChatboxMessage, sendFriendsList, sendLogout, sendSideBarWidget, sendSidebarWidgetWithDisabledTabs, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
-import { createPlayerSyncState, PlayerSyncState, SyncFlags } from './player-sync';
+import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
-import { createMovementQueue, MovementQueue, movementTick, resetMovementQueue } from '../movement-queue';
+import { createMovementQueue, MovementQueue, movementTick } from '../movement-queue';
 import { Npc } from '../npc';
 import { updatePlayerChunk } from '../region';
 
@@ -48,14 +48,7 @@ export const playerTickCleanup = async (player: Player): Promise<void> => {
     // We wrap this in a promise so that all player tick cleanups can be run
     // in parallel using Promise.all()
     return new Promise<void>(resolve => {
-        // @todo - Kat 19/Oct/22
-        // @todo send queued outgoing packets - Kat 19/Oct/22
-        player.sync.flags = 0;
-        player.sync.teleporting = false;
-        player.sync.runDir = -1;
-        player.sync.walkDir = -1;
-        player.sync.mapRegion = false;
-        player.sync.appearanceData = undefined;
+        resetPlayerSyncState(player);
 
         writePackets(player);
 
@@ -66,8 +59,6 @@ export const playerTickCleanup = async (player: Player): Promise<void> => {
 export const playerLogin = (player: Player): boolean => {
     player.sync = createPlayerSyncState();
     player.appearance = defaultAppearance();
-
-    player.sync.flags |= SyncFlags.APPEARANCE_UPDATE;
 
     player.movementQueue = createMovementQueue();
 
@@ -91,7 +82,7 @@ export const playerLogin = (player: Player): boolean => {
         sendSideBarWidget(player, index, id);
     });
 
-    sendChatboxMessage(player, "Welcome to RS-Reborn #319!");
+    sendChatboxMessage(player, `Welcome to RS-Reborn ${player.client.connection.buildNumber}!`);
     sendFriendsList(player, 2);
     for (let i = 0; i < 20; i++) {
         if (i === 3) {
@@ -100,7 +91,7 @@ export const playerLogin = (player: Player): boolean => {
             sendSkill(player, i, 1, 0);
         }
     }
-
+    sendSidebarWidgetWithDisabledTabs(player, 0)
     return addPlayer(player);
 };
 

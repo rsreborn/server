@@ -3,16 +3,17 @@ import { queue } from 'async';
 import { ByteBuffer } from '@runejs/common';
 import { getFileData } from '@runejs/cache';
 import { getCache } from '../../cache';
+import { Connection } from '../connection';
 
 export interface UpdateTask {
     cacheIndex: number;
     fileNumber: number;
     priority: number;
-    socket: Socket;
+    connection: Connection;
 }
 
 export const handleUpdateRequests = (
-    socket: Socket,
+    connection: Connection,
     request: ByteBuffer,
 ): void => {
     while (request.readable >= 4) {
@@ -25,15 +26,15 @@ export const handleUpdateRequests = (
         // priority 2 = mandatory
 
         updateQueue.push({
-            cacheIndex, fileNumber, priority, socket,
+            cacheIndex, fileNumber, priority, connection,
         });
     }
 };
 
 export const updateQueue = queue<UpdateTask>((task, completed) => {
     // @todo handle different file priorities - Kat 22/Oct/22
-    const { cacheIndex, fileNumber, priority, socket } = task;
-    const cache = getCache();
+    const { cacheIndex, fileNumber, priority, connection } = task;
+    const cache = getCache(connection.buildNumber);
 
     // logger.info(`Handling update server task: cache[${cacheIndex}] file[${fileNumber}]
     // priority[${priority}]`);
@@ -65,7 +66,7 @@ export const updateQueue = queue<UpdateTask>((task, completed) => {
         packet.putBytes(file, written, written + blockSize);
 
         written += blockSize;
-        socket.write(packet.toNodeBuffer());
+        connection.socket.write(packet.toNodeBuffer());
     }
 
     completed();

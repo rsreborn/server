@@ -1,5 +1,5 @@
 import { Coord } from "../coord";
-import { NpcSyncState } from "./npc-sync";
+import { NpcSyncState, resetNpcSyncState } from "./npc-sync";
 
 export interface Npc {
     id: number;
@@ -20,10 +20,7 @@ export const npcTick = async (npc: Npc): Promise<void> => {
 
 export const npcTickCleanup = async (npc: Npc): Promise<void> => {
     return new Promise<void>(resolve => {
-        npc.sync.flags = 0;
-        npc.sync.teleporting = false;
-        npc.sync.runDir = -1;
-        npc.sync.walkDir = -1;
+        resetNpcSyncState(npc);
         resolve();
     });
 };

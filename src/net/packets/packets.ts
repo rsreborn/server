@@ -2,13 +2,18 @@ import { ByteBuffer, logger } from '@runejs/common';
 import { Player } from '../../world/player';
 import { getMapCoord } from '../../world';
 import inboundPackets from './inbound-packets';
-import { getGameServer } from '../server';
-import { INBOUND_PACKET_SIZES } from './inbound-packet-sizes';
+import outboundPackets from './outbound-packets';
+import INBOUND_PACKET_SIZES from './inbound-packet-sizes';
 
-export enum PacketSize {
+export const enum PacketSize {
     FIXED = 0,
     VAR_BYTE = 1,
-    VAR_SHORT = 2
+    VAR_SHORT = 2,
+}
+
+export const enum PacketQueueType {
+    PACKET = 'packet',
+    SYNC = 'sync',
 }
 
 export interface Packet {
@@ -18,8 +23,10 @@ export interface Packet {
 }
 
 export type PacketOpcodeMap = { [key: number ]: number | number[] };
-export type PacketDecoderMap<T = any> = { [key: number]: PacketDecoder<T> };
 export type PacketDecoder<T = any> = (opcode: number, data: ByteBuffer) => T;
+export type PacketDecoderMap<T = any> = { [key: number]: PacketDecoder<T> };
+export type PacketEncoder<T = any> = (player: Player, opcode: number, data: T) => ByteBuffer;
+export type PacketEncoderMap<T = any> = { [key: number]: PacketEncoder<T> };
 
 export type PacketHandler<T = any> = (
     player: Player,
@@ -33,19 +40,20 @@ export interface InboundPacket<T = any> {
     decoders: PacketDecoderMap<T>;
 }
 
+export interface OutboundPacket<T = any> {
+    name: string;
+    size?: PacketSize;
+    queue?: PacketQueueType;
+    opcodes: PacketOpcodeMap;
+    encoders: PacketEncoderMap<T>;
+}
+
 export const handleInboundPacket = (
     player: Player,
     opcode: number,
     data: ByteBuffer | null,
 ): boolean => {
-    // @todo the below is all test code until we have an auto-importer for everything in inbound-packets/impl/* - Kat 25/Oct/22
-
-    // Junk packets
-    if (opcode === 25 || opcode === 63 || opcode === 226) {
-        return true;
-    }
-
-    const buildNumber = getGameServer().buildNumber;
+    const buildNumber = player.client.connection.buildNumber;
     let inboundPacket: InboundPacket;
 
     for (const packet of inboundPackets) {
@@ -74,7 +82,7 @@ export const handleInboundPacket = (
 
     logger.info(`Unhandled packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
 
-    const knownPacket = INBOUND_PACKET_SIZES[String(opcode)] !== undefined;
+    const knownPacket = INBOUND_PACKET_SIZES[String(buildNumber)][String(opcode)] !== undefined;
     if (!knownPacket) {
         logger.warn(`Unknown packet ${ opcode } encountered!`);
         return false;
@@ -83,12 +91,49 @@ export const handleInboundPacket = (
     return true;
 };
 
+export const handleOutboundPacket = <T = any>(
+    player: Player,
+    packetName: string,
+    data: T,
+): void => {
+    const outboundPacket: OutboundPacket = outboundPackets.find(p => p.name === packetName);
+
+    if (!outboundPacket) {
+        logger.error(`Outbound packet ${packetName} is not registered!`);
+        return;
+    }
+
+    const buildNumber = player.client.connection.buildNumber;
+    const opcode = outboundPacket.opcodes[String(buildNumber)];
+
+    if (opcode === undefined) {
+        logger.error(`Outbound packet ${packetName} opcode is not registered for game build ${buildNumber}!`);
+        return;
+    }
+
+    const encoder = outboundPacket.encoders[String(buildNumber)];
+
+    if (!encoder) {
+        logger.error(`Outbound packet ${packetName} encoder is not registered for game build ${buildNumber}!`);
+        return;
+    }
+
+    const buffer = encoder(player, opcode, data);
+    queuePacket(
+        player,
+        opcode,
+        buffer,
+        outboundPacket.size ?? PacketSize.FIXED,
+        outboundPacket.queue ?? PacketQueueType.PACKET
+    );
+};
+
 export const queuePacket = (
     player: Player,
     opcode: number,
     packetData: ByteBuffer,
     packetType: PacketSize = PacketSize.FIXED,
-    queueType: 'packet' | 'update' = 'packet',
+    queueType: PacketQueueType = PacketQueueType.PACKET,
 ): void => {
     let size = packetData.length;
 
@@ -111,17 +156,17 @@ export const queuePacket = (
 
     packetData.copy(packet, copyStart, 0, size);
 
-    if (queueType === 'packet') {
+    if (queueType === PacketQueueType.PACKET) {
         player.client.outboundPacketQueue.push(packet.toNodeBuffer());
-    } else if (queueType === 'update') {
-        player.client.outboundUpdateQueue.push(packet.toNodeBuffer());
+    } else if (queueType === PacketQueueType.SYNC) {
+        player.client.outboundSyncQueue.push(packet.toNodeBuffer());
     }
 };
 
 export const writePackets = (player: Player): void => {
     const buffer = Buffer.concat([
         ...player.client.outboundPacketQueue,
-        ...player.client.outboundUpdateQueue,
+        ...player.client.outboundSyncQueue,
     ]);
 
     if (buffer.length !== 0) {
@@ -129,118 +174,108 @@ export const writePackets = (player: Player): void => {
     }
 
     player.client.outboundPacketQueue = [];
-    player.client.outboundUpdateQueue = [];
+    player.client.outboundSyncQueue = [];
 };
 
 export const sendChatboxMessage = (player: Player, message: string): void => {
-    const buffer = new ByteBuffer(message.length + 1);
-    buffer.putString(message, 10);
-    queuePacket(player, 50, buffer, PacketSize.VAR_BYTE);
+    handleOutboundPacket(player, 'chatboxMessage', {
+        message,
+    });
 };
 
 export const sendUpdateMapRegionPacket = (player: Player): void => {
-    const buffer = new ByteBuffer(4);
-    const mapCoord = getMapCoord(player.coords);
-    buffer.put(mapCoord.x, 'short');
-    buffer.put(mapCoord.y, 'short', 'le');
-
-    queuePacket(player, 228, buffer);
+    const mapCoords = getMapCoord(player.coords);
+    handleOutboundPacket(player, 'updateMapRegion', {
+        mapCoords,
+    });
 };
 
 export const sendWidget = (player: Player, widgetId: number): void => {
-    const buffer = new ByteBuffer(2);
-    buffer.put(widgetId, 'short', 'le');
-    queuePacket(player, 188, buffer);
-}
-
-export const sendChatboxWidget = (player: Player, widgetId: number): void => {
-    const buffer = new ByteBuffer(2);
-    buffer.put(widgetId, 'short');
-    queuePacket(player, 200, buffer);
-}
-
-export const sendSideBarWidgetWithDisabledTabs = (player: Player, widgetId: number): void => {
-    const buffer = new ByteBuffer(2);
-    buffer.put(widgetId, 'short', 'le');
-    queuePacket(player, 253, buffer);
-}
-
-export const sendAnimateWidget = (player: Player, widgetId: number, animationId: number): void => {
-    const buffer = new ByteBuffer(4);
-    buffer.put(widgetId, 'short');
-    buffer.put(animationId, 'short');
-    queuePacket(player, 95, buffer);
-}
-
-export const sendWidgetPlayerHead = (player: Player, widgetId: number): void => {
-    const buffer = new ByteBuffer(2);
-    buffer.put(widgetId, 'short', 'le');
-    queuePacket(player, 252, buffer);
-}
-
-export const sendWidgetNpcHead = (player: Player, widgetId: number, npcId: number): void => {
-    const buffer = new ByteBuffer(4);
-    buffer.put(widgetId, 'short');
-    buffer.put(widgetId, 'short', 'le');
-    queuePacket(player, 157, buffer);
-}
-
-export const sendWidgetString = (player: Player, widgetId: number, message: string): void => {
-    const buffer = new ByteBuffer(message.length + 3);
-    buffer.putString(message, 10);
-    buffer.put(widgetId, 'short');
-    queuePacket(player, 127, buffer, PacketSize.VAR_SHORT);
-}
-
-export const sendCloseWidgets = (player: Player): void => {
-    const buffer = new ByteBuffer(0);
-    queuePacket(player, 143, buffer);
-}
-
-export const sendSideBarWidget = (player: Player, sideBarId: number, widgetId: number): void => {
-    const buffer = new ByteBuffer(3);
-    buffer.put(widgetId, 'short');
-    buffer.put(sideBarId, 'byte');
-    queuePacket(player, 229, buffer);
+    handleOutboundPacket(player, 'widget', {
+        widgetId,
+    }); 
 };
 
-export const sendFlashSideBarIcon = (player: Player, sideBarId: number): void => {
-    const buffer = new ByteBuffer(1);
-    buffer.put(sideBarId, 'byte');
-    queuePacket(player, 168, buffer);
-}
+export const sendChatboxWidget = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'chatboxWidget', {
+        widgetId,
+    }); 
+};
+
+export const sendSidebarWidgetWithDisabledTabs = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'sidebarDisabledTabs', {
+        widgetId,
+    });
+};
+
+export const sendAnimateWidget = (player: Player, widgetId: number, animationId: number): void => {
+    handleOutboundPacket(player, 'animateWidget', {
+        widgetId,
+        animationId,
+    }); 
+};
+
+export const sendWidgetPlayerHead = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'widgetPlayerHead', {
+        widgetId,
+    });
+};
+
+export const sendWidgetNpcHead = (player: Player, widgetId: number, npcId: number): void => {
+    handleOutboundPacket(player, 'widgetNpcHead', {
+        widgetId,
+        npcId,
+    });
+};
+
+export const sendWidgetString = (player: Player, widgetId: number, message: string): void => {
+    handleOutboundPacket(player, 'updateWidgetString', {
+        widgetId,
+        message,
+    });
+};
+
+export const sendCloseWidgets = (player: Player): void => {
+    handleOutboundPacket(player, 'closeWidgets', {});
+};
+
+export const sendSideBarWidget = (player: Player, sidebarId: number, widgetId: number): void => {
+    handleOutboundPacket(player, 'sidebarWidget', {
+        widgetId,
+        sidebarId,
+    });
+};
+
+export const sendFlashSidebarIcon = (player: Player, sidebarId: number): void => {
+    handleOutboundPacket(player, 'flashSideBarIcon', {
+        sidebarId,
+    });
+};
 
 export const sendSystemUpdate = (player: Player, time: number): void => {
-    const buffer = new ByteBuffer(2);
-    buffer.put(time, 'short');
-    queuePacket(player, 103, buffer);
+    handleOutboundPacket(player, 'systemUpdate', {
+        time,
+    });
 };
 
 export const sendLogout = (player: Player): void => {
-    const buffer = new ByteBuffer(0);
-    queuePacket(player, 49, buffer);
-}
+    handleOutboundPacket(player, 'logout', {});
+};
 
 export const sendWelcomeScreen = (player: Player): void => {
-    const buffer = new ByteBuffer(10);
-    buffer.put(0, 'short');
-    buffer.put(77777, 'int');
-    buffer.put(0, 'byte');
-    buffer.put(0, 'byte');
-    buffer.put(0, 'short', 'le');
-    queuePacket(player, 178, buffer);
-}
+    handleOutboundPacket(player, 'welcomeScreen', {});
+};
 
 export const sendFriendsList = (player: Player, friendListStatus: number): void => {
-    const buffer = new ByteBuffer(1);
-    buffer.put(friendListStatus, 'byte');
-    queuePacket(player, 78, buffer);
-}
+    handleOutboundPacket(player, 'friendsList', {
+        friendListStatus,
+    });
+};
 
 export const sendSkill = (player: Player, skillId: number, skillLevel: number, skillExperience: number): void => {
-    const buffer = new ByteBuffer(6);
-    buffer.put(skillExperience, 'int');
-    buffer.put(skillLevel, 'byte');
-    buffer.put(skillId, 'byte');
-    queuePacket(player, 211, buffer);
-}
+    handleOutboundPacket(player, 'updateSkill', {
+        skillId,
+        skillLevel,
+        skillExperience,
+    });
+};
