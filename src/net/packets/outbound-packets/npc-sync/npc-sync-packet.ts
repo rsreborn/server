@@ -68,12 +68,16 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     });
 
     for (const npc of npcs) {
+        //console.log(player.trackedNpcs?.length)
         if (player.trackedNpcs.length === 255) {
             break;
         }
 
-        if (player.trackedNpcs.includes(npc)
-            || !isWithinDistance(player?.coords, npc.coords)) {
+        if (player.trackedNpcs.includes(npc)) {
+            continue;
+        }
+
+        if (!isWithinDistance(player?.coords, npc.coords)) {
             continue;
         }
 

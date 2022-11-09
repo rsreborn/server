@@ -1,8 +1,10 @@
 import { coord, Coord } from './coord';
 import { Player } from './player';
+import { getRegionCoords } from './region';
 
 export interface MovementQueue {
     path: Coord[];
+    lastMapRegionUpdateCoords?: Coord;
 }
 
 export const createMovementQueue = (): MovementQueue => {
@@ -120,8 +122,30 @@ export const movementTick = (player: Player) => {
 
     player.coords = walkPosition;
 
-    // @todo running - Kat 1/Nov/22
-    // @todo map region changing - Kat 1/Nov/22
+    let runDir = -1;
+
+    if (player.running && player.movementQueue.path.length) {
+        const runPosition = path.shift();
+        const runDiffX = runPosition.x - walkPosition.x;
+        const runDiffY = runPosition.y - walkPosition.y;
+        runDir = calculateDirection(runDiffX, runDiffY);
+
+        if (runDir != -1) {
+            player.coords = runPosition;
+        }
+    }
 
     player.sync.walkDir = walkDir;
+    player.sync.runDir = runDir;
+
+    const lastMapRegionUpdateCoords = player.movementQueue.lastMapRegionUpdateCoords || player.coords;
+
+    const mapDiffX = player.coords.x - (((lastMapRegionUpdateCoords.x >> 3) - 6) * 8);
+    const mapDiffY = player.coords.y - (((lastMapRegionUpdateCoords.y >> 3) - 6) * 8);
+    console.log(player.coords.x, player.coords.y)
+    console.log(mapDiffX, mapDiffY);
+    if (mapDiffX < 16 || mapDiffX > 87 || mapDiffY < 16 || mapDiffY > 87) {
+        player.sync.mapRegion = true;
+        player.movementQueue.lastMapRegionUpdateCoords = player.coords;
+    }
 };

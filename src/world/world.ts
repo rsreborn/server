@@ -73,7 +73,7 @@ export const addPlayer = (player: Player): boolean => {
     player.worldIndex = worldIndex;
     worldSingleton.players[worldIndex] = player;
 
-    addPlayerToChunk(player)
+    addPlayerToChunk(player);
 
     return true;
 };
@@ -111,7 +111,7 @@ export const openWorld = (
     worldSingleton = {
         worldId,
         players: new Array(2048).fill(null),
-        npcs: npcs(),
+        npcs: new Array(), //npcs(),
         chunkManager: {
             activeChunks: new Array(0),
         }

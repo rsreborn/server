@@ -32,6 +32,7 @@ export interface Player {
     movementQueue?: MovementQueue;
     trackedNpcs?: Npc[];
     lastChunkId?: number;
+    running?: boolean;
 }
 
 export const playerTick = async (player: Player): Promise<void> => {
@@ -40,6 +41,11 @@ export const playerTick = async (player: Player): Promise<void> => {
     return new Promise<void>(resolve => {
         movementTick(player);
         updatePlayerChunk(player);
+
+        if (player.sync.mapRegion) {
+            sendUpdateMapRegionPacket(player);
+        }
+
         resolve();
     });
 };
@@ -64,7 +70,7 @@ export const playerLogin = (player: Player): boolean => {
 
     player.trackedNpcs = [];
 
-    player.coords = {
+    player.coords = player.movementQueue.lastMapRegionUpdateCoords = {
         x: 3222,
         y: 3222,
         plane: 0,
@@ -84,7 +90,7 @@ export const playerLogin = (player: Player): boolean => {
 
     sendChatboxMessage(player, `Welcome to RS-Reborn ${player.client.connection.buildNumber}!`);
     sendFriendsList(player, 2);
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 21; i++) {
         if (i === 3) {
             sendSkill(player, i, 10, 1154);
         } else {

@@ -1,7 +1,7 @@
 import { Coord, coord } from "../coord";
 import { getWorld } from "../world";
 import { Npc } from "../npc";
-import { Player } from "../player";
+import { Player, playerLogin } from "../player";
 import { Chunk } from "./region";
 
 export interface ChunkManager {
@@ -45,7 +45,14 @@ export const addNpcToChunk = (npc: Npc): void => {
 export const updatePlayerChunk = (player: Player): void => {
     const chunkId = getChunkId(player.coords);
     if (player.lastChunkId !== chunkId) {
-        console.log('updatePlayerChunk - updating player: ', player);
+        const regionId = chunkId & 0xffff;
+        const lastRegionId = player.lastChunkId & 0xffff;
+        console.log('regionId: ', regionId)
+        console.log('lastRegionId: ', lastRegionId)
+        if (regionId !== lastRegionId) {
+            // player.sync.mapRegion = true;
+        }
+       // console.log('updatePlayerChunk - updating player: ', player);
         getChunk(player.lastChunkId).players.splice(player.worldIndex, 1);
         addPlayerToChunk(player);
     }

@@ -47,14 +47,15 @@ playerSyncEncoders[319] = {
         // Map region update required
         data.putBits(1, 1);
         // Map region changed (movement type - 0=none, 1=walk, 2=run, 3=mapchange
+        // @todo eat me
         data.putBits(2, 3);
 
         // Local X coord
-        data.putBits(7, localCoord.x);
+        data.putBits(7, localCoord.y);
         // Local plane coord
         data.putBits(2, localCoord.plane);
         // Local Y coord
-        data.putBits(7, localCoord.y);
+        data.putBits(7, localCoord.x);
         // Whether the client should discard the current walking queue (1 if teleporting, 0 if not)
         data.putBits(1, player.sync.teleporting ? 1 : 0);
         // Whether an update flag block follows

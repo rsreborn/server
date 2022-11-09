@@ -17,6 +17,12 @@ export const buttonPacket: InboundPacket<ButtonPacketData> = {
             case 2458:
                 sendLogout(player);
                 break;
+            case 153:
+                player.running = true;
+                break;
+            case 152:
+                player.running = false;
+                break;
         }
         console.log(`button packet handler ${data.widgetId}`);
     },
