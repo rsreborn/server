@@ -5,7 +5,7 @@ import { SocketOptions } from './server';
 import { Isaac } from './isaac';
 import { Player, playerLogin, PlayerRights } from '../world/player';
 import { handleInboundPacket } from './packets';
-import { handleUpdateRequests } from './file-server';
+import { handleOnDemandRequests } from './file-server';
 import INBOUND_PACKET_SIZES from './packets/inbound-packet-sizes';
 
 const RSA_EXPONENT = BigInteger('85749236153780929917924872511187713651124617292658988978182063731979923800090977664547424642067377984001222110909310620040899943594191124988795815431638577479242072599794149649824942794144264088097130432112910214560183536387949202712729964914726145231993678948421001368196284315651219252190430508607437712749');
@@ -172,7 +172,7 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
         // Post-handshake
         if (connectionState === ConnectionState.UPDATE) {
             // Update server request
-            handleUpdateRequests(connection, buffer);
+            handleOnDemandRequests(connection, buffer);
         } else if (connectionState === ConnectionState.LOGIN) {
             // Login type
             const loginOpcode = buffer.get('byte', 'u');

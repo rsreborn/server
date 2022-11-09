@@ -1,2 +1,2 @@
-export * from './update-queue';
+export * from './on-demand-queue';
 export * from './file-server';

@@ -27,18 +27,7 @@ const caches: Map<number, FileCache> = new Map<number, FileCache>();
 const archives: Map<number, { [key: string]: Archive }> = new Map<number, {[p: string]: Archive}>();
 const crcTables: Map<number, ByteBuffer> = new Map<number, ByteBuffer>();
 
-const readArchive = (
-    cache: FileCache,
-    archiveNumber: number,
-): Archive => {
-    const dataFile = cache.dataFile;
-    const indexFile = cache.indexFiles[0];
-    const data = getFileData(dataFile, indexFile, archiveNumber);
-    const checksum = Crc32.update(0, data.length, data);
-    return { archiveNumber, checksum, data };
-};
-
-export const archiveNames = [
+export const oldEngineArchiveNames = [
     'title',
     'config',
     'interface',
@@ -49,18 +38,58 @@ export const archiveNames = [
     'sounds',
 ];
 
+export const newEngineArchiveNames = [
+    'anims',
+    'bases',
+    'config',
+    'interfaces',
+    'synth_sounds',
+    'maps',
+    'midi_songs',
+    'models',
+    'sprites',
+    'textures',
+    'binary',
+    'midi_jingles',
+    'clientscripts',
+];
+
+const readArchive = (
+    buildNumber: number,
+    cache: FileCache,
+    archiveNumber: number,
+): Archive => {
+    const indexNumber = buildNumber < 400 ? 0 : 255;
+    const dataFile = cache.dataFile;
+    const indexFile = cache.indexFiles[indexNumber];
+    const data = getFileData(dataFile, indexFile, archiveNumber);
+    const checksum = Crc32.update(0, data.length, data);
+    return { archiveNumber, checksum, data };
+};
+
 const loadArchives = (): void => {
     for (const [ build, cache ] of caches) {
-        archives.set(build, {
-            'title': readArchive(cache, 1),
-            'config': readArchive(cache, 2),
-            'interface': readArchive(cache, 3),
-            'media': readArchive(cache, 4),
-            'versionlist': readArchive(cache, 5),
-            'textures': readArchive(cache, 6),
-            'wordenc': readArchive(cache, 7),
-            'sounds': readArchive(cache, 8),
-        });
+        if (build < 400) {
+            archives.set(build, {
+                'title': readArchive(build, cache, 1),
+                'config': readArchive(build, cache, 2),
+                'interface': readArchive(build, cache, 3),
+                'media': readArchive(build, cache, 4),
+                'versionlist': readArchive(build, cache, 5),
+                'textures': readArchive(build, cache, 6),
+                'wordenc': readArchive(build, cache, 7),
+                'sounds': readArchive(build, cache, 8),
+            });
+        } else {
+            const archiveMap: { [key: string]: Archive } = {};
+
+            for (let i = 0; i < newEngineArchiveNames.length; i++) {
+                const archiveName = newEngineArchiveNames[i];
+                // @todo stopped here - kat 8/Nov/22
+            }
+
+            archives.set(build, archiveMap);
+        }
     }
 };
 
