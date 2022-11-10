@@ -6,6 +6,7 @@ import { Npc, npcUpdateRequired } from '../../../../world/npc';
 import { npcSyncEncoders } from './npc-sync-encoder';
 import './builds/npc-sync-319';
 import './builds/npc-sync-357';
+import { getLocalNpcIds } from '../../../../world/region/chunk-manager';
 
 const appendNewlyTrackedNpcs = (
     player: Player,
@@ -52,42 +53,58 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
 
     packetData.openBitBuffer();
 
-    const npcs = getWorld().npcs;
-    const trackedNpcs = player.trackedNpcs;
+    const npcs = getLocalNpcIds(player.coords)
+    const trackedNpcs = player.trackedNpcIndexes;
 
     packetData.putBits(8, trackedNpcs.length);
 
-    trackedNpcs.forEach(npc => {
-        if (npcs.includes(npc) && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
+    trackedNpcs.forEach(trackedNpcIndex =>  {
+        const npc = getWorld().npcs[trackedNpcIndex]
+        if (npcs.includes(trackedNpcIndex) && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
             appendMovement(npc, packetData);
             appendUpdateMasks(player, npc, updateMaskData);
         } else {
             packetData.putBits(1, 1);
             packetData.putBits(2, 3);
-        }
-    });
 
-    for (const npc of npcs) {
+            // player.trackedNpcIndexes.filter(index => index !== trackedNpcIndex)
+        }
+    })
+
+    // trackedNpcs.forEach(npc => {
+    //     if (npcs.includes(npc) && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
+    //         appendMovement(npc, packetData);
+    //         appendUpdateMasks(player, npc, updateMaskData);
+    //     } else { 
+    //         packetData.putBits(1, 1);
+    //         packetData.putBits(2, 3);
+    //     }
+    // });
+
+    // for (const npcIndex of npcs) {
+    for (let i = 0; i < npcs.length; i++)  {
         //console.log(player.trackedNpcs?.length)
-        if (player.trackedNpcs.length === 255) {
+        if (player.trackedNpcIndexes.length === 255) {
             break;
         }
-
-        if (player.trackedNpcs.includes(npc)) {
+        if (trackedNpcs.includes(npcs[i])) {
             continue;
         }
 
+        const npc = getWorld().npcs[i];
         if (!isWithinDistance(player?.coords, npc.coords)) {
             continue;
         }
-
-        player.trackedNpcs.push(npc);
+        
+        console.log(npcs[i])
+        // console.log("Do we get down to npcs push?");
+        player.trackedNpcIndexes.push(npcs[i]);
 
         if (npc) {
             appendNewlyTrackedNpcs(player, npc, packetData);
             appendUpdateMasks(player, npc, updateMaskData);
         }
-    }
+    };
 
     if (updateMaskData.writerIndex !== 0) {
         packetData.putBits(14, 16383);

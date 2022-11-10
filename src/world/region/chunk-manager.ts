@@ -31,7 +31,6 @@ export const removeNpcFromChunk = (npc: Npc): void => {
 
 export const addPlayerToChunk = (player: Player): void => {
     const chunkId = getChunkId(player.coords);
-    console.log('addPlayerToChunk - chunkId: ', chunkId);
     player.lastChunkId = chunkId;
     getChunk(chunkId).players[player.worldIndex] = player.worldIndex;
 }
@@ -47,8 +46,8 @@ export const updatePlayerChunk = (player: Player): void => {
     if (player.lastChunkId !== chunkId) {
         const regionId = chunkId & 0xffff;
         const lastRegionId = player.lastChunkId & 0xffff;
-        console.log('regionId: ', regionId)
-        console.log('lastRegionId: ', lastRegionId)
+        // console.log('regionId: ', regionId)
+        // console.log('lastRegionId: ', lastRegionId)
         if (regionId !== lastRegionId) {
             // player.sync.mapRegion = true;
         }
@@ -89,15 +88,30 @@ export const getLocalChunkIds = (entityCoord: Coord, distance: number = 14): num
     return chunkIds;
 }
 
+export const getChunkIds = (chunkIds: number[]): Chunk[] => chunkIds.map(id => getWorld().chunkManager.activeChunks[id]).filter(chunk => chunk !== undefined);
+
 export const getLocalPlayerIds = (entityCoord: Coord, distance: number = 14): number[] => {
     const chunkIds = getLocalChunkIds(entityCoord, distance);
-    const chunks = chunkIds.map(id => getWorld().chunkManager.activeChunks[id]);
+    const chunks = getChunkIds(chunkIds);
 
     // TODO
     // Only pull player in range
     // Start on coords chunk and work our way out
 
     return chunks.map(chunk => chunk.players).flat();
+}
+
+export const getLocalNpcIds = (entityCoord: Coord, distance: number = 14): number[] => {
+    const chunkIds = getLocalChunkIds(entityCoord, distance);
+    const chunks = getChunkIds(chunkIds);
+    // console.log(chunkIds, chunks)
+
+    // TODO
+    // Only pull npc in range
+    // Start on coords chunk and work our way out
+    // console.log('npcs: ', chunks.map(chunk => chunk.npcs).flat());
+
+    return chunks.map(chunk => chunk.npcs).flat();
 }
 
 export const getRegionCoords = (coord: Coord): RegionCoord => {

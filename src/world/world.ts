@@ -55,7 +55,7 @@ const tick = async (): Promise<void> => {
     const duration = endTime - startTime;
     const delay = Math.max(TICK_LENGTH - duration, 0);
 
-    //logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
+    logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
     tickTimeout = setTimeout(async () => tick(), delay);
 };
 
@@ -86,10 +86,10 @@ export const removePlayer = (player: Player): boolean => {
 
 export const npcs = (): Npc[] => {
     let npcs = [];
-    for (let i = 0; i < 16000; i++) {
-    let random = Math.floor(Math.random() * 15);
-    let random2 = Math.floor(Math.random() * 15);
-    let random3 = Math.floor(Math.random() * 2000);
+    for (let i = 0; i < 10; i++) {
+        let random = Math.floor(Math.random() * 10);
+        let random2 = Math.floor(Math.random() * 10);
+        let random3 = Math.floor(Math.random() * 2000);
         npcs.push({
             id: random3,
             worldIndex: i,
@@ -100,8 +100,8 @@ export const npcs = (): Npc[] => {
             },
             sync: createNpcSyncState(),
         })
+        addNpcToChunk(npcs[i]);
     }
-
     return npcs;
 }
 
@@ -110,12 +110,13 @@ export const openWorld = (
 ): World => {
     worldSingleton = {
         worldId,
-        players: new Array(2048).fill(null),
-        npcs: new Array(), //npcs(),
         chunkManager: {
             activeChunks: new Array(0),
-        }
+        },
+        players: new Array(2048).fill(null),
+        npcs: new Array(0)
     };
+    worldSingleton.npcs = npcs();
 
     logger.info(`World ${worldId} opened.`);
 

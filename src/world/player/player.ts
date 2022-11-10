@@ -30,7 +30,7 @@ export interface Player {
     sync?: PlayerSyncState;
     appearance?: Appearance;
     movementQueue?: MovementQueue;
-    trackedNpcs?: Npc[];
+    trackedNpcIndexes?: number[];
     lastChunkId?: number;
     running?: boolean;
 }
@@ -68,7 +68,7 @@ export const playerLogin = (player: Player): boolean => {
 
     player.movementQueue = createMovementQueue();
 
-    player.trackedNpcs = [];
+    player.trackedNpcIndexes = [];
 
     player.coords = player.movementQueue.lastMapRegionUpdateCoords = {
         x: 3222,
