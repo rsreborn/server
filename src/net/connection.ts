@@ -7,6 +7,7 @@ import { Player, playerLogin, PlayerRights } from '../world/player';
 import { handleInboundPacket } from './packets';
 import { handleOnDemandRequests } from './file-server';
 import INBOUND_PACKET_SIZES from './packets/inbound-packet-sizes';
+import { handleUpdateServerRequests } from './update-server';
 
 const RSA_EXPONENT = BigInteger('85749236153780929917924872511187713651124617292658988978182063731979923800090977664547424642067377984001222110909310620040899943594191124988795815431638577479242072599794149649824942794144264088097130432112910214560183536387949202712729964914726145231993678948421001368196284315651219252190430508607437712749');
 const RSA_MODULUS = BigInteger('85851413706447406835286856960321868491021158946959045519533110967212579875747603892534938950597622190034801837526749417278303359405620369366942839883641648688111135276342550236485518612241524546375576253238379707601227775510104577557183947475438430283206434950768729692944226445159468674814615586984703672433');
@@ -31,6 +32,10 @@ export interface Connection {
     clientKey2?: number;
     buildNumber?: number;
     player?: Player;
+    queuedFiles?: {
+        indexNumber: number;
+        fileNumber: number;
+    }[];
 }
 
 const handleInboundPacketData = (
@@ -159,11 +164,15 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             socket.write(response.toNodeBuffer());
             connection.connectionState = ConnectionState.LOGIN;
         } else if (connectionType === ConnectionType.UPDATE) {
-            if (buffer.readable >= 2) {
+            if (buffer.readable >= 4) {
+                connection.buildNumber = buffer.get('int', 'u');
+                logger.info(`Update Server build ${connection.buildNumber}.`);
+                socket.write(Buffer.from([0]));
+            } else if (buffer.readable >= 2) {
                 connection.buildNumber = buffer.get('short', 'u');
-                logger.info(`On demand build ${connection.buildNumber}.`);
+                logger.info(`On-Demand build ${connection.buildNumber}.`);
+                socket.write(RESPONSE_OK);
             }
-            socket.write(RESPONSE_OK);
             connection.connectionState = ConnectionState.UPDATE;
         } else {
             logger.error(`Invalid connection type ${connectionType} received.`);
@@ -172,7 +181,11 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
         // Post-handshake
         if (connectionState === ConnectionState.UPDATE) {
             // Update server request
-            handleOnDemandRequests(connection, buffer);
+            if (connection.buildNumber < 400) {
+                handleOnDemandRequests(connection, buffer);
+            } else {
+                handleUpdateServerRequests(connection, buffer);
+            }
         } else if (connectionState === ConnectionState.LOGIN) {
             // Login type
             const loginOpcode = buffer.get('byte', 'u');

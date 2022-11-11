@@ -61,7 +61,10 @@ const readArchive = (
 ): Archive => {
     const indexNumber = buildNumber < 400 ? 0 : 255;
     const dataFile = cache.dataFile;
-    const indexFile = cache.indexFiles[indexNumber];
+    const indexFile = cache.indexFiles.find(index => index.indexNumber === indexNumber);
+    if (!indexFile) {
+        return null;
+    }
     const data = getFileData(dataFile, indexFile, archiveNumber);
     const checksum = Crc32.update(0, data.length, data);
     return { archiveNumber, checksum, data };
@@ -84,8 +87,13 @@ const loadArchives = (): void => {
             const archiveMap: { [key: string]: Archive } = {};
 
             for (let i = 0; i < newEngineArchiveNames.length; i++) {
+                const indexFile = cache.indexFiles.find(index => index.indexNumber === i);
+                if (!indexFile) {
+                    continue;
+                }
+
                 const archiveName = newEngineArchiveNames[i];
-                // @todo stopped here - kat 8/Nov/22
+                archiveMap[archiveName] = readArchive(build, cache, i);
             }
 
             archives.set(build, archiveMap);
@@ -154,32 +162,48 @@ export const getCrcTable = (buildNumber: number): ByteBuffer => {
         return crcTables.get(buildNumber);
     }
 
-    const checksums: number[] = new Array(9);
+    if (buildNumber < 400) {
+        const checksums: number[] = new Array(9);
 
-    checksums[0] = buildNumber;
+        checksums[0] = buildNumber;
 
-    const archiveMap = archives.get(buildNumber);
-    const archiveList = Object.values(archiveMap);
+        const archiveMap = archives.get(buildNumber);
+        const archiveList = Object.values(archiveMap);
 
-    for (let i = 1; i < checksums.length; i++) {
-        const archive = archiveList.find(a => a.archiveNumber === i);
-        checksums[i] = archive.checksum;
+        for (let i = 1; i < checksums.length; i++) {
+            const archive = archiveList.find(a => a.archiveNumber === i);
+            checksums[i] = archive.checksum;
+        }
+
+        let hash = 1234;
+
+        for (let i = 0; i < checksums.length; i++) {
+            hash = (hash << 1) + checksums[i];
+        }
+
+        const buffer = new ByteBuffer(4 * (checksums.length + 1));
+        for (let i = 0; i < checksums.length; i++) {
+            buffer.put(checksums[i], 'int');
+        }
+
+        buffer.put(hash, 'int');
+
+        crcTables.set(buildNumber, buffer);
+    } else {
+        const cache = caches.get(buildNumber);
+        const archiveList = Array.from(Object.values(archives.get(buildNumber)));
+        const mainIndex = cache.indexFiles.find(index => index.indexNumber === 255);
+        const indexLength = mainIndex.data.length;
+        const buffer = new ByteBuffer(4048);
+        buffer.put(0, 'byte');
+        buffer.put(indexLength, 'int');
+        for (let i = 0; i < archiveList.length; i++) {
+            buffer.put(archiveList[i].checksum, 'int');
+        }
+
+        crcTables.set(buildNumber, buffer);
     }
 
-    let hash = 1234;
-
-    for (let i = 0; i < checksums.length; i++) {
-        hash = (hash << 1) + checksums[i];
-    }
-
-    const buffer = new ByteBuffer(4 * (checksums.length + 1));
-    for (let i = 0; i < checksums.length; i++) {
-        buffer.put(checksums[i], 'int');
-    }
-
-    buffer.put(hash, 'int');
-
-    crcTables.set(buildNumber, buffer);
     return crcTables.get(buildNumber);
 };
 
