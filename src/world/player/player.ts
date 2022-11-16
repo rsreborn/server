@@ -88,7 +88,6 @@ export const playerLogin = (player: Player): boolean => {
             sendSkill(player, i, 1, 0);
         }
     }
-
     // sendChatboxWidget(player, 4882);
     // sendWidgetNpcHead(player, 4883, 1);
     // sendAnimateWidget(player, 4883, 591);

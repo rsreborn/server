@@ -2,6 +2,7 @@ import { ByteBuffer } from '@runejs/common';
 import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '../../packets';
 import { Player, playerUpdateRequired } from '../../../../world/player';
 import { playerSyncEncoders } from './player-sync-encoder';
+import './builds/player-sync-289';
 import './builds/player-sync-319';
 import './builds/player-sync-357';
 
