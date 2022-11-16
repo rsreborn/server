@@ -4,6 +4,7 @@ import { Player, playerUpdateRequired } from '../../../../world/player';
 import { playerSyncEncoders } from './player-sync-encoder';
 import './builds/player-sync-319';
 import './builds/player-sync-357';
+import './builds/player-sync-414';
 
 const appendNewlyTrackedPlayers = (data: ByteBuffer) => {
     // @todo multiplayer support - Kat 3/Nov/22
