@@ -32,14 +32,14 @@ export const updateMapRegionPacket: OutboundPacket<UpdateMapRegionData> = {
         },
         414: (player, opcode, data) => {
             const buffer = new ByteBuffer(500);
-            buffer.put(data.mapCoords.x + 6, 'short', 'le');
+            buffer.put(data.mapCoords.x, 'short', 'le');
             buffer.put(data.localCoords.x, 'short', 'le');
-            buffer.put(data.mapCoords.y + 6, 'short', 'le');
+            buffer.put(data.mapCoords.y, 'short', 'le');
 
-            const startX = Math.floor(data.mapCoords.x / 8);
-            const endX = Math.floor((data.mapCoords.x + 12) / 8);
-            const startY = Math.floor(data.mapCoords.y / 8);
-            const endY = Math.floor((data.mapCoords.y + 12) / 8);
+            const startX = Math.floor((data.mapCoords.x - 6) / 8);
+            const endX = Math.floor((data.mapCoords.x + 6) / 8);
+            const startY = Math.floor((data.mapCoords.y - 6) / 8);
+            const endY = Math.floor((data.mapCoords.y + 6) / 8);
 
             // @todo xtea key support - Kat 13/Nov/22
             for (let mapX = startX; mapX <= endX; mapX++) {
