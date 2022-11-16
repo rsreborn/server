@@ -88,7 +88,7 @@ export const playerLogin = (player: Player): boolean => {
             sendSkill(player, i, 1, 0);
         }
     }
-    sendSidebarWidgetWithDisabledTabs(player, 0)
+    
     return addPlayer(player);
 };
 

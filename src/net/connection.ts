@@ -171,6 +171,7 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
                 // Old engine
                 const response = new ByteBuffer(17);
                 response.putBytes(RESPONSE_OK);
+                response.put(0); // response code - 0 for OK
                 response.put(connection.serverKey, 'long');
                 socket.write(response.toNodeBuffer());
             }
@@ -213,8 +214,6 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
 
             const newEngine = !!connection.buildNumber; // @todo fix this - Kat 12/Nov/22 //buffer.readable <= 130;
 
-            console.log(buffer.readable);
-
             if (newEngine) {
                 // New engine
 
@@ -243,7 +242,7 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             const lowMemory = buffer.get('byte', 'u') === 1;
 
             const cache = getCache(connection.buildNumber);
-            const checksumCount = connection.buildNumber < 400 ? 9 : (Array.from(Object.values(cache.indexFiles)).length - 1);
+            const checksumCount = !newEngine ? 9 : (Array.from(Object.values(cache.indexFiles)).length - 1);
             const checksums: number[] = new Array(checksumCount);
             const expectedChecksums: number[] = new Array(checksumCount);
             const archiveList = Array.from(Object.values(getArchives(connection.buildNumber)));
@@ -252,10 +251,15 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             // Cache checksums
             for (let i = 0; i < checksumCount; i++) {
                 checksums[i] = buffer.get('int');
-                expectedChecksums[i] = archiveList.find(archive => archive.archiveNumber === i).checksum;
-                if (checksums[i] !== expectedChecksums[i]) {
-                    // @todo do something with this - Kat 12/Nov/22
-                    outOfDate = true;
+
+                if (!newEngine && i !== 0) {
+                    expectedChecksums[i] = archiveList.find(archive => archive.archiveNumber === i)?.checksum ?? 0;
+                    if (checksums[i] !== expectedChecksums[i]) {
+                        // @todo do something with this - Kat 12/Nov/22
+                        outOfDate = true;
+                    }
+                } else {
+                    // @todo check old engine checksum 0 (hash of all checksums) - Kat 15/Nov/22
                 }
             }
 
