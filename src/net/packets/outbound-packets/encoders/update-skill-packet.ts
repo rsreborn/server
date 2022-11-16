@@ -11,6 +11,7 @@ export const updateSkillPacket: OutboundPacket<UpdateSkillData> = {
     name: 'updateSkill',
     opcodes: {
         319: 211,
+        357: 200,
     },
     encoders: {
         319: (player, opcode, data) => {
@@ -19,6 +20,13 @@ export const updateSkillPacket: OutboundPacket<UpdateSkillData> = {
             buffer.put(data.skillLevel, 'byte');
             buffer.put(data.skillId, 'byte');
             return buffer;
-        }       
+        },
+        357: (player, opcode, data) => {
+            const buffer = new ByteBuffer(6);
+            buffer.put(data.skillId, 'byte');
+            buffer.put(data.skillLevel, 'byte');
+            buffer.put(data.skillExperience, 'int', 'le');
+            return buffer;
+        },        
     },
 };

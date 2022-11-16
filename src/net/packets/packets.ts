@@ -213,6 +213,13 @@ export const sendChatboxWidget = (player: Player, widgetId: number): void => {
     }); 
 };
 
+export const sendFullscreenWidget = (player: Player, fullscreenWidgetId: number, widgetId: number) => {
+    handleOutboundPacket(player, 'fullscreenWidget', {
+        fullscreenWidgetId,
+        widgetId,
+    }); 
+}
+
 export const sendSidebarWidgetWithDisabledTabs = (player: Player, widgetId: number): void => {
     handleOutboundPacket(player, 'sidebarDisabledTabs', {
         widgetId,

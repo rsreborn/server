@@ -9,9 +9,15 @@ export const showWidgetPlayerHeadPacket: OutboundPacket<WidgetData> = {
     name: 'widgetPlayerHead',
     opcodes: {
         319: 252,
+        357: 34,
     },
     encoders: {
         319: (player, opcode, data) => {
+            const buffer = new ByteBuffer(2);
+            buffer.put(data.widgetId, 'short', 'le');
+            return buffer;
+        },
+        357: (player, opcode, data) => {
             const buffer = new ByteBuffer(2);
             buffer.put(data.widgetId, 'short', 'le');
             return buffer;

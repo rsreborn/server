@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendChatboxMessage, sendFriendsList, sendLogout, sendSideBarWidget, sendSidebarWidgetWithDisabledTabs, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendFriendsList, sendFullscreenWidget, sendLogout, sendSideBarWidget, sendSidebarWidgetWithDisabledTabs, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -88,7 +88,22 @@ export const playerLogin = (player: Player): boolean => {
             sendSkill(player, i, 1, 0);
         }
     }
+
+    // sendChatboxWidget(player, 4882);
+    // sendWidgetNpcHead(player, 4883, 1);
+    // sendAnimateWidget(player, 4883, 591);
+    // sendWidgetString(player, 4884, "NPC Name Goes here")
+    // sendWidgetString(player, 4885, "We've got some text here!");
+
+    // sendChatboxWidget(player, 968);
+    // sendWidgetPlayerHead(player, 969);
+    // sendAnimateWidget(player, 969, 591);
+    // sendWidgetString(player, 970, "Brian")
+    // sendWidgetString(player, 971, "We've got some text here!");
     
+    sendWelcomeScreen(player);
+    sendFullscreenWidget(player, 15244, 5993);
+
     return addPlayer(player);
 };
 

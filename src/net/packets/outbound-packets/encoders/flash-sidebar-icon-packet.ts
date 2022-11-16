@@ -9,9 +9,15 @@ export const flashSidebarIconPacket: OutboundPacket<SideBarData> = {
     name: 'flashSideBarIcon',
     opcodes: {
         319: 168,
+        357: 236,
     },
     encoders: {
         319: (player, opcode, data) => {
+            const buffer = new ByteBuffer(1);
+            buffer.put(data.sidebarId, 'byte');
+            return buffer;
+        },
+        357: (player, opcode, data) => {
             const buffer = new ByteBuffer(1);
             buffer.put(data.sidebarId, 'byte');
             return buffer;
