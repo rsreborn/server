@@ -4,16 +4,16 @@ import { getLocalCoord } from '../../../../../world';
 import { playerUpdateRequired } from '../../../../../world/player';
 
 enum UpdateFlags {
-    FACE_COORDS = 0x1,
+    FACE_COORDS = 0x20,
     APPEARANCE_UPDATE = 0x1,
-    PLAY_ANIMATION = 0x4,
-    FACE_ENTITY = 0x8,
-    FORCE_CHAT = 0x10,
-    DAMAGE_TYPE_1 = 0x20,
-    CHAT = 0x80,
-    FORCE_MOVEMENT = 0x100,
-    DAMAGE_TYPE_2 = 0x200,
-    PLAY_SPOT_ANIMATION = 0x400,
+    PLAY_ANIMATION = 0x100,
+    FACE_ENTITY = 0x4,
+    FORCE_CHAT = 0x8,
+    DAMAGE_TYPE_1 = 0x10,
+    CHAT = 0x40,
+    FORCE_MOVEMENT = 0x200,
+    DAMAGE_TYPE_2 = 0x400,
+    PLAY_SPOT_ANIMATION = 0x2,
 }
 
 playerSyncEncoders[289] = {

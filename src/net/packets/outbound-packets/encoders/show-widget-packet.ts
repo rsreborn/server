@@ -8,10 +8,16 @@ interface WidgetData {
 export const showWidgetPacket: OutboundPacket<WidgetData> = {
     name: 'widget',
     opcodes: {
+        289: 119,
         319: 229,
         357: 255,
     },
     encoders: {
+        289: (player, opcode, data) => {
+            const buffer = new ByteBuffer(2);
+            buffer.put(data.widgetId, 'short');
+            return buffer;
+        },
         319: (player, opcode, data) => {
             const buffer = new ByteBuffer(2);
             buffer.put(data.widgetId, 'short', 'le');

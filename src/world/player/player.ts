@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendFriendsList, sendFullscreenWidget, sendLogout, sendSideBarWidget, sendSidebarWidgetWithDisabledTabs, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendLogout, sendSideBarWidget, sendSidebarWidgetWithDisabledTabs, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -88,6 +88,7 @@ export const playerLogin = (player: Player): boolean => {
             sendSkill(player, i, 1, 0);
         }
     }
+
     // sendChatboxWidget(player, 4882);
     // sendWidgetNpcHead(player, 4883, 1);
     // sendAnimateWidget(player, 4883, 591);

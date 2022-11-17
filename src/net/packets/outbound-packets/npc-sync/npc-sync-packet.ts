@@ -4,6 +4,7 @@ import { Player } from '../../../../world/player';
 import { getWorld, isWithinDistance } from '../../../../world';
 import { Npc, npcUpdateRequired } from '../../../../world/npc';
 import { npcSyncEncoders } from './npc-sync-encoder';
+import './builds/npc-sync-289';
 import './builds/npc-sync-319';
 import './builds/npc-sync-357';
 

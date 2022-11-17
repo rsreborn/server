@@ -82,10 +82,10 @@ export const removePlayer = (player: Player): boolean => {
 
 export const npcs = (): Npc[] => {
     let npcs = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 25; i++) {
     let random = Math.floor(Math.random() * 15);
     let random2 = Math.floor(Math.random() * 15);
-    let random3 = Math.floor(Math.random() * 2000);
+    let random3 = Math.floor(Math.random() * 9);
         npcs.push({
             id: random3,
             index: i,
