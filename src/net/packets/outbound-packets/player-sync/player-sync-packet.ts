@@ -4,9 +4,18 @@ import { Player, playerUpdateRequired } from '../../../../world/player';
 import { playerSyncEncoders } from './player-sync-encoder';
 import './builds/player-sync-319';
 import './builds/player-sync-357';
+import { getLocalPlayerIds } from '../../../../world/region';
+import { getWorld, isWithinDistance } from '../../../../world';
 
-const appendNewlyTrackedPlayers = (data: ByteBuffer) => {
-    // @todo multiplayer support - Kat 3/Nov/22
+const appendNewlyTrackedPlayers = (data: ByteBuffer, player: Player, otherPlayer: Player) => {
+    const xPos = otherPlayer.coords.x - player.coords.x;
+    const yPos = otherPlayer.coords.y - player.coords.y;
+
+    data.putBits(11, otherPlayer.worldIndex);
+    data.putBits(1, 1);
+    data.putBits(5, yPos);
+    data.putBits(5, xPos);
+    data.putBits(1, 1);
 };
 
 const appendTrackedPlayers = (data: ByteBuffer) => {
@@ -16,10 +25,11 @@ const appendTrackedPlayers = (data: ByteBuffer) => {
 
 const appendUpdateMasks = (
     player: Player,
+    otherPlayer: Player,
     data: ByteBuffer,
     forceAppearanceUpdate: boolean = false,
 ): void => {
-    if (!playerUpdateRequired(player) && !forceAppearanceUpdate) {
+    if (!playerUpdateRequired(otherPlayer) && !playerUpdateRequired(player) && !forceAppearanceUpdate) {
         return;
     }
 
@@ -70,16 +80,50 @@ const constructPlayerSyncPacket = (player: Player): ByteBuffer => {
 
     packetData.openBitBuffer();
 
+    const players = getLocalPlayerIds(player.coords);
+    const trackedPlayers = player.trackedPlayerIndexes;
+
+    players.splice(player.worldIndex, 1);
+
     if (player.sync.mapRegion || player.sync.teleporting) {
         appendMapRegionUpdate(player, packetData);
     } else {
         appendMovement(player, packetData);
     }
 
-    appendUpdateMasks(player, updateMaskData);
+   packetData.putBits(8, trackedPlayers.length);
+    trackedPlayers.forEach(trackedPlayerIndex => {
+        const otherPlayer = getWorld().players[trackedPlayerIndex];
+        if (players.includes(trackedPlayerIndex) && !otherPlayer.sync.teleporting && isWithinDistance(otherPlayer?.coords, player?.coords)) {
+            appendMovement(otherPlayer, packetData);
+            appendUpdateMasks(player, otherPlayer, updateMaskData);
+        } else {
+            player.trackedPlayerIndexes.splice(trackedPlayerIndex, 1);
+            packetData.putBits(1, 1);
+            packetData.putBits(2, 3);
+        }
+    });
 
-    appendTrackedPlayers(packetData);
-    appendNewlyTrackedPlayers(packetData);
+    for (let i = 0; i < players.length; i++)  {
+        if (player.trackedPlayerIndexes.length === 255) {
+            break;
+        }
+        if (trackedPlayers.includes(players[i])) {
+            continue;
+        }
+
+        const otherPlayer = getWorld().players[i];
+        if (!isWithinDistance(player?.coords, otherPlayer.coords)) {
+            continue;
+        }
+        
+        player.trackedPlayerIndexes.push(otherPlayer.worldIndex);
+
+        if (otherPlayer) {
+            appendNewlyTrackedPlayers(packetData, player, otherPlayer);
+            appendUpdateMasks(player, otherPlayer, updateMaskData);
+        }
+    }
 
     if (updateMaskData.writerIndex !== 0) {
         packetData.putBits(11, 2047);

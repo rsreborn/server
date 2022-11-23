@@ -86,16 +86,16 @@ export const removePlayer = (player: Player): boolean => {
 
 export const npcs = (): Npc[] => {
     let npcs = [];
-    for (let i = 0; i < 10; i++) {
-        let random = Math.floor(Math.random() * 10);
-        let random2 = Math.floor(Math.random() * 10);
+    for (let i = 0; i < 2; i++) {
+        let random = Math.floor(Math.random() * 2);
+        let random2 = Math.floor(Math.random() * 2);
         let random3 = Math.floor(Math.random() * 2000);
         npcs.push({
             id: random3,
             worldIndex: i,
             coords: {
-                x: 3217 + random,
-                y: 3217 + random2,
+                x: 3222 + random,
+                y: 3222 + random2,
                 plane: 0
             },
             sync: createNpcSyncState(),

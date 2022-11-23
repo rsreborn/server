@@ -51,7 +51,6 @@ export const updatePlayerChunk = (player: Player): void => {
         if (regionId !== lastRegionId) {
             // player.sync.mapRegion = true;
         }
-       // console.log('updatePlayerChunk - updating player: ', player);
         getChunk(player.lastChunkId).players.splice(player.worldIndex, 1);
         addPlayerToChunk(player);
     }

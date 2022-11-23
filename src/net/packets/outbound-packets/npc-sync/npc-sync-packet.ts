@@ -53,37 +53,23 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
 
     packetData.openBitBuffer();
 
-    const npcs = getLocalNpcIds(player.coords)
+    const npcs = getLocalNpcIds(player.coords);
     const trackedNpcs = player.trackedNpcIndexes;
 
     packetData.putBits(8, trackedNpcs.length);
-
     trackedNpcs.forEach(trackedNpcIndex =>  {
         const npc = getWorld().npcs[trackedNpcIndex]
         if (npcs.includes(trackedNpcIndex) && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
             appendMovement(npc, packetData);
             appendUpdateMasks(player, npc, updateMaskData);
         } else {
+            player.trackedNpcIndexes.splice(trackedNpcIndex, 1);
             packetData.putBits(1, 1);
             packetData.putBits(2, 3);
-
-            // player.trackedNpcIndexes.filter(index => index !== trackedNpcIndex)
         }
-    })
+    });
 
-    // trackedNpcs.forEach(npc => {
-    //     if (npcs.includes(npc) && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
-    //         appendMovement(npc, packetData);
-    //         appendUpdateMasks(player, npc, updateMaskData);
-    //     } else { 
-    //         packetData.putBits(1, 1);
-    //         packetData.putBits(2, 3);
-    //     }
-    // });
-
-    // for (const npcIndex of npcs) {
     for (let i = 0; i < npcs.length; i++)  {
-        //console.log(player.trackedNpcs?.length)
         if (player.trackedNpcIndexes.length === 255) {
             break;
         }
@@ -96,15 +82,13 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
             continue;
         }
         
-        console.log(npcs[i])
-        // console.log("Do we get down to npcs push?");
-        player.trackedNpcIndexes.push(npcs[i]);
+        player.trackedNpcIndexes.push(npc.worldIndex);
 
         if (npc) {
             appendNewlyTrackedNpcs(player, npc, packetData);
             appendUpdateMasks(player, npc, updateMaskData);
         }
-    };
+    }
 
     if (updateMaskData.writerIndex !== 0) {
         packetData.putBits(14, 16383);

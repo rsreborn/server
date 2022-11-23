@@ -144,6 +144,7 @@ export const movementTick = (player: Player) => {
     const mapDiffY = player.coords.y - (((lastMapRegionUpdateCoords.y >> 3) - 6) * 8);
     console.log(player.coords.x, player.coords.y)
     console.log(mapDiffX, mapDiffY);
+    
     if (mapDiffX < 16 || mapDiffX > 87 || mapDiffY < 16 || mapDiffY > 87) {
         player.sync.mapRegion = true;
         player.movementQueue.lastMapRegionUpdateCoords = player.coords;
