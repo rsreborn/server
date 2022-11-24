@@ -9,7 +9,7 @@ export const showWidgetPacket: OutboundPacket<WidgetData> = {
     name: 'widget',
     opcodes: {
         289: 119,
-        319: 229,
+        319: 188,
         357: 255,
     },
     encoders: {
