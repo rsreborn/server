@@ -24,7 +24,7 @@ playerSyncEncoders[319] = {
 
         // @todo append all flags - Kat 3/Nov/22
         const { appearanceUpdate } = player.sync;
-        if (appearanceUpdate) {
+        if (appearanceUpdate || forceAppearanceUpdate) {
             flags |= UpdateFlags.APPEARANCE_UPDATE;
         }
 
@@ -58,5 +58,15 @@ playerSyncEncoders[319] = {
         data.putBits(1, player.sync.teleporting ? 1 : 0);
         // Whether an update flag block follows
         data.putBits(1, playerUpdateRequired(player) ? 1 : 0);
+    },
+
+    appendNewlyTrackedPlayer: (data, player, otherPlayer) => {
+        const xPos = otherPlayer.coords.x - player.coords.x;
+        const yPos = otherPlayer.coords.y - player.coords.y;
+        data.putBits(11, otherPlayer.worldIndex + 1);
+        data.putBits(1, 1);
+        data.putBits(5, yPos);
+        data.putBits(5, xPos);
+        data.putBits(1, 1);
     },
 };

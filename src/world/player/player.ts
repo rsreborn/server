@@ -98,6 +98,8 @@ export const playerLogin = (player: Player): boolean => {
         }
     }
 
+    writePackets(player);
+
     return addPlayer(player);
 };
 
@@ -105,4 +107,8 @@ export const playerLogout = (player: Player): void => {
     // @todo logout packet - Kat 19/Oct/22
     sendLogout(player);
     removePlayer(player);
+};
+
+export const getBuildNumber = (player: Player): string => {
+    return String(player.client.connection.buildNumber);
 };

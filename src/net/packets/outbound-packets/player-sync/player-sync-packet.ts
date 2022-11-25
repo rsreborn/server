@@ -1,24 +1,15 @@
 import { ByteBuffer } from '@runejs/common';
 import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize, sendUpdateMapRegionPacket } from '../../packets';
-import { Player, playerUpdateRequired } from '../../../../world/player';
+import { getBuildNumber, Player, playerUpdateRequired } from '../../../../world/player';
 import { playerSyncEncoders } from './player-sync-encoder';
+import { getLocalPlayerIds } from '../../../../world/region';
+import { getWorld } from '../../../../world';
 import './builds/player-sync-319';
 import './builds/player-sync-357';
-import { getLocalPlayerIds } from '../../../../world/region';
-import { getWorld, isWithinDistance } from '../../../../world';
-
-const appendNewlyTrackedPlayers = (data: ByteBuffer, player: Player, otherPlayer: Player) => {
-    const xPos = otherPlayer.coords.x - player.coords.x;
-    const yPos = otherPlayer.coords.y - player.coords.y;
-    data.putBits(11, otherPlayer?.worldIndex);
-    data.putBits(1, 1);
-    data.putBits(5, yPos);
-    data.putBits(5, xPos);
-    data.putBits(1, 1);
-};
 
 const appendUpdateMasks = (
     player: Player,
+    buildNumber: string,
     data: ByteBuffer,
     forceAppearanceUpdate: boolean = false,
 ): void => {
@@ -26,13 +17,20 @@ const appendUpdateMasks = (
         return;
     }
 
-    playerSyncEncoders[String(player.client.connection.buildNumber)]?.updateMaskEncoder?.(player, data, forceAppearanceUpdate);
+    playerSyncEncoders[buildNumber]?.updateMaskEncoder?.(player, data, forceAppearanceUpdate);
 };
 
 const appendMapRegionUpdate = (
     player: Player,
+    buildNumber: string,
     data: ByteBuffer,
-): void => playerSyncEncoders[String(player.client.connection.buildNumber)]?.mapRegionUpdateEncoder?.(player, data);
+): void => playerSyncEncoders[buildNumber]?.mapRegionUpdateEncoder?.(player, data);
+
+const appendNewlyTrackedPlayer = (
+    player: Player,
+    otherPlayer: Player,
+    data: ByteBuffer,
+): void => playerSyncEncoders[getBuildNumber(player)]?.appendNewlyTrackedPlayer?.(data, player, otherPlayer);
 
 const appendMovement = (
     player: Player,
@@ -67,28 +65,27 @@ const appendMovement = (
 const constructPlayerSyncPacket = (player: Player): ByteBuffer => {
     const packetData = new ByteBuffer(5000);
     const updateMaskData = new ByteBuffer(5000);
+    const buildNumber = getBuildNumber(player);
 
     packetData.openBitBuffer();
 
     const players = getLocalPlayerIds(player.coords).filter(index => index != player.worldIndex);
 
     if (player.sync.mapRegion || player.sync.teleporting) {
-        appendMapRegionUpdate(player, packetData);
+        appendMapRegionUpdate(player, buildNumber, packetData);
     } else {
         appendMovement(player, packetData);
     }
 
-    appendUpdateMasks(player, updateMaskData);
+    appendUpdateMasks(player, buildNumber, updateMaskData);
 
     packetData.putBits(8, player.trackedPlayerIndexes.length);
     player.trackedPlayerIndexes.forEach(trackedPlayerIndex => {
-        console.log(player.username, ": tracking player", trackedPlayerIndex);
         const otherPlayer = getWorld().players[trackedPlayerIndex];
         if (otherPlayer != null && players.includes(trackedPlayerIndex) && !otherPlayer.sync.teleporting) {
             appendMovement(otherPlayer, packetData);
-            appendUpdateMasks(otherPlayer, updateMaskData);
+            appendUpdateMasks(otherPlayer, buildNumber, updateMaskData);
         } else {
-            console.log(player.username, ": removed player", trackedPlayerIndex);
             player.trackedPlayerIndexes = player.trackedPlayerIndexes.filter(index => index != trackedPlayerIndex)
             packetData.putBits(1, 1);
             packetData.putBits(2, 3);
@@ -108,10 +105,9 @@ const constructPlayerSyncPacket = (player: Player): ByteBuffer => {
             continue;
         }
 
-        console.log(player.username, ": added player", otherPlayer.worldIndex);
         player.trackedPlayerIndexes.push(otherPlayer.worldIndex);
-        appendNewlyTrackedPlayers(packetData, player, otherPlayer);
-        appendUpdateMasks(otherPlayer, updateMaskData, true);
+        appendNewlyTrackedPlayer?.(player, otherPlayer, packetData);
+        appendUpdateMasks(otherPlayer, buildNumber, updateMaskData, true);
     }
 
     if (updateMaskData.writerIndex !== 0) {
