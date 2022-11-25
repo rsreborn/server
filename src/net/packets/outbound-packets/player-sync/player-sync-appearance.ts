@@ -25,13 +25,17 @@ export const appendAppearanceData = (
         appearanceData.put(0); // neck item
         appearanceData.put(0); // main hand item
         appearanceData.put(0x100 + player.appearance.torso, 'short'); // torso
+
         appearanceData.put(0); // off-hand item
-        appearanceData.put(0x100 + player.appearance.arms, 'short'); // arms
+        appearanceData.put(0x100 + player.appearance.arms, 'short'); // arms or
+        // appearanceData.put(0);
         appearanceData.put(0x100 + player.appearance.legs, 'short'); // legs
-        appearanceData.put(0x100 + player.appearance.head, 'short'); // head
+        appearanceData.put(0x100 + player.appearance.head, 'short'); // head or
+        // appearanceData.put(0);
         appearanceData.put(0x100 + player.appearance.hands, 'short'); // hands
         appearanceData.put(0x100 + player.appearance.feet, 'short'); // feet
-        appearanceData.put(0x100 + player.appearance.facialHair, 'short'); // facial hair
+        appearanceData.put(0x100 + player.appearance.facialHair, 'short'); // facial hair or 
+        // appearanceData.put(0);
 
         [
             player.appearance.hairColor,

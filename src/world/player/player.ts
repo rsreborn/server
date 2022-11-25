@@ -56,9 +56,7 @@ export const playerTickCleanup = async (player: Player): Promise<void> => {
     // in parallel using Promise.all()
     return new Promise<void>(resolve => {
         resetPlayerSyncState(player);
-
         writePackets(player);
-
         resolve();
     });
 };
@@ -74,7 +72,7 @@ export const playerLogin = (player: Player): boolean => {
 
     player.coords = player.movementQueue.lastMapRegionUpdateCoords = {
         x: 3222,
-        y: 3222,
+        y: 3220,
         plane: 0,
     };
 
@@ -99,11 +97,12 @@ export const playerLogin = (player: Player): boolean => {
             sendSkill(player, i, 1, 0);
         }
     }
+
     return addPlayer(player);
 };
 
-export const playerLogout = (player: Player): boolean => {
+export const playerLogout = (player: Player): void => {
     // @todo logout packet - Kat 19/Oct/22
     sendLogout(player);
-    return removePlayer(player);
+    removePlayer(player);
 };

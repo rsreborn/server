@@ -3,7 +3,7 @@ import { ByteBuffer, logger } from '@runejs/common';
 import BigInteger from 'bigi';
 import { SocketOptions } from './server';
 import { Isaac } from './isaac';
-import { Player, playerLogin, PlayerRights } from '../world/player';
+import { Player, playerLogin, playerLogout, PlayerRights } from '../world/player';
 import { handleInboundPacket } from './packets';
 import { handleUpdateRequests } from './file-server';
 import INBOUND_PACKET_SIZES from './packets/inbound-packet-sizes';
@@ -109,12 +109,12 @@ const handleInboundPacketData = (
     if (packet.size !== 0) {
         packetData = new ByteBuffer(packet.size);
         packet.buffer.copy(packetData, 0, packet.buffer.readerIndex,
-            packet.buffer.readerIndex + packet.size);
+        packet.buffer.readerIndex + packet.size);
         packet.buffer.readerIndex += packet.size;
     }
 
     if (!handleInboundPacket(player, packet.opcode, packetData)) {
-        logger.error(`Unhandled packet ${packet.opcode}.`);
+       // logger.error(`Unhandled packet ${packet.opcode}.`);
         clearBuffer = true;
     }
 
@@ -232,6 +232,7 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             }
 
             const uid = decrypted.get('int');
+            console.log("UID", uid)
             const username = decrypted.getString(10);
             const password = decrypted.getString(10);
             const rights = PlayerRights.JMOD; // @todo - Kat 18-Oct-22
@@ -280,17 +281,21 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             // Packet data received
             handleInboundPacketData(connection.player, buffer);
         } else {
-            logger.error(`Unhandled connection state ${connectionState} encountered.`);
+            //logger.error(`Unhandled connection state ${connectionState} encountered.`);
         }
     }
 };
 
 const connectionClosed = (connection: Connection, hadError: boolean): void => {
-
+    if (connection.player) {
+        playerLogout(connection.player)
+    }
 };
 
 const connectionError = (connection: Connection, error: Error): void => {
-
+    if (connection.player) {
+        playerLogout(connection.player)
+    }
 };
 
 export const connectionCreated = (

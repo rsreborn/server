@@ -54,40 +54,36 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     packetData.openBitBuffer();
 
     const npcs = getLocalNpcIds(player.coords);
-    const trackedNpcs = player.trackedNpcIndexes;
 
-    packetData.putBits(8, trackedNpcs.length);
-    trackedNpcs.forEach(trackedNpcIndex =>  {
+    packetData.putBits(8, player.trackedNpcIndexes.length);
+    player.trackedNpcIndexes.forEach(trackedNpcIndex =>  {
         const npc = getWorld().npcs[trackedNpcIndex]
-        if (npcs.includes(trackedNpcIndex) && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
+        if (npcs.includes(trackedNpcIndex) && !npc.sync.teleporting) {
             appendMovement(npc, packetData);
             appendUpdateMasks(player, npc, updateMaskData);
         } else {
-            player.trackedNpcIndexes.splice(trackedNpcIndex, 1);
+            player.trackedNpcIndexes = player.trackedNpcIndexes.filter(index => index != trackedNpcIndex);
             packetData.putBits(1, 1);
             packetData.putBits(2, 3);
         }
     });
 
-    for (let i = 0; i < npcs.length; i++)  {
+    for (let index of npcs)  {
         if (player.trackedNpcIndexes.length === 255) {
             break;
         }
-        if (trackedNpcs.includes(npcs[i])) {
+        if (player.trackedNpcIndexes.includes(index)) {
             continue;
         }
-
-        const npc = getWorld().npcs[i];
-        if (!isWithinDistance(player?.coords, npc.coords)) {
+        const npc = getWorld().npcs[index];
+        if (npc == null) {
             continue;
         }
         
         player.trackedNpcIndexes.push(npc.worldIndex);
+        appendNewlyTrackedNpcs(player, npc, packetData);
+        appendUpdateMasks(player, npc, updateMaskData);
 
-        if (npc) {
-            appendNewlyTrackedNpcs(player, npc, packetData);
-            appendUpdateMasks(player, npc, updateMaskData);
-        }
     }
 
     if (updateMaskData.writerIndex !== 0) {

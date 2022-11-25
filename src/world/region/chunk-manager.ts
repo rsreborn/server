@@ -1,4 +1,4 @@
-import { Coord, coord } from "../coord";
+import { Coord, coord, isWithinDistance } from "../coord";
 import { getWorld } from "../world";
 import { Npc } from "../npc";
 import { Player, playerLogin } from "../player";
@@ -19,6 +19,15 @@ export interface RegionCoord {
     regionChunkLocalY: number,
     regionChunkTileLocalX: number,
     regionChunkTileLocalY: number,
+}
+
+export interface ChunkCoord {
+    regionId: number,
+    regionX: number,
+    regionY: number,
+    regionChunkLocalX: number,
+    regionChunkLocalY: number,
+    plane: number,
 }
 
 export const removePlayerFromChunk = (player: Player): void => {
@@ -92,25 +101,17 @@ export const getChunkIds = (chunkIds: number[]): Chunk[] => chunkIds.map(id => g
 export const getLocalPlayerIds = (entityCoord: Coord, distance: number = 14): number[] => {
     const chunkIds = getLocalChunkIds(entityCoord, distance);
     const chunks = getChunkIds(chunkIds);
+    const players = chunks.map(chunk => chunk.players).flat();
 
-    // TODO
-    // Only pull player in range
-    // Start on coords chunk and work our way out
-
-    return chunks.map(chunk => chunk.players).flat();
+    return players.filter(playerIndex => getWorld().players[playerIndex] && isWithinDistance(getWorld().players[playerIndex].coords, entityCoord, distance));
 }
 
 export const getLocalNpcIds = (entityCoord: Coord, distance: number = 14): number[] => {
     const chunkIds = getLocalChunkIds(entityCoord, distance);
     const chunks = getChunkIds(chunkIds);
-    // console.log(chunkIds, chunks)
+    const npcs = chunks.map(chunk => chunk.npcs).flat();
 
-    // TODO
-    // Only pull npc in range
-    // Start on coords chunk and work our way out
-    // console.log('npcs: ', chunks.map(chunk => chunk.npcs).flat());
-
-    return chunks.map(chunk => chunk.npcs).flat();
+    return npcs.filter(npcIndex => getWorld().npcs[npcIndex] && isWithinDistance(getWorld().npcs[npcIndex].coords, entityCoord, distance));
 }
 
 export const getRegionCoords = (coord: Coord): RegionCoord => {
@@ -139,10 +140,20 @@ export const getRegionCoords = (coord: Coord): RegionCoord => {
     }
 };
 
+export const getChunkCoord = (chunkId: number): ChunkCoord => {
+    return {
+        regionId: chunkId & 0xffff,
+        regionX: (chunkId >> 8) & 0xff,
+        regionY: chunkId & 0xff,
+        regionChunkLocalX: (chunkId >> 20) & 0xf,
+        regionChunkLocalY: (chunkId >> 16) & 0xf,
+        plane: (chunkId >> 24) & 0xf,
+    }
+};
+
 export const getChunkByCoords = (coord: Coord): Chunk =>  getChunk(getChunkId(coord));
 
 export const getChunk = (chunkId: number): Chunk => {
-
     const activeChunks = getWorld().chunkManager.activeChunks;
     let chunk = activeChunks[chunkId] ?? null;
 
@@ -160,8 +171,8 @@ export const getChunkId = (coord: Coord): number => {
     const regionCoords = getRegionCoords(coord);
 
     return (coord.plane << 24)
-      | (regionCoords.regionChunkLocalY << 20)
-      | (regionCoords.regionChunkLocalX << 16)
+      | (regionCoords.regionChunkLocalX << 20)
+      | (regionCoords.regionChunkLocalY << 16)
       | (regionCoords.regionX << 8)
       | regionCoords.regionY;
 }

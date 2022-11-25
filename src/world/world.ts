@@ -55,17 +55,17 @@ const tick = async (): Promise<void> => {
     const duration = endTime - startTime;
     const delay = Math.max(TICK_LENGTH - duration, 0);
 
-    logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
+    //logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
     tickTimeout = setTimeout(async () => tick(), delay);
 };
 
 export const addPlayer = (player: Player): boolean => {
-    if (worldSingleton.players.find(p => p?.uid === player.uid)) {
-        logger.error(`Player ${player.username} (${player.uid}) is already online!`);
-        return false;
-    }
+    // if (worldSingleton.players.find(p => p?.uid === player.uid)) { wtf
+    //     logger.error(`Player ${player.username} (${player.uid}) is already online!`);
+    //     return false;
+    // }
 
-    const worldIndex = worldSingleton.players.findIndex(p => p === null);
+    const worldIndex = worldSingleton.players.findIndex(p => p == null);
     if (worldIndex === -1) {
         return false; // World is full
     }
@@ -78,17 +78,16 @@ export const addPlayer = (player: Player): boolean => {
     return true;
 };
 
-export const removePlayer = (player: Player): boolean => {
+export const removePlayer = (player: Player): void => {
     removePlayerFromChunk(player)
     worldSingleton.players[player.worldIndex] = null;
-    return true;
 };
 
 export const npcs = (): Npc[] => {
     let npcs = [];
-    for (let i = 0; i < 2; i++) {
-        let random = Math.floor(Math.random() * 2);
-        let random2 = Math.floor(Math.random() * 2);
+    for (let i = 0; i < 16000; i++) {
+        let random = Math.floor(Math.random() * 120);
+        let random2 = Math.floor(Math.random() * 120);
         let random3 = Math.floor(Math.random() * 2000);
         npcs.push({
             id: random3,

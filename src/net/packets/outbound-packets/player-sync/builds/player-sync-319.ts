@@ -47,9 +47,7 @@ playerSyncEncoders[319] = {
         // Map region update required
         data.putBits(1, 1);
         // Map region changed (movement type - 0=none, 1=walk, 2=run, 3=mapchange
-        // @todo eat me
         data.putBits(2, 3);
-
         // Local X coord
         data.putBits(7, localCoord.y);
         // Local plane coord
