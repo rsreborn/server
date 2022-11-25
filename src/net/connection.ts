@@ -4,9 +4,12 @@ import BigInteger from 'bigi';
 import { SocketOptions } from './server';
 import { Isaac } from './isaac';
 import { Player, playerLogin, playerLogout, PlayerRights } from '../world/player';
-import { handleInboundPacket } from './packets';
-import { handleUpdateRequests } from './file-server';
+import { handleInboundPacket, writePackets } from './packets';
+import { handleOnDemandRequests } from './file-server';
 import INBOUND_PACKET_SIZES from './packets/inbound-packet-sizes';
+import { handleUpdateServerRequests } from './update-server';
+import { getArchives, getCache } from '../cache';
+import { decodeBase37Username } from '../util/base37';
 
 const RSA_EXPONENT = BigInteger('85749236153780929917924872511187713651124617292658988978182063731979923800090977664547424642067377984001222110909310620040899943594191124988795815431638577479242072599794149649824942794144264088097130432112910214560183536387949202712729964914726145231993678948421001368196284315651219252190430508607437712749');
 const RSA_MODULUS = BigInteger('85851413706447406835286856960321868491021158946959045519533110967212579875747603892534938950597622190034801837526749417278303359405620369366942839883641648688111135276342550236485518612241524546375576253238379707601227775510104577557183947475438430283206434950768729692944226445159468674814615586984703672433');
@@ -31,6 +34,10 @@ export interface Connection {
     clientKey2?: number;
     buildNumber?: number;
     player?: Player;
+    queuedFiles?: {
+        indexNumber: number;
+        fileNumber: number;
+    }[];
 }
 
 const handleInboundPacketData = (
@@ -152,18 +159,34 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
 
             connection.serverKey = BigInt(Math.floor(Math.random() * 999999));
 
-            const response = new ByteBuffer(17);
-            response.putBytes(RESPONSE_OK);
-            response.put(0); // response code - 0 for OK
-            response.put(connection.serverKey, 'long');
-            socket.write(response.toNodeBuffer());
+            if (buffer.readable >= 4) {
+                // New engine
+                connection.buildNumber = buffer.get('int', 'u');
+                
+                const response = new ByteBuffer(9);
+                response.put(0); // response code - 0 for OK
+                response.put(connection.serverKey, 'long');
+                socket.write(response.toNodeBuffer());
+            } else {
+                // Old engine
+                const response = new ByteBuffer(17);
+                response.putBytes(RESPONSE_OK);
+                response.put(0); // response code - 0 for OK
+                response.put(connection.serverKey, 'long');
+                socket.write(response.toNodeBuffer());
+            }
+
             connection.connectionState = ConnectionState.LOGIN;
         } else if (connectionType === ConnectionType.UPDATE) {
-            if (buffer.readable >= 2) {
+            if (buffer.readable >= 4) {
+                connection.buildNumber = buffer.get('int', 'u');
+                logger.info(`Update Server build ${connection.buildNumber}.`);
+                socket.write(Buffer.from([0]));
+            } else if (buffer.readable >= 2) {
                 connection.buildNumber = buffer.get('short', 'u');
-                logger.info(`On demand build ${connection.buildNumber}.`);
+                logger.info(`On-Demand build ${connection.buildNumber}.`);
+                socket.write(RESPONSE_OK);
             }
-            socket.write(RESPONSE_OK);
             connection.connectionState = ConnectionState.UPDATE;
         } else {
             logger.error(`Invalid connection type ${connectionType} received.`);
@@ -172,8 +195,13 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
         // Post-handshake
         if (connectionState === ConnectionState.UPDATE) {
             // Update server request
-            handleUpdateRequests(connection, buffer);
+            if (connection.buildNumber < 400) {
+                handleOnDemandRequests(connection, buffer);
+            } else {
+                handleUpdateServerRequests(connection, buffer);
+            }
         } else if (connectionState === ConnectionState.LOGIN) {
+
             // Login type
             const loginOpcode = buffer.get('byte', 'u');
             if (loginOpcode !== 16 && loginOpcode !== 18) {
@@ -183,31 +211,72 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
 
             const loginPacketSize = buffer.get('byte', 'u');
             let encryptedPacketSize = loginPacketSize - (36 + 1 + 1 + 2);
-            const magicNumber = buffer.get('byte', 'u');
 
-            if (magicNumber !== 255) {
-                logger.error(`Invalid magic number ${magicNumber} received!`);
-                return;
+            const newEngine = !!connection.buildNumber; // @todo fix this - Kat 12/Nov/22 //buffer.readable <= 130;
+
+            if (newEngine) {
+                // New engine
+
+                const buildNumber = buffer.get('int', 'u');
+                if (connection.buildNumber !== buildNumber) {
+                    logger.error(`Build number mismatch - handshake ${connection.buildNumber} vs login ${buildNumber}!`);
+                    return;
+                }
+                // @todo ensure build is supported - Kat 11/Nov/22
+            } else {
+                // Old engine
+
+                const magicNumber = buffer.get('byte', 'u');
+
+                if (magicNumber !== 255) {
+                    logger.error(`Invalid magic number ${magicNumber} received!`);
+                    return;
+                }
+
+                connection.buildNumber = buffer.get('short', 'u');
+                // @todo ensure build is supported - Kat 11/Nov/22
             }
 
-            connection.buildNumber = buffer.get('short', 'u');
-            // @todo ensure build is supported - Kat 2/Nov/22
+            logger.info(`Login requested for build ${connection.buildNumber}.`);
 
             const lowMemory = buffer.get('byte', 'u') === 1;
 
+            const cache = getCache(connection.buildNumber);
+            const checksumCount = !newEngine ? 9 : (Array.from(Object.values(cache.indexFiles)).length - 1);
+            const checksums: number[] = new Array(checksumCount);
+            const expectedChecksums: number[] = new Array(checksumCount);
+            const archiveList = Array.from(Object.values(getArchives(connection.buildNumber)));
+            let outOfDate = false;
+
             // Cache checksums
-            for (let i = 0; i < 9; i++) {
-                // @todo verify these against the cache - Kat 2/Nov/22
-                buffer.get('int');
+            for (let i = 0; i < checksumCount; i++) {
+                checksums[i] = buffer.get('int');
+
+                if (!newEngine && i !== 0) {
+                    expectedChecksums[i] = archiveList.find(archive => archive.archiveNumber === i)?.checksum ?? 0;
+                    if (checksums[i] !== expectedChecksums[i]) {
+                        // @todo do something with this - Kat 12/Nov/22
+                        outOfDate = true;
+                    }
+                } else {
+                    // @todo check old engine checksum 0 (hash of all checksums) - Kat 15/Nov/22
+                }
             }
+
+            // logger.info('Expected Checksums:');
+            // logger.info(expectedChecksums);
+
+            // logger.info('Received Checksums:');
+            // logger.info(checksums);
 
             // The encrypted size includes the size byte which we don't need.
             encryptedPacketSize--;
 
             const reportedSize = buffer.get('byte', 'u');
+
             if (encryptedPacketSize !== reportedSize) {
                 logger.error(`Encrypted login packet size mismatch; calculated ${encryptedPacketSize} vs reported ${reportedSize}!`);
-                return;
+                // return; // @todo disabled while working on new engine clients - Kat 12/Nov/22
             }
 
             const encryptedBytes: Buffer = Buffer.alloc(reportedSize);
@@ -226,15 +295,29 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             const clientKey2 = connection.clientKey2 = decrypted.get('int');
             const incomingServerKey = decrypted.get('long');
 
-            if(serverKey !== incomingServerKey) {
+            if (serverKey !== incomingServerKey) {
                 logger.error(`Server key mismatch; original ${serverKey} vs reported ${incomingServerKey}!`);
                 return;
             }
 
             const uid = decrypted.get('int');
-            console.log("UID", uid)
-            const username = decrypted.getString(10);
-            const password = decrypted.getString(10);
+
+            let username: string;
+            let password: string;
+
+            if (newEngine) {
+                // New engine
+
+                const usernameLong = BigInt(decrypted.get('long'));
+                username = decodeBase37Username(usernameLong);
+                password = decrypted.getString();
+            } else {
+                // Old engine
+                
+                username = decrypted.getString(10);
+                password = decrypted.getString(10);
+            }
+
             const rights = PlayerRights.JMOD; // @todo - Kat 18-Oct-22
 
             const sessionKey: number[] = [
@@ -251,12 +334,6 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             }
 
             const outCipher = new Isaac(sessionKey);
-
-            const outputBuffer = new ByteBuffer(3);
-            outputBuffer.put(2); // login response code
-            outputBuffer.put(rights); // player role/rights
-            outputBuffer.put(0); // ??? still dunno what the fuck this is
-            socket.write(outputBuffer.toNodeBuffer());
 
             connection.player = {
                 uid,
@@ -276,7 +353,28 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             connection.connectionState = ConnectionState.LOGGED_IN;
 
             playerLogin(connection.player);
+
+            if (newEngine) {
+                // New engine
+                const outputBuffer = new ByteBuffer(6);
+                outputBuffer.put(2, 'byte'); // Success
+                outputBuffer.put(rights, 'byte');
+                outputBuffer.put(0, 'byte'); // ???
+                outputBuffer.put(connection.player.worldIndex, 'short');
+                outputBuffer.put(0, 'byte'); // ???
+                socket.write(outputBuffer.toNodeBuffer());
+            } else {
+                // Old engine
+                const outputBuffer = new ByteBuffer(3);
+                outputBuffer.put(2); // login response code
+                outputBuffer.put(rights); // player role/rights
+                outputBuffer.put(0); // ??? still dunno what the fuck this is
+                socket.write(outputBuffer.toNodeBuffer());
+            }
+
             logger.info(`Player ${username} has logged in.`);
+
+            writePackets(connection.player);
         } else if (connectionState === ConnectionState.LOGGED_IN) {
             // Packet data received
             handleInboundPacketData(connection.player, buffer);

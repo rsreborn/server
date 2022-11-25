@@ -18,6 +18,7 @@ import { closeWidgetsPacket } from './encoders/close-widgets-packet';
 import { updateWidgetString } from './encoders/update-widget-string-packet';
 import { systemUpdatePacket } from './encoders/system-update-packet';
 import { sidebarWidgetWithDisabledTabsPacket } from './encoders/sidebar-widget-with-disabled-tabs';
+import { showFullscreenWidget } from './encoders/fullscreen-widget-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -39,6 +40,7 @@ const outboundPackets: OutboundPacket[] = [
     updateWidgetString,
     systemUpdatePacket,
     sidebarWidgetWithDisabledTabsPacket,
+    showFullscreenWidget,
 ];
 
 export default outboundPackets;

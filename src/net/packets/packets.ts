@@ -1,6 +1,6 @@
 import { ByteBuffer, logger } from '@runejs/common';
 import { Player } from '../../world/player';
-import { getMapCoord } from '../../world';
+import { getLocalCoord, getMapCoord } from '../../world';
 import inboundPackets from './inbound-packets';
 import outboundPackets from './outbound-packets';
 import INBOUND_PACKET_SIZES from './inbound-packet-sizes';
@@ -27,6 +27,7 @@ export type PacketDecoder<T = any> = (opcode: number, data: ByteBuffer) => T;
 export type PacketDecoderMap<T = any> = { [key: number]: PacketDecoder<T> };
 export type PacketEncoder<T = any> = (player: Player, opcode: number, data: T) => ByteBuffer;
 export type PacketEncoderMap<T = any> = { [key: number]: PacketEncoder<T> };
+export type PacketSizeMap = { [key: number ]: PacketSize };
 
 export type PacketHandler<T = any> = (
     player: Player,
@@ -44,6 +45,7 @@ export interface OutboundPacket<T = any> {
     name: string;
     size?: PacketSize;
     queue?: PacketQueueType;
+    sizes?: PacketSizeMap;
     opcodes: PacketOpcodeMap;
     encoders: PacketEncoderMap<T>;
 }
@@ -118,12 +120,19 @@ export const handleOutboundPacket = <T = any>(
         return;
     }
 
+    let packetSize = PacketSize.FIXED;
+    if (outboundPacket.size !== undefined) {
+        packetSize = outboundPacket.size;
+    } else if (outboundPacket.sizes !== undefined) {
+        packetSize = outboundPacket.sizes[String(buildNumber)] ?? PacketSize.FIXED;
+    }
+
     const buffer = encoder(player, opcode, data);
     queuePacket(
         player,
         opcode,
         buffer,
-        outboundPacket.size ?? PacketSize.FIXED,
+        packetSize,
         outboundPacket.queue ?? PacketQueueType.PACKET
     );
 };
@@ -185,8 +194,10 @@ export const sendChatboxMessage = (player: Player, message: string): void => {
 
 export const sendUpdateMapRegionPacket = (player: Player): void => {
     const mapCoords = getMapCoord(player.coords);
+    const localCoords = getLocalCoord(player.coords);
     handleOutboundPacket(player, 'updateMapRegion', {
         mapCoords,
+        localCoords,
     });
 };
 
@@ -201,6 +212,13 @@ export const sendChatboxWidget = (player: Player, widgetId: number): void => {
         widgetId,
     }); 
 };
+
+export const sendFullscreenWidget = (player: Player, fullscreenWidgetId: number, widgetId: number) => {
+    handleOutboundPacket(player, 'fullscreenWidget', {
+        fullscreenWidgetId,
+        widgetId,
+    }); 
+}
 
 export const sendSidebarWidgetWithDisabledTabs = (player: Player, widgetId: number): void => {
     handleOutboundPacket(player, 'sidebarDisabledTabs', {

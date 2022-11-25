@@ -5,14 +5,14 @@ import { getFileData } from '@runejs/cache';
 import { getCache } from '../../cache';
 import { Connection } from '../connection';
 
-export interface UpdateTask {
+export interface OnDemandTask {
     cacheIndex: number;
     fileNumber: number;
     priority: number;
     connection: Connection;
 }
 
-export const handleUpdateRequests = (
+export const handleOnDemandRequests = (
     connection: Connection,
     request: ByteBuffer,
 ): void => {
@@ -25,13 +25,13 @@ export const handleUpdateRequests = (
         // priority 1 = not logged in
         // priority 2 = mandatory
 
-        updateQueue.push({
+        onDemandQueue.push({
             cacheIndex, fileNumber, priority, connection,
         });
     }
 };
 
-export const updateQueue = queue<UpdateTask>((task, completed) => {
+export const onDemandQueue = queue<OnDemandTask>((task, completed) => {
     // @todo handle different file priorities - Kat 22/Oct/22
     const { cacheIndex, fileNumber, priority, connection } = task;
     const cache = getCache(connection.buildNumber);

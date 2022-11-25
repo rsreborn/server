@@ -2,7 +2,7 @@ import { createServer, Server, Socket } from 'net';
 import { createServer as createWebServer } from 'http';
 import { ByteBuffer, logger } from '@runejs/common';
 import { SocketOptions } from '../server';
-import { archiveNames, findArchive, getCrcTable } from '../../cache';
+import { oldEngineArchiveNames, findArchive, getCrcTable } from '../../cache';
 
 export interface FileServer {
     hostName: string;
@@ -34,7 +34,7 @@ const handleRequest = (
             return null;
         }
     } else {
-        for (const archiveName of archiveNames) {
+        for (const archiveName of oldEngineArchiveNames) {
             if (request.startsWith(`/${archiveName}`)) {
                 const checksum = parseInt(request.substring(archiveName.length + 1), 10);
                 return findArchive(archiveName, checksum)?.data || null;

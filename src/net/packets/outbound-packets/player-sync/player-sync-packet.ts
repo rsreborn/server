@@ -4,6 +4,7 @@ import { getBuildNumber, Player, playerUpdateRequired } from '../../../../world/
 import { playerSyncEncoders } from './player-sync-encoder';
 import { getLocalPlayerIds } from '../../../../world/region';
 import { getWorld } from '../../../../world';
+import './builds/player-sync-289';
 import './builds/player-sync-319';
 import './builds/player-sync-357';
 

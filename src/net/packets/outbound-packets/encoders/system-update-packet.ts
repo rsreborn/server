@@ -8,12 +8,24 @@ interface SystemUpdateData {
 export const systemUpdatePacket: OutboundPacket<SystemUpdateData> = {
     name: 'systemUpdate',
     opcodes: {
-        319: 103
+        289: 204,
+        319: 103,
+        357: 10,
     },
     encoders: {
+        289: (player, opcode, data) => {
+            const buffer = new ByteBuffer(2);
+            buffer.put(data.time, 'short');
+            return buffer;
+        },
         319: (player, opcode, data) => {
             const buffer = new ByteBuffer(2);
             buffer.put(data.time, 'short');
+            return buffer;
+        },
+        357: (player, opcode, data) => {
+            const buffer = new ByteBuffer(2);
+            buffer.put(data.time, 'short', 'le');
             return buffer;
         }
     },

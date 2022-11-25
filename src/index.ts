@@ -8,5 +8,6 @@ import { startServer } from './net/server';
         1,
         43595,
         80,
+        [289, 319, 357, 414],
     );
 })();
