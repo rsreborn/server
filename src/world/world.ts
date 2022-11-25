@@ -1,9 +1,11 @@
 import { logger } from '@runejs/common';
 import { Coord } from './coord';
 import { createNpcSyncState, Npc, npcSync, npcTick, npcTickCleanup } from './npc';
-import { Player, playerTickCleanup, playerTick, playerSync } from './player';
+import { Player, playerTickCleanup, playerTick, playerSync, createPlayerSyncState } from './player';
 import { ChunkManager, addPlayerToChunk, removePlayerFromChunk, addNpcToChunk, removeNpcFromChunk } from './region';
 import { serverRunning } from '../net/server';
+import { defaultAppearance } from '../world/player/appearance';
+import { createMovementQueue } from './movement-queue';
 
 export const TICK_LENGTH = 600;
 
@@ -103,6 +105,30 @@ export const npcs = (): Npc[] => {
     }
     return npcs;
 }
+
+export const players = (): Player[] => {
+    let players = [];
+
+    for (let i = 10; i < 2048; i++) {
+        let random = Math.floor(Math.random() * 120);
+        let random2 = Math.floor(Math.random() * 120);
+        players.push({
+            worldIndex: i,
+            username: "Cats" + i,
+            coords: {
+                x: 3222 + random,
+                y: 3222 + random2,
+                plane: 0
+            },
+            sync: createPlayerSyncState(),
+            appearance: defaultAppearance(),
+            movementQueue: createMovementQueue(),
+            trackedPlayerIndexes: [],
+            trackedNpcIndexes: [],
+        });        
+    }
+    return players;
+};
 
 export const openWorld = (
     worldId: number,

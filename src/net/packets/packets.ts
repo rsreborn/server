@@ -98,6 +98,9 @@ export const handleOutboundPacket = <T = any>(
     packetName: string,
     data: T,
 ): void => {
+    if (player.client == null) {
+        return;
+    }
     const outboundPacket: OutboundPacket = outboundPackets.find(p => p.name === packetName);
 
     if (!outboundPacket) {
@@ -173,6 +176,9 @@ export const queuePacket = (
 };
 
 export const writePackets = (player: Player): void => {
+    if (player.client == null) {
+        return;
+    }
     const buffer = Buffer.concat([
         ...player.client.outboundPacketQueue,
         ...player.client.outboundSyncQueue,
