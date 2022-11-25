@@ -52,6 +52,19 @@ export const newEngineArchiveNames = [
     'binary',
     'midi_jingles',
     'clientscripts',
+    'fontmetrics',
+    'vorbis',
+    'midi_instruments',
+    'config_loc',
+    'config_enum',
+    'config_npc',
+    'config_obj',
+    'config_seq',
+    'config_spot',
+    'config_var_bit',
+    'worldmapdata',
+    'quickchat',
+    'quickchat_global',
 ];
 
 const readArchive = (
@@ -196,9 +209,13 @@ export const getCrcTable = (buildNumber: number): ByteBuffer => {
         const indexLength = mainIndex.data.length;
         const buffer = new ByteBuffer(4048);
         buffer.put(0, 'byte');
-        buffer.put(indexLength, 'int');
+        buffer.put(indexLength, 'int'); // 498 - indexLength * 8
         for (let i = 0; i < archiveList.length; i++) {
             buffer.put(archiveList[i].checksum, 'int');
+            if (buildNumber >= 460) {
+                // @todo determine if archives are versioned from the cache instead of build number - Kat 15/Nov/22
+                buffer.put(0, 'int'); // @todo version numbers
+            }
         }
 
         crcTables.set(buildNumber, buffer);
