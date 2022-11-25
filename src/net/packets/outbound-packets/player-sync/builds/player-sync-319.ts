@@ -37,7 +37,7 @@ playerSyncEncoders[319] = {
         }
 
         if (appearanceUpdate || forceAppearanceUpdate) {
-            appendAppearanceData(player, data);
+            appendAppearanceData(player, 319, data);
         }
     },
 
