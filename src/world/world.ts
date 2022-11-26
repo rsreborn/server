@@ -87,9 +87,9 @@ export const removePlayer = (player: Player): void => {
 
 export const npcs = (): Npc[] => {
     let npcs = [];
-    for (let i = 0; i < 16000; i++) {
-        let random = Math.floor(Math.random() * 120);
-        let random2 = Math.floor(Math.random() * 120);
+    for (let i = 0; i < 250; i++) {
+        let random = Math.floor(Math.random() * 80);
+        let random2 = Math.floor(Math.random() * 80);
         let random3 = Math.floor(Math.random() * 2000);
         npcs.push({
             id: random3,
@@ -113,7 +113,6 @@ export const players = (): Player[] => {
         let random = Math.floor(Math.random() * 120);
         let random2 = Math.floor(Math.random() * 120);
         players.push({
-            worldIndex: i,
             username: "Cats" + i,
             coords: {
                 x: 3222 + random,

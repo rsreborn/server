@@ -31,11 +31,11 @@ export interface ChunkCoord {
 }
 
 export const removePlayerFromChunk = (player: Player): void => {
-    getChunkByCoords(player.coords).players.splice(player.worldIndex, 1);
+    getChunkByCoords(player.coords).players = getChunkByCoords(player.coords).players.filter(index => index != player.worldIndex);
 }
 
 export const removeNpcFromChunk = (npc: Npc): void => {
-    getChunkByCoords(npc.coords).npcs.splice(npc.worldIndex, 1);
+    getChunkByCoords(npc.coords).npcs = getChunkByCoords(npc.coords).npcs.filter(index => index != npc.worldIndex);
 }
 
 export const addPlayerToChunk = (player: Player): void => {
