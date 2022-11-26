@@ -70,6 +70,9 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     });
 
     for (let index of npcs)  {
+        if (player.trackedNpcIndexes.length >= 255) {
+            break;
+        }
         if (player.trackedNpcIndexes.includes(index)) {
             continue;
         }
@@ -81,10 +84,6 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
         player.trackedNpcIndexes.push(npc.worldIndex);
         appendNewlyTrackedNpcs(player, npc, packetData);
         appendUpdateMasks(player, npc, updateMaskData);
-
-        if (player.trackedNpcIndexes.length === 255) {
-            break;
-        }
     }
 
     if (updateMaskData.writerIndex !== 0) {

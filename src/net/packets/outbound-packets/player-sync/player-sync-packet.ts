@@ -94,7 +94,7 @@ const constructPlayerSyncPacket = (player: Player): ByteBuffer => {
     });
 
     for (let index of players)  {
-        if (player.trackedPlayerIndexes.length === 255) {
+        if (player.trackedPlayerIndexes.length >= 255) {
             break;
         }
         if (player.trackedPlayerIndexes.includes(index)) {
