@@ -1,8 +1,11 @@
 import { logger } from '@runejs/common';
 import { Coord } from './coord';
 import { createNpcSyncState, Npc, npcSync, npcTick, npcTickCleanup } from './npc';
-import { Player, playerTickCleanup, playerTick, playerSync } from './player';
+import { Player, playerTickCleanup, playerTick, playerSync, createPlayerSyncState } from './player';
+import { ChunkManager, addPlayerToChunk, removePlayerFromChunk, addNpcToChunk, removeNpcFromChunk } from './region';
 import { serverRunning } from '../net/server';
+import { defaultAppearance } from '../world/player/appearance';
+import { createMovementQueue } from './movement-queue';
 
 export const TICK_LENGTH = 600;
 
@@ -10,6 +13,7 @@ export interface World {
     worldId: number;
     players: Player[];
     npcs: Npc[];
+    chunkManager: ChunkManager;
 }
 
 let worldSingleton: World;
@@ -53,17 +57,17 @@ const tick = async (): Promise<void> => {
     const duration = endTime - startTime;
     const delay = Math.max(TICK_LENGTH - duration, 0);
 
-    //logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
+    logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
     tickTimeout = setTimeout(async () => tick(), delay);
 };
 
 export const addPlayer = (player: Player): boolean => {
-    if (worldSingleton.players.find(p => p?.uid === player.uid)) {
-        logger.error(`Player ${player.username} (${player.uid}) is already online!`);
-        return false;
-    }
+    // if (worldSingleton.players.find(p => p?.uid === player.uid)) { wtf
+    //     logger.error(`Player ${player.username} (${player.uid}) is already online!`);
+    //     return false;
+    // }
 
-    const worldIndex = worldSingleton.players.findIndex(p => p === null);
+    const worldIndex = worldSingleton.players.findIndex(p => p == null);
     if (worldIndex === -1) {
         return false; // World is full
     }
@@ -71,43 +75,72 @@ export const addPlayer = (player: Player): boolean => {
     player.worldIndex = worldIndex;
     worldSingleton.players[worldIndex] = player;
 
+    addPlayerToChunk(player);
+
     return true;
 };
 
-export const removePlayer = (player: Player): boolean => {
+export const removePlayer = (player: Player): void => {
+    removePlayerFromChunk(player)
     worldSingleton.players[player.worldIndex] = null;
-    return true;
 };
-
 
 export const npcs = (): Npc[] => {
     let npcs = [];
-    for (let i = 0; i < 25; i++) {
-    let random = Math.floor(Math.random() * 15);
-    let random2 = Math.floor(Math.random() * 15);
-    let random3 = Math.floor(Math.random() * 9);
+    for (let i = 0; i < 250; i++) {
+        let random = Math.floor(Math.random() * 80);
+        let random2 = Math.floor(Math.random() * 80);
+        let random3 = Math.floor(Math.random() * 2000);
         npcs.push({
             id: random3,
-            index: i,
+            worldIndex: i,
             coords: {
-                x: 3217 + random,
-                y: 3217 + random2,
+                x: 3222 + random,
+                y: 3222 + random2,
                 plane: 0
             },
-            sync: createNpcSyncState()
+            sync: createNpcSyncState(),
         })
+        addNpcToChunk(npcs[i]);
     }
     return npcs;
 }
+
+export const players = (): Player[] => {
+    let players = [];
+
+    for (let i = 10; i < 2048; i++) {
+        let random = Math.floor(Math.random() * 120);
+        let random2 = Math.floor(Math.random() * 120);
+        players.push({
+            username: "Cats" + i,
+            coords: {
+                x: 3222 + random,
+                y: 3222 + random2,
+                plane: 0
+            },
+            sync: createPlayerSyncState(),
+            appearance: defaultAppearance(),
+            movementQueue: createMovementQueue(),
+            trackedPlayerIndexes: [],
+            trackedNpcIndexes: [],
+        });        
+    }
+    return players;
+};
 
 export const openWorld = (
     worldId: number,
 ): World => {
     worldSingleton = {
         worldId,
-        players: new Array(2000).fill(null),
-        npcs: npcs(),
+        chunkManager: {
+            activeChunks: new Array(0),
+        },
+        players: new Array(2048).fill(null),
+        npcs: new Array(0)
     };
+    worldSingleton.npcs = npcs();
 
     logger.info(`World ${worldId} opened.`);
 

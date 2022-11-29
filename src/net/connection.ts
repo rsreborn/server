@@ -3,8 +3,8 @@ import { ByteBuffer, logger } from '@runejs/common';
 import BigInteger from 'bigi';
 import { SocketOptions } from './server';
 import { Isaac } from './isaac';
-import { Player, playerLogin, PlayerRights } from '../world/player';
-import { handleInboundPacket } from './packets';
+import { Player, playerLogin, playerLogout, PlayerRights } from '../world/player';
+import { handleInboundPacket, writePackets } from './packets';
 import { handleOnDemandRequests } from './file-server';
 import INBOUND_PACKET_SIZES from './packets/inbound-packet-sizes';
 import { handleUpdateServerRequests } from './update-server';
@@ -116,12 +116,12 @@ const handleInboundPacketData = (
     if (packet.size !== 0) {
         packetData = new ByteBuffer(packet.size);
         packet.buffer.copy(packetData, 0, packet.buffer.readerIndex,
-            packet.buffer.readerIndex + packet.size);
+        packet.buffer.readerIndex + packet.size);
         packet.buffer.readerIndex += packet.size;
     }
 
     if (!handleInboundPacket(player, packet.opcode, packetData)) {
-        logger.error(`Unhandled packet ${packet.opcode}.`);
+       // logger.error(`Unhandled packet ${packet.opcode}.`);
         clearBuffer = true;
     }
 
@@ -373,21 +373,27 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
             }
 
             logger.info(`Player ${username} has logged in.`);
+
+            writePackets(connection.player);
         } else if (connectionState === ConnectionState.LOGGED_IN) {
             // Packet data received
             handleInboundPacketData(connection.player, buffer);
         } else {
-            logger.error(`Unhandled connection state ${connectionState} encountered.`);
+            //logger.error(`Unhandled connection state ${connectionState} encountered.`);
         }
     }
 };
 
 const connectionClosed = (connection: Connection, hadError: boolean): void => {
-
+    if (connection.player) {
+        playerLogout(connection.player)
+    }
 };
 
 const connectionError = (connection: Connection, error: Error): void => {
-
+    if (connection.player) {
+        playerLogout(connection.player)
+    }
 };
 
 export const connectionCreated = (

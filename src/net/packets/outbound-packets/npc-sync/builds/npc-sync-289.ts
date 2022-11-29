@@ -28,11 +28,11 @@ npcSyncEncoders[289] = {
     },
 
     appendNewlyTrackedNpcs: (player, npc, data) => {
-        const relativeX = npc.coords.x - player.coords.x;
-        const relativeY = npc.coords.y - player.coords.y;
+        const relativeX = npc.coords.x - (player?.coords?.x ?? 0);
+        const relativeY = npc.coords.y - (player?.coords?.y ?? 0);
         const updateRequired = npcUpdateRequired(npc);
 
-        data.putBits(14, npc.index);
+        data.putBits(14, npc.worldIndex + 1);
         data.putBits(11, npc.id);
         data.putBits(5, relativeX);
         data.putBits(5, relativeY);

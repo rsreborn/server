@@ -6,6 +6,7 @@ import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './
 import { Appearance, defaultAppearance } from './appearance';
 import { createMovementQueue, MovementQueue, movementTick } from '../movement-queue';
 import { Npc } from '../npc';
+import { updatePlayerChunk } from '../region';
 
 export enum PlayerRights {
     USER = 0,
@@ -29,7 +30,10 @@ export interface Player {
     sync?: PlayerSyncState;
     appearance?: Appearance;
     movementQueue?: MovementQueue;
-    trackedNpcs?: Npc[];
+    trackedPlayerIndexes?: number[];
+    trackedNpcIndexes?: number[];
+    lastChunkId?: number;
+    running?: boolean;
 }
 
 export const playerTick = async (player: Player): Promise<void> => {
@@ -37,6 +41,12 @@ export const playerTick = async (player: Player): Promise<void> => {
     // in parallel using Promise.all()
     return new Promise<void>(resolve => {
         movementTick(player);
+        updatePlayerChunk(player);
+
+        if (player.sync.mapRegion) {
+            sendUpdateMapRegionPacket(player);
+        }
+
         resolve();
     });
 };
@@ -46,9 +56,7 @@ export const playerTickCleanup = async (player: Player): Promise<void> => {
     // in parallel using Promise.all()
     return new Promise<void>(resolve => {
         resetPlayerSyncState(player);
-
         writePackets(player);
-
         resolve();
     });
 };
@@ -59,11 +67,12 @@ export const playerLogin = (player: Player): boolean => {
 
     player.movementQueue = createMovementQueue();
 
-    player.trackedNpcs = [];
+    player.trackedPlayerIndexes = [];
+    player.trackedNpcIndexes = [];
 
-    player.coords = {
+    player.coords = player.movementQueue.lastMapRegionUpdateCoords = {
         x: 3222,
-        y: 3222,
+        y: 3220,
         plane: 0,
     };
 
@@ -73,15 +82,13 @@ export const playerLogin = (player: Player): boolean => {
 
     sendUpdateMapRegionPacket(player); // @todo move to player sync when available - Kat 18/Oct/22
     
-    sendWelcomeScreen(player);
-
     player.widgetState.sideBarData.forEach((id, index) => {
         sendSideBarWidget(player, index, id);
     });
 
     sendChatboxMessage(player, `Welcome to RS-Reborn ${player.client.connection.buildNumber}!`);
     sendFriendsList(player, 2);
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 21; i++) {
         if (i === 3) {
             sendSkill(player, i, 10, 1154);
         } else {
@@ -107,8 +114,12 @@ export const playerLogin = (player: Player): boolean => {
     return addPlayer(player);
 };
 
-export const playerLogout = (player: Player): boolean => {
+export const playerLogout = (player: Player): void => {
     // @todo logout packet - Kat 19/Oct/22
     sendLogout(player);
-    return removePlayer(player);
+    removePlayer(player);
+};
+
+export const getBuildNumber = (player: Player): string => {
+    return String(player.client.connection.buildNumber);
 };

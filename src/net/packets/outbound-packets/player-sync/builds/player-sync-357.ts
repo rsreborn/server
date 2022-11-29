@@ -16,7 +16,7 @@ playerSyncEncoders[357] = {
 
         // @todo append all flags - Kat 3/Nov/22
         const { appearanceUpdate } = player.sync;
-        if (appearanceUpdate) {
+        if (appearanceUpdate || forceAppearanceUpdate) {
             flags |= UpdateFlags.APPEARANCE_UPDATE;
         }
 
@@ -29,7 +29,7 @@ playerSyncEncoders[357] = {
         }
 
         if (appearanceUpdate || forceAppearanceUpdate) {
-            appendAppearanceData(player, data);
+            appendAppearanceData(player, 357, data);
         }
     },
 
@@ -38,6 +38,7 @@ playerSyncEncoders[357] = {
 
         // Map region update required
         data.putBits(1, 1);
+
         // Map region changed (movement type - 0=none, 1=walk, 2=run, 3=mapchange
         data.putBits(2, 3);
 
@@ -45,16 +46,26 @@ playerSyncEncoders[357] = {
         data.putBits(2, localCoord.plane);
 
         // Local Y coord
-        data.putBits(7, localCoord.y);
+        data.putBits(7, localCoord.x);
 
         // Whether an update flag block follows
         data.putBits(1, playerUpdateRequired(player) ? 1 : 0);
 
         // Local X coord
-        data.putBits(7, localCoord.x);
+        data.putBits(7, localCoord.y);
 
         // Whether the client should discard the current walking queue (1 if teleporting, 0 if not)
         data.putBits(1, player.sync.teleporting ? 1 : 0);
+    },
+
+    appendNewlyTrackedPlayer: (data, player, otherPlayer) => {
+        const xPos = otherPlayer.coords.x - player.coords.x;
+        const yPos = otherPlayer.coords.y - player.coords.y;
+        data.putBits(11, otherPlayer.worldIndex + 1);
+        data.putBits(5, xPos);
+        data.putBits(1, 1);
+        data.putBits(1, 1);
+        data.putBits(5, yPos);
     },
 };
 

@@ -1,6 +1,6 @@
 import { ByteBuffer, logger } from '@runejs/common';
 import { Player } from '../../world/player';
-import { getLocalCoord, getMapCoord, getRegionId } from '../../world';
+import { getLocalCoord, getMapCoord } from '../../world';
 import inboundPackets from './inbound-packets';
 import outboundPackets from './outbound-packets';
 import INBOUND_PACKET_SIZES from './inbound-packet-sizes';
@@ -82,7 +82,7 @@ export const handleInboundPacket = (
         return true;
     }
 
-    logger.info(`Unhandled packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
+    //logger.info(`Unhandled packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
 
     const knownPacket = INBOUND_PACKET_SIZES[String(buildNumber)][String(opcode)] !== undefined;
     if (!knownPacket) {
@@ -98,6 +98,9 @@ export const handleOutboundPacket = <T = any>(
     packetName: string,
     data: T,
 ): void => {
+    if (player.client == null) {
+        return;
+    }
     const outboundPacket: OutboundPacket = outboundPackets.find(p => p.name === packetName);
 
     if (!outboundPacket) {
@@ -173,6 +176,9 @@ export const queuePacket = (
 };
 
 export const writePackets = (player: Player): void => {
+    if (player.client == null) {
+        return;
+    }
     const buffer = Buffer.concat([
         ...player.client.outboundPacketQueue,
         ...player.client.outboundSyncQueue,

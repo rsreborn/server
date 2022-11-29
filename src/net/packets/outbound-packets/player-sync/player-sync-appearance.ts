@@ -4,15 +4,17 @@ import { encodeBase37Username } from '../../../../util/base37';
 
 export const appendAppearanceData = (
     player: Player,
+    buildNumber: number,
     data: ByteBuffer,
 ): void => {
-    if (!player.sync.appearanceData) {
+    // @todo fix this by making it build-specific - Kat 25/Nov/22
+    // if (!player.sync.appearanceData) {
         const appearanceData = new ByteBuffer(500);
 
         appearanceData.put(player.appearance.bodyType); // Body type
-        appearanceData.put(player.client.connection.buildNumber >= 357 ? -1 : 0); // @todo head icons - Kat 25/Oct/22
+        appearanceData.put(buildNumber >= 357 ? -1 : 0); // @todo head icons - Kat 25/Oct/22
 
-        if (player.client.connection.buildNumber >= 357) {
+        if (buildNumber >= 357) {
             appearanceData.put(-1); // @todo skull icons for later revisions - Kat 3/Nov/22
         }
 
@@ -25,6 +27,7 @@ export const appendAppearanceData = (
         appearanceData.put(0); // neck item
         appearanceData.put(0); // main hand item
         appearanceData.put(0x100 + player.appearance.torso, 'short'); // torso
+
         appearanceData.put(0); // off-hand item
         appearanceData.put(0x100 + player.appearance.arms, 'short'); // arms
         appearanceData.put(0x100 + player.appearance.legs, 'short'); // legs
@@ -56,7 +59,7 @@ export const appendAppearanceData = (
         appearanceData.put(0, 'short'); // @todo Skill Level - Kat 25/Oct/22
 
         player.sync.appearanceData = appearanceData.flipWriter();
-    }
+    // }
 
     data.put(player.sync.appearanceData.length);
     data.putBytes(player.sync.appearanceData);
