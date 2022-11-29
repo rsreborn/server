@@ -3,9 +3,10 @@ import { NpcSyncState, resetNpcSyncState } from "./npc-sync";
 
 export interface Npc {
     id: number;
-    index: number;
+    worldIndex: number;
     coords: Coord;
     sync: NpcSyncState;
+    lastChunkId?: number;
 }
 
 export const npcTick = async (npc: Npc): Promise<void> => {

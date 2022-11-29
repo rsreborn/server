@@ -17,14 +17,25 @@ export const buttonPacket: InboundPacket<ButtonPacketData> = {
             case 2458:
                 sendLogout(player);
                 break;
+            case 153:
+                player.running = true;
+                break;
+            case 152:
+                player.running = false;
+                break;
         }
         console.log(`button packet handler ${data.widgetId}`);
     },
     opcodes: {
+        289: 86,
         319: 189,
         357: 211,
     },
     decoders: {
+        289: (opcode: number, data: ByteBuffer) => {
+            const widgetId = data.get('short', 'u');
+            return { widgetId };
+        },
         319: (opcode: number, data: ByteBuffer) => {
             const widgetId = data.get('short', 'u');
             return { widgetId };

@@ -1,11 +1,12 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendChatboxMessage, sendFriendsList, sendLogout, sendSideBarWidget, sendSidebarWidgetWithDisabledTabs, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendLogout, sendSideBarWidget, sendSidebarWidgetWithDisabledTabs, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
 import { createMovementQueue, MovementQueue, movementTick } from '../movement-queue';
 import { Npc } from '../npc';
+import { updatePlayerChunk } from '../region';
 
 export enum PlayerRights {
     USER = 0,
@@ -29,7 +30,10 @@ export interface Player {
     sync?: PlayerSyncState;
     appearance?: Appearance;
     movementQueue?: MovementQueue;
-    trackedNpcs?: Npc[];
+    trackedPlayerIndexes?: number[];
+    trackedNpcIndexes?: number[];
+    lastChunkId?: number;
+    running?: boolean;
 }
 
 export const playerTick = async (player: Player): Promise<void> => {
@@ -37,6 +41,12 @@ export const playerTick = async (player: Player): Promise<void> => {
     // in parallel using Promise.all()
     return new Promise<void>(resolve => {
         movementTick(player);
+        updatePlayerChunk(player);
+
+        if (player.sync.mapRegion) {
+            sendUpdateMapRegionPacket(player);
+        }
+
         resolve();
     });
 };
@@ -46,9 +56,7 @@ export const playerTickCleanup = async (player: Player): Promise<void> => {
     // in parallel using Promise.all()
     return new Promise<void>(resolve => {
         resetPlayerSyncState(player);
-
         writePackets(player);
-
         resolve();
     });
 };
@@ -59,11 +67,12 @@ export const playerLogin = (player: Player): boolean => {
 
     player.movementQueue = createMovementQueue();
 
-    player.trackedNpcs = [];
+    player.trackedPlayerIndexes = [];
+    player.trackedNpcIndexes = [];
 
-    player.coords = {
+    player.coords = player.movementQueue.lastMapRegionUpdateCoords = {
         x: 3222,
-        y: 3222,
+        y: 3220,
         plane: 0,
     };
 
@@ -73,27 +82,44 @@ export const playerLogin = (player: Player): boolean => {
 
     sendUpdateMapRegionPacket(player); // @todo move to player sync when available - Kat 18/Oct/22
     
-    sendWelcomeScreen(player);
-
     player.widgetState.sideBarData.forEach((id, index) => {
         sendSideBarWidget(player, index, id);
     });
 
     sendChatboxMessage(player, `Welcome to RS-Reborn ${player.client.connection.buildNumber}!`);
     sendFriendsList(player, 2);
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 21; i++) {
         if (i === 3) {
             sendSkill(player, i, 10, 1154);
         } else {
             sendSkill(player, i, 1, 0);
         }
     }
+
+    // sendChatboxWidget(player, 4882);
+    // sendWidgetNpcHead(player, 4883, 1);
+    // sendAnimateWidget(player, 4883, 591);
+    // sendWidgetString(player, 4884, "NPC Name Goes here")
+    // sendWidgetString(player, 4885, "We've got some text here!");
+
+    // sendChatboxWidget(player, 968);
+    // sendWidgetPlayerHead(player, 969);
+    // sendAnimateWidget(player, 969, 591);
+    // sendWidgetString(player, 970, "Brian")
+    // sendWidgetString(player, 971, "We've got some text here!");
     
+    sendWelcomeScreen(player);
+    sendFullscreenWidget(player, 15244, 5993);
+
     return addPlayer(player);
 };
 
-export const playerLogout = (player: Player): boolean => {
+export const playerLogout = (player: Player): void => {
     // @todo logout packet - Kat 19/Oct/22
     sendLogout(player);
-    return removePlayer(player);
+    removePlayer(player);
+};
+
+export const getBuildNumber = (player: Player): string => {
+    return String(player.client.connection.buildNumber);
 };

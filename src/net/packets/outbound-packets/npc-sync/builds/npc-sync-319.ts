@@ -32,10 +32,10 @@ npcSyncEncoders[319] = {
         const relativeY = npc.coords.y - player.coords.y;
         const updateRequired = npcUpdateRequired(npc);
 
-        data.putBits(14, npc.index);
-        data.putBits(5, relativeX);
-        data.putBits(1, updateRequired ? 1 : 0);
+        data.putBits(14, npc.worldIndex);
         data.putBits(5, relativeY);
+        data.putBits(1, updateRequired ? 1 : 0);
+        data.putBits(5, relativeX);
         data.putBits(12, npc.id);
         data.putBits(1, 0);
     },

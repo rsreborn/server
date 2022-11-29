@@ -4,8 +4,10 @@ import { Player } from '../../../../world/player';
 import { getWorld, isWithinDistance } from '../../../../world';
 import { Npc, npcUpdateRequired } from '../../../../world/npc';
 import { npcSyncEncoders } from './npc-sync-encoder';
+import './builds/npc-sync-289';
 import './builds/npc-sync-319';
 import './builds/npc-sync-357';
+import { getLocalNpcIds } from '../../../../world/region/chunk-manager';
 
 const appendNewlyTrackedNpcs = (
     player: Player,
@@ -52,37 +54,36 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
 
     packetData.openBitBuffer();
 
-    const npcs = getWorld().npcs;
-    const trackedNpcs = player.trackedNpcs;
+    const npcs = getLocalNpcIds(player.coords);
 
-    packetData.putBits(8, trackedNpcs.length);
-
-    trackedNpcs.forEach(npc => {
-        if (npcs.includes(npc) && !npc.sync.teleporting && isWithinDistance(npc.coords, player?.coords)) {
+    packetData.putBits(8, player.trackedNpcIndexes.length);
+    player.trackedNpcIndexes.forEach(trackedNpcIndex =>  {
+        const npc = getWorld().npcs[trackedNpcIndex]
+        if (npcs.includes(trackedNpcIndex) && !npc.sync.teleporting) {
             appendMovement(npc, packetData);
             appendUpdateMasks(player, npc, updateMaskData);
         } else {
+            player.trackedNpcIndexes = player.trackedNpcIndexes.filter(index => index != trackedNpcIndex);
             packetData.putBits(1, 1);
             packetData.putBits(2, 3);
         }
     });
 
-    for (const npc of npcs) {
-        if (player.trackedNpcs.length === 255) {
+    for (let index of npcs)  {
+        if (player.trackedNpcIndexes.length >= 255) {
             break;
         }
-
-        if (player.trackedNpcs.includes(npc)
-            || !isWithinDistance(player?.coords, npc.coords)) {
+        if (player.trackedNpcIndexes.includes(index)) {
             continue;
         }
-
-        player.trackedNpcs.push(npc);
-
-        if (npc) {
-            appendNewlyTrackedNpcs(player, npc, packetData);
-            appendUpdateMasks(player, npc, updateMaskData);
+        const npc = getWorld().npcs[index];
+        if (npc == null) {
+            continue;
         }
+        
+        player.trackedNpcIndexes.push(npc.worldIndex);
+        appendNewlyTrackedNpcs(player, npc, packetData);
+        appendUpdateMasks(player, npc, updateMaskData);
     }
 
     if (updateMaskData.writerIndex !== 0) {
