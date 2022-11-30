@@ -67,6 +67,10 @@ export const newEngineArchiveNames = [
     'quickchat_global',
 ];
 
+export const archiveCounts = new Map<number, number>();
+archiveCounts.set(414, 12);
+archiveCounts.set(498, 26);
+
 const readArchive = (
     buildNumber: number,
     cache: FileCache,
@@ -76,11 +80,13 @@ const readArchive = (
     const dataFile = cache.dataFile;
     const indexFile = cache.indexFiles.find(index => index.indexNumber === indexNumber);
     if (!indexFile) {
-        return null;
+        logger.warn(`Could not find index file ${archiveNumber} for build ${buildNumber}!`);
+        return { archiveNumber, checksum: -1, data: new ByteBuffer(0) }
+    } else {
+        const data = getFileData(dataFile, indexFile, archiveNumber);
+        const checksum = Crc32.update(0, data.length, data);
+        return { archiveNumber, checksum, data };
     }
-    const data = getFileData(dataFile, indexFile, archiveNumber);
-    const checksum = Crc32.update(0, data.length, data);
-    return { archiveNumber, checksum, data };
 };
 
 const loadArchives = (): void => {
@@ -98,13 +104,14 @@ const loadArchives = (): void => {
             });
         } else {
             const archiveMap: { [key: string]: Archive } = {};
+            const archiveCount = archiveCounts.get(build);
 
-            for (let i = 0; i < newEngineArchiveNames.length; i++) {
-                const indexFile = cache.indexFiles.find(index => index.indexNumber === i);
-                if (!indexFile) {
-                    continue;
-                }
+            if (!archiveCount) {
+                logger.error(`Build ${build} not registered within archiveCounts, please specify the number of archives within build ${build}.`);
+                return;
+            }
 
+            for (let i = 0; i < archiveCount; i++) {
                 const archiveName = newEngineArchiveNames[i];
                 archiveMap[archiveName] = readArchive(build, cache, i);
             }
@@ -206,10 +213,10 @@ export const getCrcTable = (buildNumber: number): ByteBuffer => {
         const cache = caches.get(buildNumber);
         const archiveList = Array.from(Object.values(archives.get(buildNumber)));
         const mainIndex = cache.indexFiles.find(index => index.indexNumber === 255);
-        const indexLength = mainIndex.data.length;
         const buffer = new ByteBuffer(4048);
         buffer.put(0, 'byte');
-        buffer.put(indexLength, 'int'); // 498 - indexLength * 8
+        buffer.put(archiveList.length * (buildNumber >= 460 ? 8 : 4), 'int');
+        
         for (let i = 0; i < archiveList.length; i++) {
             buffer.put(archiveList[i].checksum, 'int');
             if (buildNumber >= 460) {

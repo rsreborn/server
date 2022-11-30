@@ -8,6 +8,7 @@ import './builds/player-sync-289';
 import './builds/player-sync-319';
 import './builds/player-sync-357';
 import './builds/player-sync-414';
+import './builds/player-sync-498';
 
 const appendUpdateMasks = (
     player: Player,

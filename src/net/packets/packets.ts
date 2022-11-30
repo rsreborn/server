@@ -207,6 +207,12 @@ export const sendUpdateMapRegionPacket = (player: Player): void => {
     });
 };
 
+export const sendWindowPane = (player: Player, windowId: number): void => {
+    handleOutboundPacket(player, 'windowPane', {
+        windowId,
+    }); 
+};
+
 export const sendWidget = (player: Player, widgetId: number): void => {
     handleOutboundPacket(player, 'widget', {
         widgetId,
