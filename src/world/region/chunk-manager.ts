@@ -3,6 +3,7 @@ import { getWorld } from "../world";
 import { Npc } from "../npc";
 import { Player, playerLogin } from "../player";
 import { Chunk } from "./region";
+import { randomUUID } from "crypto";
 
 export interface ChunkManager {
     activeChunks: Chunk[];
@@ -41,13 +42,13 @@ export const removeNpcFromChunk = (npc: Npc): void => {
 export const addPlayerToChunk = (player: Player): void => {
     const chunkId = getChunkId(player.coords);
     player.lastChunkId = chunkId;
-    getChunk(chunkId).players[player.worldIndex] = player.worldIndex;
+    getChunk(chunkId).players.push(player.worldIndex);
 }
 
 export const addNpcToChunk = (npc: Npc): void => {
     const chunkId = getChunkId(npc.coords);
     npc.lastChunkId = chunkId;
-    getChunk(chunkId).npcs[npc.worldIndex] = npc.worldIndex;
+    getChunk(chunkId).npcs.push(npc.worldIndex);
 }
 
 export const updatePlayerChunk = (player: Player): void => {
@@ -60,7 +61,10 @@ export const updatePlayerChunk = (player: Player): void => {
         if (regionId !== lastRegionId) {
             // player.sync.mapRegion = true;
         }
-        getChunk(player.lastChunkId).players.splice(player.worldIndex, 1);
+
+        getChunk(player.lastChunkId).players = getChunk(player.lastChunkId).players.filter(index => index != player.worldIndex);
+        // getChunk(player.lastChunkId).playerTriggers = getChunk(player.lastChunkId).playerTriggers.filter(data => index != player.worldIndex);
+
         addPlayerToChunk(player);
     }
 }
@@ -68,7 +72,7 @@ export const updatePlayerChunk = (player: Player): void => {
 export const updateNpcChunk = (npc: Npc): void => {
     const chunkId = getChunkId(npc.coords);
     if (npc.lastChunkId !== chunkId) {
-        getChunk(npc.lastChunkId).npcs.splice(npc.worldIndex, 1);
+        getChunk(npc.lastChunkId).npcs = getChunk(npc.lastChunkId).npcs.filter(index => index != npc.worldIndex);
         addNpcToChunk(npc);
     }
 }
@@ -151,6 +155,46 @@ export const getChunkCoord = (chunkId: number): ChunkCoord => {
     }
 };
 
+export const addPlayerTrigger = (player: Player, callback: Function): string => {
+    const regionCoords = getRegionCoords(player.coords);
+    const chunk = getChunkByCoords(player.coords);
+
+    const uuid = randomUUID();
+    chunk.playerTriggers[player.worldIndex][regionCoords.regionChunkLocalX][regionCoords.regionChunkLocalY].push({
+        uuid: uuid,
+        callback: callback,
+    });
+
+    return uuid;
+}
+
+export const addNpcTrigger = (npc: Npc, callback: Function): string => {
+    const regionCoords = getRegionCoords(npc.coords);
+    const chunk = getChunkByCoords(npc.coords);
+
+    const uuid = randomUUID();
+    chunk.npcTriggers[npc.worldIndex][regionCoords.regionChunkLocalX][regionCoords.regionChunkLocalY].push({
+        uuid: uuid,
+        callback: callback,
+    });
+
+    return uuid;
+}
+
+export const removePlayerTrigger = (player: Player, coords: Coord, uuid: string): void => {
+    const regionCoords = getRegionCoords(coords);
+    const chunk = getChunkByCoords(coords);
+
+    chunk.playerTriggers[player.worldIndex][regionCoords.regionChunkLocalX][regionCoords.regionChunkLocalY] = chunk.playerTriggers[player.worldIndex][regionCoords.regionChunkLocalX][regionCoords.regionChunkLocalY].filter(trigger => trigger.uuid != uuid);
+}
+
+export const removeNpcTrigger = (npc: Npc, coords: Coord, uuid: string): void => {
+    const regionCoords = getRegionCoords(coords);
+    const chunk = getChunkByCoords(coords);
+
+    chunk.npcTriggers[npc.worldIndex][regionCoords.regionChunkLocalX][regionCoords.regionChunkLocalY] = chunk.npcTriggers[npc.worldIndex][regionCoords.regionChunkLocalX][regionCoords.regionChunkLocalY].filter(trigger => trigger.uuid != uuid);
+}
+
 export const getChunkByCoords = (coord: Coord): Chunk =>  getChunk(getChunkId(coord));
 
 export const getChunk = (chunkId: number): Chunk => {
@@ -161,9 +205,12 @@ export const getChunk = (chunkId: number): Chunk => {
         chunk = {
             npcs: new Array(0),
             players: new Array(0),
+            npcTriggers: [[]],
+            playerTriggers: [[]],
         };
         activeChunks[chunkId] = chunk;
     }
+
     return chunk;
 }
 
