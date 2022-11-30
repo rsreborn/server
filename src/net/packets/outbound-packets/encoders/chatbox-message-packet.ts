@@ -12,6 +12,7 @@ export const chatboxMessagePacket: OutboundPacket<ChatboxMessageData> = {
         289: 196,
         319: 50,
         357: 31,
+        414: 75,
     },
     encoders: {
         289: (player, opcode, data) => {
@@ -27,6 +28,11 @@ export const chatboxMessagePacket: OutboundPacket<ChatboxMessageData> = {
         357: (player, opcode, data) => {
             const buffer = new ByteBuffer(data.message.length + 1);
             buffer.putString(data.message, 10);
+            return buffer;
+        },
+        414: (player, opcode, data) => {
+            const buffer = new ByteBuffer(data.message.length + 1);
+            buffer.putString(data.message);
             return buffer;
         }
     },

@@ -76,9 +76,15 @@ export const playerLogin = (player: Player): boolean => {
         plane: 0,
     };
 
-    player.widgetState = {
-        sideBarData: [ 2423, 3917, 638, 3213, 1644, 5608, 1151, 65535, 5065, 5715, 2449, 904, 147, 962 ]
-    };
+    if ((player?.client?.connection?.buildNumber ?? 0) < 400) {
+        player.widgetState = {
+            sideBarData: [ 2423, 3917, 638, 3213, 1644, 5608, 1151, 65535, 5065, 5715, 2449, 904, 147, 962 ]
+        };
+    } else {
+        player.widgetState = {
+            sideBarData: [ 92, 320, 274, 149, 387, 271, 192, 65535, 131, 148, 182, 261, 262, 239 ]
+        };
+    }
 
     sendUpdateMapRegionPacket(player); // @todo move to player sync when available - Kat 18/Oct/22
     

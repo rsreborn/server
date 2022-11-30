@@ -12,6 +12,7 @@ export const sidebarWidgetPacket: OutboundPacket<SidebarWidgetData> = {
         289: 63,
         319: 229,
         357: 163,
+        414: 242,
     },
     encoders: {
         289: (player, opcode, data) => {
@@ -27,6 +28,12 @@ export const sidebarWidgetPacket: OutboundPacket<SidebarWidgetData> = {
             return buffer;
         },
         357: (player, opcode, data) => {
+            const buffer = new ByteBuffer(3);
+            buffer.put(data.widgetId, 'short');
+            buffer.put(data.sidebarId, 'byte');
+            return buffer;
+        },
+        414: (player, opcode, data) => {
             const buffer = new ByteBuffer(3);
             buffer.put(data.widgetId, 'short');
             buffer.put(data.sidebarId, 'byte');
