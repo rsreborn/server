@@ -25,6 +25,17 @@ export const commandPacket: InboundPacket<CommandPacketData> = {
             sendWidget(player, parseInt(args[1]));
         }
 
+        if (command === 'tele') {
+            const x =  parseInt(args[1]);
+            const y = parseInt(args[2]);
+            const plane = parseInt(args[3]) ?? 0;
+
+            player.coords.x = x;
+            player.coords.y = y;
+            player.coords.plane = plane;
+            player.sync.mapRegion = true;
+        }
+
     },
     opcodes: {
         319: 192,
