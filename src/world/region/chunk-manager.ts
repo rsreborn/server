@@ -26,6 +26,7 @@ export interface ChunkCoord {
     regionId: number,
     regionX: number,
     regionY: number,
+    chunkId: number,
     regionChunkLocalX: number,
     regionChunkLocalY: number,
     plane: number,
@@ -149,11 +150,14 @@ export const getChunkCoord = (chunkId: number): ChunkCoord => {
         regionId: chunkId & 0xffff,
         regionX: (chunkId >> 8) & 0xff,
         regionY: chunkId & 0xff,
+        chunkId: chunkId,
         regionChunkLocalX: (chunkId >> 20) & 0xf,
         regionChunkLocalY: (chunkId >> 16) & 0xf,
         plane: (chunkId >> 24) & 0xf,
     }
 };
+
+export const getChunkCoordByCoords = (coord: Coord): ChunkCoord =>  getChunkCoord(getChunkId(coord));
 
 export const addPlayerTrigger = (player: Player, callback: Function): string => {
     const regionCoords = getRegionCoords(player.coords);
@@ -205,8 +209,8 @@ export const getChunk = (chunkId: number): Chunk => {
         chunk = {
             npcs: new Array(0),
             players: new Array(0),
-            npcTriggers: [[]],
-            playerTriggers: [[]],
+            npcTriggers: [],
+            playerTriggers: [],
         };
         activeChunks[chunkId] = chunk;
     }

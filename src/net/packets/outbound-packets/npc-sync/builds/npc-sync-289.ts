@@ -11,7 +11,7 @@ enum UpdateFlags {
 npcSyncEncoders[289] = {
     packetOpcode: 65,
 
-    updateMaskEncoder: (npc, data) => {
+    updateMaskEncoder: (npc, player, data) => {
         let flags = 0;
 
         // @todo append all flags - Kat 3/Nov/22
@@ -38,5 +38,10 @@ npcSyncEncoders[289] = {
         data.putBits(5, relativeY);
         data.putBits(1, updateRequired ? 1 : 0);
         data.putBits(1, 0);
+    },
+
+    facePlayer: (npc, player, data) => {
+        // npc.sync.faceEntity = true;
+        // data.put(player.worldIndex, 'short', 'le')
     },
 };
