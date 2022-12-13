@@ -22,6 +22,7 @@ export const walkPacket: InboundPacket<WalkPacketData> = {
         319: [ 155, 178, 191 ],
         357: [ 66, 77, 213 ],
         414: [ 20, 104, 142 ],
+        498: [ 74, 149, 177 ],
     },
     decoders: {
         289: (opcode: number, data: ByteBuffer) => {
@@ -155,6 +156,41 @@ export const walkPacket: InboundPacket<WalkPacketData> = {
             const forceRun = data.get('byte') === 1;
             const startY = data.get('short', 'u', 'le');
             const startX = data.get('short', 'u');
+
+            path[0] = {
+                x: startX, y: startY, plane: null
+            };
+
+            for (let i = 1; i < totalSteps; i++) {
+                path[i].x += startX;
+                path[i].y += startY;
+            }
+
+            return {
+                forceRun,
+                path,
+            };
+        },
+        498: (opcode: number, data: ByteBuffer) => {
+            let size = data.length;
+            if (opcode === 74) {
+                size -= 14;
+            }
+
+            const totalSteps = Math.floor((size - 5) / 2) + 1;
+            const path: Coord[] = new Array(totalSteps);
+
+            const startY = data.get('short', 'u', 'le');
+            const startX = data.get('short', 'u', 'le');
+            const forceRun = data.get('byte') === 1;
+
+            for (let i = 1; i < totalSteps; i++) {
+                const x = data.get('byte');
+                const y = data.get('byte');
+                path[i] = {
+                    x, y, plane: null
+                };
+            }
 
             path[0] = {
                 x: startX, y: startY, plane: null
