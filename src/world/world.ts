@@ -8,6 +8,7 @@ import { defaultAppearance } from '../world/player/appearance';
 import { createMovementQueue } from './movement-queue';
 import { readFileSync } from 'fs';
 import { systemUpdatePacket } from 'net/packets/outbound-packets/encoders/system-update-packet';
+import { join } from 'path';
 
 export const TICK_LENGTH = 600;
 
@@ -108,7 +109,7 @@ interface NpcSpawns {
 }
 
 const convertTheStuff = () => {
-    const result = readFileSync('C:/Users/eveni/Desktop/spawn-config.cfg', 'utf-8');
+    const result = readFileSync(join('.', 'data', 'spawn-config.cfg'), 'utf-8');
     
     let split = result.split(/[\t|\n]+/)
     let spawns: NpcSpawnData[] = []
@@ -135,7 +136,7 @@ const convertTheStuff = () => {
 }
 
 const loadTheJson = () => {
-    const result = readFileSync('C:/Users/eveni/Desktop/spawn-config.json', 'utf-8');
+    const result = readFileSync(join('.', 'data', 'spawn-config.cfg'), 'utf-8');
     let spawns: NpcSpawns;
     spawns = JSON.parse(result);
     return spawns;
