@@ -6,6 +6,9 @@ import { ChunkManager, addPlayerToChunk, removePlayerFromChunk, addNpcToChunk, r
 import { serverRunning } from '../net/server';
 import { defaultAppearance } from '../world/player/appearance';
 import { createMovementQueue } from './movement-queue';
+import { readFileSync } from 'fs';
+import { systemUpdatePacket } from 'net/packets/outbound-packets/encoders/system-update-packet';
+import { join } from 'path';
 
 export const TICK_LENGTH = 600;
 
@@ -57,7 +60,7 @@ const tick = async (): Promise<void> => {
     const duration = endTime - startTime;
     const delay = Math.max(TICK_LENGTH - duration, 0);
 
-    logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
+    //logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
     tickTimeout = setTimeout(async () => tick(), delay);
 };
 
@@ -67,7 +70,7 @@ export const addPlayer = (player: Player): boolean => {
     //     return false;
     // }
 
-    const worldIndex = worldSingleton.players.findIndex(p => p == null);
+    const worldIndex = worldSingleton.players.findIndex((p, index) => p == null && index > 0);
     if (worldIndex === -1) {
         return false; // World is full
     }
@@ -85,23 +88,79 @@ export const removePlayer = (player: Player): void => {
     worldSingleton.players[player.worldIndex] = null;
 };
 
+interface NpcSpawnData {
+    id: number;
+    coords: Coord;
+}
+
+interface NpcSpawnData2 {
+    id: number;
+    x: number;
+    y: number;
+    height: number;
+    walk: number;
+    maxHit: number;
+    strength: number;
+    attack: number;
+}
+
+interface NpcSpawns {
+    spawns: NpcSpawnData2[];
+}
+
+const convertTheStuff = () => {
+    const result = readFileSync(join('.', 'data', 'spawn-config.cfg'), 'utf-8');
+    
+    let split = result.split(/[\t|\n]+/)
+    let spawns: NpcSpawnData[] = []
+
+    console.log(split[0], split.length)
+
+    for(let i = 0; i < split.length; i++) {
+        if (split[i].startsWith("spawn")) {
+            let npcId = parseInt(split[i].substring(7));
+
+            let npc = {
+                id: npcId,
+                coords: {
+                    x: parseInt(split[i + 1]),
+                    y: parseInt(split[i + 2]),
+                    plane: parseInt(split[i + 3]),
+                }
+            } as NpcSpawnData;
+            if (npcId <= 2291)
+                spawns.push(npc);
+        }
+    }
+    return spawns;
+}
+
+const loadTheJson = () => {
+    const result = readFileSync(join('.', 'data', 'spawn-config.cfg'), 'utf-8');
+    let spawns: NpcSpawns;
+    spawns = JSON.parse(result);
+    return spawns;
+}
+
 export const npcs = (): Npc[] => {
+    let spawnData = convertTheStuff()
     let npcs = [];
-    for (let i = 0; i < 250; i++) {
-        let random = Math.floor(Math.random() * 80);
-        let random2 = Math.floor(Math.random() * 80);
-        let random3 = Math.floor(Math.random() * 2000);
-        npcs.push({
-            id: random3,
-            worldIndex: i,
-            coords: {
-                x: 3222 + random,
-                y: 3222 + random2,
-                plane: 0
-            },
-            sync: createNpcSyncState(),
-        })
-        addNpcToChunk(npcs[i]);
+    console.log(spawnData.length);
+    for (let i = 0; i < spawnData.length; i++) {
+        const worldIndex = worldSingleton.npcs.findIndex((p, index) => p == null && index > 0)
+            npcs.push({
+                id: spawnData[i].id,
+                worldIndex: worldIndex,
+                coords: {
+                    x: spawnData[i].coords.x,
+                    y: spawnData[i].coords.y,
+                    plane: spawnData[i].coords.plane,
+                },
+                sync: createNpcSyncState(),
+            });
+            let npc = npcs[worldIndex]
+            worldSingleton.npcs[worldIndex] = npc;
+            addNpcToChunk(npcs[i]);
     }
     return npcs;
 }
@@ -138,7 +197,7 @@ export const openWorld = (
             activeChunks: new Array(0),
         },
         players: new Array(2048).fill(null),
-        npcs: new Array(0)
+        npcs: new Array(16000).fill(null),
     };
     worldSingleton.npcs = npcs();
 

@@ -96,7 +96,7 @@ export const handleInboundPacket = (
 export const handleOutboundPacket = <T = any>(
     player: Player,
     packetName: string,
-    data: T,
+    data?: T,
 ): void => {
     if (player.client == null) {
         return;
@@ -191,6 +191,10 @@ export const writePackets = (player: Player): void => {
     player.client.outboundPacketQueue = [];
     player.client.outboundSyncQueue = [];
 };
+
+export const sendPlayerDetails = (player: Player): void => {
+    handleOutboundPacket(player, 'playerDetails');
+}
 
 export const sendChatboxMessage = (player: Player, message: string): void => {
     handleOutboundPacket(player, 'chatboxMessage', {

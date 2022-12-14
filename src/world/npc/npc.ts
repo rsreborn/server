@@ -7,6 +7,7 @@ export interface Npc {
     coords: Coord;
     sync: NpcSyncState;
     lastChunkId?: number;
+    interactingEntity: number;
 }
 
 export const npcTick = async (npc: Npc): Promise<void> => {

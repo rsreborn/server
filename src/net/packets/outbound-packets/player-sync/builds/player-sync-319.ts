@@ -63,7 +63,7 @@ playerSyncEncoders[319] = {
     appendNewlyTrackedPlayer: (data, player, otherPlayer) => {
         const xPos = otherPlayer.coords.x - player.coords.x;
         const yPos = otherPlayer.coords.y - player.coords.y;
-        data.putBits(11, otherPlayer.worldIndex + 1);
+        data.putBits(11, otherPlayer.worldIndex);
         data.putBits(1, 1);
         data.putBits(5, yPos);
         data.putBits(5, xPos);

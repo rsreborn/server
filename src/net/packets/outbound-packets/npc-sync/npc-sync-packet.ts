@@ -26,7 +26,7 @@ const appendUpdateMasks = (
         return;
     }
 
-    npcSyncEncoders[String(player.client.connection.buildNumber)]?.updateMaskEncoder(npc, data);
+    npcSyncEncoders[String(player.client.connection.buildNumber)]?.updateMaskEncoder(npc, player, data);
 };
 
 const appendMovement = (npc: Npc, data: ByteBuffer): void => {
