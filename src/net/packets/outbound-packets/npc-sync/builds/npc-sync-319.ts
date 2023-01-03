@@ -1,7 +1,7 @@
 import { npcSyncEncoders } from '../npc-sync-encoder';
 import { npcUpdateRequired } from '../../../../../world/npc';
 import { facePlayer } from '../npc-sync-face';
-import { sendChatboxMessage } from '../../../packets';
+import { sendChatboxMessage } from '../../../packet-handler';
 
 enum UpdateFlags {
     TRANSFORMED = 0x1,

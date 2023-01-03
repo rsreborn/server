@@ -1,4 +1,3 @@
-import { OutboundPacket } from '../packets';
 import { chatboxMessagePacket } from './encoders/chatbox-message-packet';
 import { sidebarWidgetPacket } from './encoders/sidebar-widget-packet';
 import { updateMapRegionPacket } from './encoders/update-map-region-packet';
@@ -20,6 +19,7 @@ import { systemUpdatePacket } from './encoders/system-update-packet';
 import { sidebarWidgetWithDisabledTabsPacket } from './encoders/sidebar-widget-with-disabled-tabs';
 import { showFullscreenWidget } from './encoders/fullscreen-widget-packet';
 import { playerDetailsPacket } from './encoders/player-details-packet';
+import { OutboundPacket } from '@net/packets/packets';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,

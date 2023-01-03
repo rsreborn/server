@@ -1,5 +1,4 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '../../packets';
 import { Player } from '../../../../world/player';
 import { getWorld, isWithinDistance } from '../../../../world';
 import { Npc, npcUpdateRequired } from '../../../../world/npc';
@@ -8,6 +7,7 @@ import './builds/npc-sync-289';
 import './builds/npc-sync-319';
 import './builds/npc-sync-357';
 import { getLocalNpcIds } from '../../../../world/region/chunk-manager';
+import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '@net/packets/packets';
 
 const appendNewlyTrackedNpcs = (
     player: Player,

@@ -1,5 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket } from '../../packets';
+import { OutboundPacket } from '@net/packets/packets';
 
 export const playerDetailsPacket: OutboundPacket<void> = {
     name: 'playerDetails',

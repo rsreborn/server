@@ -1,5 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket } from '../../packets';
+import { OutboundPacket } from '@net/packets/packets';
 
 interface WidgetData {
     widgetId: number;

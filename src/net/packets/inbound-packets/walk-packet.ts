@@ -1,8 +1,8 @@
 import { ByteBuffer } from '@runejs/common';
 import { Player } from '../../../world/player';
-import { InboundPacket } from '../packets';
 import { Coord } from '../../../world';
 import { queuePath } from '../../../world/movement-queue';
+import { InboundPacket } from '@net/packets/packets';
 
 interface WalkPacketData {
     forceRun: boolean;

@@ -1,6 +1,7 @@
 import { ByteBuffer } from '@runejs/common';
 import { Player } from '../../../world/player';
-import { sendLogout, InboundPacket } from '../packets';
+import { sendLogout } from '../packet-handler';
+import { InboundPacket } from '@net/packets/packets';
 
 interface ButtonPacketData {
     widgetId: number;

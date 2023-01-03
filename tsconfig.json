@@ -14,7 +14,17 @@
         "outDir": "./dist",
         "types": [
             "node"
-        ]
+        ],
+        "paths": {
+            "@cache/*": ["cache/*"],
+            "@cache": ["cache/index"],
+            "@net/*": ["net/*"],
+            "@net": ["net/index"],
+            "@util/*": ["util/*"],
+            "@util": ["util/index"],
+            "@world/*": ["world/*"],
+            "@world": ["world/index"]
+        }
     },
     "include": [ "src/" ],
     "exclude": [ "!src/" ]

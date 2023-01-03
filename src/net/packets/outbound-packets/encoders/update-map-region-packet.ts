@@ -1,6 +1,6 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket, PacketSize } from '../../packets';
 import { Coord } from '../../../../world';
+import { OutboundPacket, PacketSize } from '@net/packets/packets';
 
 interface UpdateMapRegionData {
     mapCoords: Coord;

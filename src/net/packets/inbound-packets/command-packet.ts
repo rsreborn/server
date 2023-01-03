@@ -1,9 +1,10 @@
 import { ByteBuffer } from '@runejs/common';
 import { Player } from '../../../world/player';
-import { InboundPacket, sendChatboxMessage, sendWidget } from '../packets';
+import { sendChatboxMessage, sendWidget } from '../packet-handler';
 import { getChunkByCoords, getRegionCoords, getChunkCoordByCoords } from '../../../world/region/';
 import { getWorld } from '../../../world';
 import { facePlayer } from '../outbound-packets/npc-sync/npc-sync-face';
+import { InboundPacket } from '@net/packets/packets';
 
 interface CommandPacketData {
     input: string;

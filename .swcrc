@@ -1,0 +1,28 @@
+{
+    "$schema": "https://json.schemastore.org/swcrc",
+    "exclude": "node_modules/",
+    "sourceMaps": true,
+    "module": {
+        "type": "commonjs"
+    },
+    "jsc": {
+        "target": "es2016",
+        "baseUrl": "./src",
+        "paths": {
+            "@cache/*": ["./cache/*"],
+            "@cache": ["./cache"],
+            "@net/*": ["./net/*"],
+            "@net": ["./net"],
+            "@util/*": ["./util/*"],
+            "@util": ["./util"],
+            "@world/*": ["./world/*"],
+            "@world": ["./world"]
+        },
+        "parser": {
+            "syntax": "typescript",
+            "tsx": false,
+            "decorators": true,
+            "dynamicImport": false
+        }
+    }
+  }

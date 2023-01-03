@@ -1,6 +1,6 @@
 import { ByteBuffer } from '@runejs/common';
 import { Player } from '../../../world/player';
-import { InboundPacket } from '../packets';
+import { InboundPacket } from '@net/packets/packets';
 
 interface ClickPacketData {
     hash: number;
