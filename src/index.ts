@@ -1,4 +1,4 @@
-import { startServer } from './net/server';
+import { startServer } from './engine/net/server';
 
 (async () => {
     await startServer(
