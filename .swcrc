@@ -9,14 +9,10 @@
         "target": "es2016",
         "baseUrl": "./src",
         "paths": {
-            "@cache/*": ["./engine/cache/*"],
-            "@cache": ["./engine/cache"],
-            "@net/*": ["./engine/net/*"],
-            "@net": ["./engine/net"],
-            "@util/*": ["./engine/util/*"],
-            "@util": ["./engine/util"],
-            "@world/*": ["./engine/world/*"],
-            "@world": ["./engine/world"]
+            "@engine/*": ["./engine/*"],
+            "@engine": ["./engine"],
+            "@plugins/*": ["./plugins/*"],
+            "@plugins": ["./plugins"]
         },
         "parser": {
             "syntax": "typescript",

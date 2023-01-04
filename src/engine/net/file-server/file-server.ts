@@ -1,4 +1,4 @@
-import { createServer, Server, Socket } from 'engine/net';
+import { createServer, Server, Socket } from 'net';
 import { createServer as createWebServer } from 'http';
 import { ByteBuffer, logger } from '@runejs/common';
 import { SocketOptions } from '../server';

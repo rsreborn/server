@@ -16,14 +16,10 @@
             "node"
         ],
         "paths": {
-            "@cache/*": ["engine/cache/*"],
-            "@cache": ["engine/cache/index"],
-            "@net/*": ["engine/net/*"],
-            "@net": ["engine/net/index"],
-            "@util/*": ["engine/util/*"],
-            "@util": ["engine/util/index"],
-            "@world/*": ["engine/world/*"],
-            "@world": ["engine/world/index"]
+            "@engine/*": ["engine/*"],
+            "@engine": ["engine/index"],
+            "@plugins/*": ["plugins/*"],
+            "@plugins": ["plugins/index"]
         }
     },
     "include": [ "src/" ],

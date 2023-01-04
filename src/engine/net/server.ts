@@ -1,4 +1,4 @@
-import { createServer, Server } from 'engine/net';
+import { createServer, Server } from 'net';
 import { logger } from '@runejs/common';
 import { connectionCreated } from './connection';
 import { closeWorld, openWorld, World } from '../world';

@@ -1,4 +1,5 @@
-import { startServer } from './engine/net/server';
+import { startServer } from '@engine/net/server';
+import TestPlugin from './plugins/test.plugin';
 
 (async () => {
     await startServer(
@@ -10,4 +11,8 @@ import { startServer } from './engine/net/server';
         80,
         [289, 319, 357, 414],
     );
+
+    const testPlugin = new TestPlugin();
+    console.log((testPlugin as any).metadata);
+    // testPlugin.testHook();
 })();
