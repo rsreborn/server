@@ -4,7 +4,7 @@
     "description": "RS-Reborn: RuneScape server emulator.",
     "main": "./dist/index.js",
     "scripts": {
-        "start": "node dist/index.js",
+        "start": "nodemon dist/index.js",
         "dev": "npm run build && concurrently \"npm run build:watch\" \"npm start\"",
         "build": "rimraf dist && swc ./src -d dist",
         "build:watch": "swc ./src -d dist -w"
@@ -33,6 +33,7 @@
         "@types/node": "^18.11.2",
         "chokidar": "^3.5.3",
         "concurrently": "^7.6.0",
+        "nodemon": "^2.0.20",
         "rimraf": "^3.0.2",
         "ts-node-dev": "^2.0.0",
         "tslib": "^2.4.0",

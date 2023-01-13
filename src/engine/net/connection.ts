@@ -1,4 +1,4 @@
-import { Socket } from 'engine/net';
+import { Socket } from 'net';
 import { ByteBuffer, logger } from '@runejs/common';
 import BigInteger from 'bigi';
 import { SocketOptions } from './server';

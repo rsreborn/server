@@ -1,7 +1,11 @@
+import pluginActions from '@engine/actions/plugin-actions';
 import { startServer } from '@engine/net/server';
-import TestPlugin from './plugins/test.plugin';
+import PluginLoader from '@engine/plugin/plugin-loader';
 
 (async () => {
+    const pluginLoader = new PluginLoader();
+    await pluginLoader.loadPlugins();
+
     await startServer(
         'RS-Reborn server',
         '0.0.0.0',
@@ -12,7 +16,7 @@ import TestPlugin from './plugins/test.plugin';
         [289, 319, 357, 414],
     );
 
-    const testPlugin = new TestPlugin();
-    console.log((testPlugin as any).metadata);
-    // testPlugin.testHook();
+    console.log(pluginActions.button);
+    const { hook, handler } = pluginActions.button[0];
+    handler(hook, null);
 })();
