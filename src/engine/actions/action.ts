@@ -1,4 +1,4 @@
-import { IPlugin } from '@engine/plugin';
+import { IRunePlugin } from '@engine/plugin';
 import { ActionType } from './action-type';
 import pluginActions from './plugin-actions';
 
@@ -8,7 +8,7 @@ export interface IActionHook<HANDLER> {
 }
 
 export interface IPluginAction<HANDLER, HOOK_FN> extends IActionHook<HANDLER> {
-    plugin: IPlugin;
+    plugin: IRunePlugin;
     hook: HOOK_FN;
 }
 
@@ -22,7 +22,7 @@ export const Action = <HOOK_ARGS, ACTION_HANDLER, HOOK_FN>(
     ) {
         const pluginAction: IPluginAction<ACTION_HANDLER, HOOK_FN> = {
             ...action,
-            plugin: targetClass as IPlugin,
+            plugin: targetClass as IRunePlugin,
             hook: targetClass[propertyKey] as HOOK_FN,
         };
 

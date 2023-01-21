@@ -1,8 +1,8 @@
 import { logger } from '@runejs/common';
-import { Plugin } from '@engine/plugin';
+import { RunePlugin } from '@engine/plugin';
 import { ButtonAction, IButtonActionData } from '@engine/actions';
 
-@Plugin({
+@RunePlugin({
     id: 'rs:logout',
     version: '1.0.0',
     // dependencies: [

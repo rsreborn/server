@@ -1,13 +1,13 @@
 import plugins from './plugins';
 
-export interface PluginMetadata {
+export interface RunePluginMetadata {
     id: string;
     version?: string;
     dependencies?: string[];
     compatibleBuilds?: number[];
 }
 
-export const Plugin = (metadata: PluginMetadata) => {
+export const RunePlugin = (metadata: RunePluginMetadata) => {
     return function (constructor: Function) {
         constructor.prototype.metadata = metadata;
         // plugins.push(constructor);
@@ -17,6 +17,6 @@ export const Plugin = (metadata: PluginMetadata) => {
     }
 };
 
-export interface IPlugin {
-    metadata: PluginMetadata;
+export interface IRunePlugin {
+    metadata: RunePluginMetadata;
 }
