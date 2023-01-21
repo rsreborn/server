@@ -40,7 +40,7 @@ export const handleInboundPacket = (
 
     //logger.info(`Unhandled packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
 
-    const knownPacket = INBOUND_PACKET_SIZES[String(buildNumber)][String(opcode)] !== undefined;
+    const knownPacket = INBOUND_PACKET_SIZES[String(buildNumber)]?.[String(opcode)] !== undefined;
     if (!knownPacket) {
         logger.warn(`Unknown packet ${ opcode } encountered!`);
         return false;
@@ -165,6 +165,12 @@ export const sendUpdateMapRegionPacket = (player: Player): void => {
         mapCoords,
         localCoords,
     });
+};
+
+export const sendWindowPane = (player: Player, windowId: number): void => {
+    handleOutboundPacket(player, 'windowPane', {
+        windowId,
+    }); 
 };
 
 export const sendWidget = (player: Player, widgetId: number): void => {

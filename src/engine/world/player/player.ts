@@ -1,11 +1,10 @@
 import { Client } from '../../net/client';
 import { Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendLogout, sendPlayerDetails, sendSideBarWidget, sendSidebarWidgetWithDisabledTabs, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, writePackets } from '../../net/packets';
-import { addPlayer, removePlayer } from '../world';
+import { sendChatboxMessage, sendFriendsList, sendFullscreenWidget, sendLogout, sendSideBarWidget, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWindowPane, writePackets } from '../../net/packets';
+import { removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
 import { createMovementQueue, MovementQueue, movementTick } from '../movement-queue';
-import { Npc } from '../npc';
 import { updatePlayerChunk } from '../region';
 
 export enum PlayerRights {
@@ -79,26 +78,31 @@ export const playerLogin = (player: Player): boolean => {
         plane: 0,
     };
 
-    player.widgetState = {
-        sideBarData: [ 2423, 3917, 638, 3213, 1644, 5608, 1151, 65535, 5065, 5715, 2449, 904, 147, 962 ]
-    };
+    if ((player?.client?.connection?.buildNumber ?? 0) < 400) {
+        player.widgetState = {
+            sideBarData: [ 2423, 3917, 638, 3213, 1644, 5608, 1151, 65535, 5065, 5715, 2449, 904, 147, 962 ]
+        };
+    } else {
+        player.widgetState = {
+            sideBarData: [ 92, 320, 274, 149, 387, 271, 192, 65535, 131, 148, 182, 261, 262, 239 ]
+        };
+    }
 
-    if (addPlayer(player)) {
-        sendPlayerDetails(player);
-        sendUpdateMapRegionPacket(player); // @todo move to player sync when available - Kat 18/Oct/22
-        
-        player.widgetState.sideBarData.forEach((id, index) => {
-            sendSideBarWidget(player, index, id);
-        });
+    sendUpdateMapRegionPacket(player); // @todo move to player sync when available - Kat 18/Oct/22
+    
+    sendWindowPane(player, 548);
+    
+    player.widgetState.sideBarData.forEach((id, index) => {
+        sendSideBarWidget(player, index, id);
+    });
 
-        sendChatboxMessage(player, `Welcome to RS-Reborn ${player.client.connection.buildNumber}!`);
-        sendFriendsList(player, 2);
-        for (let i = 0; i < 21; i++) {
-            if (i === 3) {
-                sendSkill(player, i, 10, 1154);
-            } else {
-                sendSkill(player, i, 1, 0);
-            }
+    sendChatboxMessage(player, `Welcome to RS-Reborn ${player.client.connection.buildNumber}!`);
+    sendFriendsList(player, 2);
+    for (let i = 0; i < 21; i++) {
+        if (i === 3) {
+            sendSkill(player, i, 10, 1154);
+        } else {
+            sendSkill(player, i, 1, 0);
         }
 
         // sendChatboxWidget(player, 4882);

@@ -8,7 +8,7 @@ import { handleInboundPacket, writePackets } from './packets';
 import { handleOnDemandRequests } from './file-server';
 import INBOUND_PACKET_SIZES from './packets/inbound-packet-sizes';
 import { handleUpdateServerRequests } from './update-server';
-import { getArchives, getCache } from '../cache';
+import { archiveCounts, getArchives, getCache } from '../cache';
 import { decodeBase37Username } from '../util/base37';
 
 const RSA_EXPONENT = BigInteger('85749236153780929917924872511187713651124617292658988978182063731979923800090977664547424642067377984001222110909310620040899943594191124988795815431638577479242072599794149649824942794144264088097130432112910214560183536387949202712729964914726145231993678948421001368196284315651219252190430508607437712749');
@@ -241,12 +241,23 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
 
             const lowMemory = buffer.get('byte', 'u') === 1;
 
-            const cache = getCache(connection.buildNumber);
-            const checksumCount = !newEngine ? 9 : (Array.from(Object.values(cache.indexFiles)).length - 1);
+            if (connection.buildNumber >= 460) {
+                buffer.get('byte');
+                while (buffer.get('byte') !== 0) {
+                }
+            }
+
+            let checksumCount = !newEngine ? 9 : archiveCounts.get(connection.buildNumber);
+            if (connection.buildNumber >= 460) {
+                checksumCount++;
+            }
+
             const checksums: number[] = new Array(checksumCount);
             const expectedChecksums: number[] = new Array(checksumCount);
             const archiveList = Array.from(Object.values(getArchives(connection.buildNumber)));
             let outOfDate = false;
+
+            logger.info(`Checksum count for build ${connection.buildNumber}: ${checksumCount}`);
 
             // Cache checksums
             for (let i = 0; i < checksumCount; i++) {
@@ -300,7 +311,11 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
                 return;
             }
 
-            const uid = decrypted.get('int');
+            let uid = Math.random() * 9.9999999E7;
+
+            if (connection.buildNumber < 460) {
+                uid = decrypted.get('int');
+            }
 
             let username: string;
             let password: string;
@@ -356,13 +371,26 @@ const dataReceived = (connection: Connection, data?: Buffer): void => {
 
             if (newEngine) {
                 // New engine
-                const outputBuffer = new ByteBuffer(6);
-                outputBuffer.put(2, 'byte'); // Success
-                outputBuffer.put(rights, 'byte');
-                outputBuffer.put(0, 'byte'); // ???
-                outputBuffer.put(connection.player.worldIndex, 'short');
-                outputBuffer.put(0, 'byte'); // ???
-                socket.write(outputBuffer.toNodeBuffer());
+                if (connection.buildNumber >= 460) {
+                    const outputBuffer = new ByteBuffer(9);
+                    outputBuffer.put(2, 'byte'); // Success
+                    outputBuffer.put(rights, 'byte');
+                    outputBuffer.put(0, 'byte'); // ???
+                    outputBuffer.put(0, 'byte'); // ???
+                    outputBuffer.put(0, 'byte'); // ???
+                    outputBuffer.put(0, 'byte'); // ???
+                    outputBuffer.put(connection.player.worldIndex, 'short');
+                    outputBuffer.put(0, 'byte'); // ???
+                    socket.write(outputBuffer.toNodeBuffer());
+                } else {
+                    const outputBuffer = new ByteBuffer(6);
+                    outputBuffer.put(2, 'byte'); // Success
+                    outputBuffer.put(rights, 'byte');
+                    outputBuffer.put(0, 'byte'); // ???
+                    outputBuffer.put(connection.player.worldIndex, 'short');
+                    outputBuffer.put(0, 'byte'); // ???
+                    socket.write(outputBuffer.toNodeBuffer());
+                }
             } else {
                 // Old engine
                 const outputBuffer = new ByteBuffer(3);

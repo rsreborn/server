@@ -7,7 +7,6 @@ import { serverRunning } from '../net/server';
 import { defaultAppearance } from './player/appearance';
 import { createMovementQueue } from './movement-queue';
 import { readFileSync } from 'fs';
-import { systemUpdatePacket } from 'engine/net/packets/outbound-packets/encoders/system-update-packet';
 import { join } from 'path';
 
 export const TICK_LENGTH = 600;
@@ -60,7 +59,7 @@ const tick = async (): Promise<void> => {
     const duration = endTime - startTime;
     const delay = Math.max(TICK_LENGTH - duration, 0);
 
-    //logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
+    // logger.info(`World ${worldSingleton.worldId} tick completed in ${duration} ms, next tick in ${delay} ms.`);
     tickTimeout = setTimeout(async () => tick(), delay);
 };
 

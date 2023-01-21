@@ -13,7 +13,7 @@ import PluginLoader from '@engine/plugin/plugin-loader';
         1,
         43595,
         80,
-        [289, 319, 357, 414],
+        [289, 319, 357, 414, 498],
     );
 
     console.log(pluginActions.button);

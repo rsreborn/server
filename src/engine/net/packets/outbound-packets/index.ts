@@ -19,6 +19,7 @@ import { systemUpdatePacket } from './encoders/system-update-packet';
 import { sidebarWidgetWithDisabledTabsPacket } from './encoders/sidebar-widget-with-disabled-tabs';
 import { showFullscreenWidget } from './encoders/fullscreen-widget-packet';
 import { playerDetailsPacket } from './encoders/player-details-packet';
+import { windowPanePacket } from './encoders/window-pane-packet';
 import { OutboundPacket } from '../packets';
 
 const outboundPackets: OutboundPacket[] = [
@@ -43,6 +44,7 @@ const outboundPackets: OutboundPacket[] = [
     sidebarWidgetWithDisabledTabsPacket,
     showFullscreenWidget,
     playerDetailsPacket,
+    windowPanePacket,
 ];
 
 export default outboundPackets;

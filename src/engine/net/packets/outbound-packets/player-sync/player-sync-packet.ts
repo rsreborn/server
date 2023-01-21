@@ -1,13 +1,14 @@
 import { ByteBuffer } from '@runejs/common';
-import { sendUpdateMapRegionPacket } from '../../packet-handler';
 import { getBuildNumber, Player, playerUpdateRequired } from '../../../../world/player';
 import { playerSyncEncoders } from './player-sync-encoder';
 import { getLocalPlayerIds } from '../../../../world/region';
 import { getWorld } from '../../../../world';
+import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '../../packets';
 import './builds/player-sync-289';
 import './builds/player-sync-319';
 import './builds/player-sync-357';
-import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '../../packets';
+import './builds/player-sync-414';
+import './builds/player-sync-498';
 
 const appendUpdateMasks = (
     player: Player,
