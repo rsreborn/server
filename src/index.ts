@@ -1,6 +1,7 @@
-import pluginActions from '@engine/actions/plugin-actions';
+import { handleButtonAction, pluginActions } from '@engine/actions';
 import { startServer } from '@engine/net/server';
-import PluginLoader from '@engine/plugin/plugin-loader';
+import { PluginLoader } from '@engine/plugin';
+import widgets from '@engine/widgets';
 
 (async () => {
     const pluginLoader = new PluginLoader();
@@ -16,7 +17,7 @@ import PluginLoader from '@engine/plugin/plugin-loader';
         [289, 319, 357, 414, 498],
     );
 
-    console.log(pluginActions.button);
-    const { hook, handler } = pluginActions.button[0];
-    handler(hook, null);
+    await widgets.load();
+
+    handleButtonAction(null, 'rs:logout', 0);
 })();

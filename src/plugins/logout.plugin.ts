@@ -15,8 +15,8 @@ import { ButtonAction, IButtonActionData } from '@engine/actions';
 export default class LogoutPlugin {
 
     @ButtonAction({
-        interfaces: 'rs:logout',
-        buttonIds: 0,
+        widgets: 'rs:logout',
+        buttons: 0,
     })
     logoutButtonClicked(action: IButtonActionData) {
         logger.info('logout hook called', action);

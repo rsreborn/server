@@ -1,0 +1,8 @@
+{
+    "rs": {
+        "test_widget": {
+            "old_engine_id": 1337,
+            "new_engine_id": 666
+        }
+    }
+}

@@ -1,6 +1,6 @@
 import { IRunePlugin } from '@engine/plugin';
 import { ActionType } from './action-type';
-import pluginActions from './plugin-actions';
+import { pluginActions } from './plugin-actions';
 
 export interface IActionHook<HANDLER> {
     actionType: ActionType;

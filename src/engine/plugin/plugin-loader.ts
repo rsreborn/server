@@ -1,9 +1,9 @@
 import { join } from 'path';
 import { logger } from '@runejs/common';
 import { getFiles } from '@runejs/common/fs';
-import plugins from './plugins';
+import { plugins } from './plugins';
 
-export default class PluginLoader {
+export class PluginLoader {
 
     constructor() {
     }

@@ -1,4 +1,3 @@
-import { IPluginAction } from './action';
 import { ActionType } from './action-type';
 import { IButtonPluginAction } from './impl';
 
@@ -8,8 +7,6 @@ interface IPluginActionMap extends PluginActionMapType {
     button: IButtonPluginAction[];
 }
 
-const pluginActions: IPluginActionMap = {
+export const pluginActions: IPluginActionMap = {
     button: [],
 };
-
-export default pluginActions;

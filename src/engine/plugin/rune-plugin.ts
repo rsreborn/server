@@ -1,4 +1,4 @@
-import plugins from './plugins';
+import { plugins } from './plugins';
 
 export interface RunePluginMetadata {
     id: string;

@@ -1,3 +1,1 @@
-const plugins = [];
-
-export default plugins;
+export const plugins = [];
