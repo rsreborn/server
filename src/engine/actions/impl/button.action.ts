@@ -2,7 +2,7 @@ import { Player } from '@engine/world/player';
 import { logger } from '@runejs/common';
 import { pluginActions, Action, IPluginAction } from '@engine/actions';
 
-export interface IButtonActionHook {
+export interface IButtonHook {
     widgets?: string | string[];
     buttons: number | number[];
 }
@@ -15,7 +15,7 @@ export interface IButtonActionData {
 
 export type ButtonHandlerFn = (data: IButtonActionData) => void;
 
-export interface IButtonAction extends IButtonActionHook, IPluginAction<ButtonHandlerFn> {
+export interface IButtonAction extends IPluginAction<IButtonHook, ButtonHandlerFn> {
 }
 
 /**
@@ -23,10 +23,10 @@ export interface IButtonAction extends IButtonActionHook, IPluginAction<ButtonHa
  * @param hook
  * @returns 
  */
-export const ButtonAction = (hook: IButtonActionHook) => {
-    return Action<IButtonActionHook, ButtonHandlerFn>({
+export const ButtonAction = (hooks: IButtonHook | IButtonHook[]) => {
+    return Action<IButtonHook, ButtonHandlerFn>({
         actionType: 'button',
-        ...hook
+        hooks
     });
 };
 
@@ -36,31 +36,37 @@ export const handleButtonAction = ({
     button,
 }: IButtonActionData): boolean => {
     const buttonActions = pluginActions.button.filter(buttonAction => {
-        const { widgets, buttons } = buttonAction;
+        const hooks = Array.isArray(buttonAction.hooks) ? buttonAction.hooks : [buttonAction.hooks];
 
-        if (widgets && widget) {
-            if (Array.isArray(widgets)) {
-                if (!widgets.includes(widget)) {
+        const validHooks = hooks.filter(hook => {
+            const { widgets, buttons } = hook;
+
+            if (widgets && widget) {
+                if (Array.isArray(widgets)) {
+                    if (!widgets.includes(widget)) {
+                        return false;
+                    }
+                } else {
+                    if (widgets !== widget) {
+                        return false;
+                    }
+                }
+            }
+
+            if (Array.isArray(buttons)) {
+                if (!buttons.includes(button)) {
                     return false;
                 }
             } else {
-                if (widgets !== widget) {
+                if (buttons !== button) {
                     return false;
                 }
             }
-        }
 
-        if (Array.isArray(buttons)) {
-            if (!buttons.includes(button)) {
-                return false;
-            }
-        } else {
-            if (buttons !== button) {
-                return false;
-            }
-        }
+            return true;
+        });
 
-        return true;
+        return validHooks.length !== 0;
     });
 
     if (!buttonActions) {
@@ -70,11 +76,15 @@ export const handleButtonAction = ({
 
     for (const action of buttonActions) {
         // @todo action queue system
-        action.handler({ 
-            player, 
-            widget, 
-            button,
-        });
+        try {
+            action.handler({ 
+                player, 
+                widget, 
+                button,
+            });
+        } catch (e) {
+            logger.error(e);
+        }
     }
 
     return true;

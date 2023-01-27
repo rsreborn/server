@@ -15,11 +15,11 @@ import { sendLogout } from '@engine/net/packets';
 })
 export default class LogoutPlugin {
 
-    @ButtonAction({
-        buttons: 2458,
-    })
+    @ButtonAction([
+        { buttons: 2458 },
+        { widgets: 'rs:logout', buttons: 8 }
+    ])
     logoutButtonClicked(action: IButtonActionData) {
-        logger.info('logout hook called', action);
         sendLogout(action.player);
     }
 
