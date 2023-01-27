@@ -2,28 +2,27 @@ import { IRunePlugin } from '@engine/plugin';
 import { ActionType } from './action-type';
 import { pluginActions } from './plugin-actions';
 
-export interface IActionHook<HANDLER> {
+export interface IActionHook {
     actionType: ActionType;
-    handler: HANDLER;
 }
 
-export interface IPluginAction<HANDLER, HOOK_FN> extends IActionHook<HANDLER> {
+export interface IPluginAction<HANDLER_FN> extends IActionHook {
     plugin: IRunePlugin;
-    hook: HOOK_FN;
+    handler: HANDLER_FN;
 }
 
-export const Action = <HOOK_ARGS, ACTION_HANDLER, HOOK_FN>(
-    action: IActionHook<ACTION_HANDLER> & HOOK_ARGS,
+export const Action = <HOOK_ARGS, HANDLER_FN>(
+    action: IActionHook & HOOK_ARGS,
 ) => {
     return function (
         targetClass: any,
         propertyKey: string | symbol,
-        propertyDescriptor: PropertyDescriptor
+        // propertyDescriptor: PropertyDescriptor
     ) {
-        const pluginAction: IPluginAction<ACTION_HANDLER, HOOK_FN> = {
+        const pluginAction: IPluginAction<HANDLER_FN> = {
             ...action,
             plugin: targetClass as IRunePlugin,
-            hook: targetClass[propertyKey] as HOOK_FN,
+            handler: targetClass[propertyKey] as HANDLER_FN,
         };
 
         pluginActions[action.actionType].push(pluginAction as any);

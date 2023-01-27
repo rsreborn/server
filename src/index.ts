@@ -19,5 +19,5 @@ import widgets from '@engine/widgets';
 
     await widgets.load();
 
-    handleButtonAction(null, 'rs:logout', 0);
+    handleButtonAction({ player: null, widget: 'rs:logout', button: 0 });
 })();

@@ -1,10 +1,10 @@
 import { ActionType } from './action-type';
-import { IButtonPluginAction } from './impl';
+import { IButtonAction } from './impl';
 
 type PluginActionMapType = { [key in ActionType]: unknown };
 
 interface IPluginActionMap extends PluginActionMapType {
-    button: IButtonPluginAction[];
+    button: IButtonAction[];
 }
 
 export const pluginActions: IPluginActionMap = {

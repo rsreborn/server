@@ -1,6 +1,7 @@
 import { logger } from '@runejs/common';
 import { RunePlugin } from '@engine/plugin';
 import { ButtonAction, IButtonActionData } from '@engine/actions';
+import { sendLogout } from '@engine/net/packets';
 
 @RunePlugin({
     id: 'rs:logout',
@@ -15,11 +16,11 @@ import { ButtonAction, IButtonActionData } from '@engine/actions';
 export default class LogoutPlugin {
 
     @ButtonAction({
-        widgets: 'rs:logout',
-        buttons: 0,
+        buttons: 2458,
     })
     logoutButtonClicked(action: IButtonActionData) {
         logger.info('logout hook called', action);
+        sendLogout(action.player);
     }
 
 }
