@@ -84,7 +84,10 @@ export const handleUpdateServerRequests = (
                 queueFile(connection, indexNumber, fileNumber);
                 break;
             case 1: // immediate
-                connection.socket.write(generateFile(connection, indexNumber, fileNumber));
+                const fileResponse = generateFile(connection, indexNumber, fileNumber);
+                if (fileResponse?.length) {
+                    connection.socket.write(fileResponse);
+                }
                 break;
             case 2:
             case 3: // clear file queue
@@ -96,7 +99,10 @@ export const handleUpdateServerRequests = (
 
         while ((connection.queuedFiles?.length ?? 0) > 0) {
             const file = connection.queuedFiles.shift();
-            connection.socket.write(generateFile(connection, file.indexNumber, file.fileNumber));
+            const fileResponse = generateFile(connection, file.indexNumber, file.fileNumber);
+            if (fileResponse?.length) {
+                connection.socket.write(generateFile(connection, file.indexNumber, file.fileNumber));
+            }
         }
     }
 };
