@@ -1,6 +1,10 @@
 // @todo make this automatic via the packet files - Kat 2/Nov/22
 const INBOUND_PACKET_SIZES: { [key: number]: { [key: number]: number }} = {};
 
+INBOUND_PACKET_SIZES[410] = {
+
+};
+
 INBOUND_PACKET_SIZES[414] = {
     // @todo fill out packet sizes - Kat 13/Nov/22
 };

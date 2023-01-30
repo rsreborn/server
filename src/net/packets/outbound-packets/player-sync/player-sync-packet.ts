@@ -7,6 +7,7 @@ import { getWorld } from '../../../../world';
 import './builds/player-sync-289';
 import './builds/player-sync-319';
 import './builds/player-sync-357';
+import './builds/player-sync-410';
 
 const appendUpdateMasks = (
     player: Player,
