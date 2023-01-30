@@ -41,7 +41,7 @@ export const updateMapRegionPacket: OutboundPacket<UpdateMapRegionData> = {
         },
         410: (player, opcode, data) => {
             const buffer = new ByteBuffer(500);
-            buffer.put(data.localCoords.y, 'short', 'le');
+            buffer.put(data.localCoords.x, 'short', 'le');
 
             const startX = Math.floor(data.mapCoords.x / 8);
             const endX = Math.floor((data.mapCoords.x + 12) / 8);
@@ -58,7 +58,7 @@ export const updateMapRegionPacket: OutboundPacket<UpdateMapRegionData> = {
             }
 
             buffer.put(data.mapCoords.y + 6, 'short', 'le');
-            buffer.put(data.localCoords.x, 'short', 'le');
+            buffer.put(data.localCoords.y, 'short', 'le');
             buffer.put(data.mapCoords.plane, 'byte');
             buffer.put(data.mapCoords.x + 6, 'short');
 
