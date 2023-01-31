@@ -14,7 +14,7 @@ import widgets from '@engine/widgets';
         1,
         43595,
         80,
-        [289, 319, 357, 414, 498],
+        [289, 319, 357, 410, 414, 498],
     );
 
     await widgets.load();
