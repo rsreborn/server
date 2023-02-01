@@ -464,4 +464,20 @@ INBOUND_PACKET_SIZES[289] = {
     255: 0,
 }
 
+INBOUND_PACKET_SIZES[254] = {
+    6: -1,
+    8: 0,
+    51: -1,
+    86: -1,
+    91: 4,
+    127: -1,
+    134: 0,
+    182: 0,
+    220: -1,
+    226: 1,
+    234: 4,
+    239: 0,
+    244: 2,
+};
+
 export default INBOUND_PACKET_SIZES;

@@ -10,6 +10,7 @@ interface UpdateMapRegionData {
 export const updateMapRegionPacket: OutboundPacket<UpdateMapRegionData> = {
     name: 'updateMapRegion',
     opcodes: {
+        254: 209,
         289: 219,
         319: 228,
         357: 121,
@@ -21,6 +22,12 @@ export const updateMapRegionPacket: OutboundPacket<UpdateMapRegionData> = {
         498: PacketSize.VAR_SHORT,
     },
     encoders: {
+        254: (player, opcode, data) => {
+            const buffer = new ByteBuffer(4);
+            buffer.put(data.mapCoords.x, 'short');
+            buffer.put(data.mapCoords.y, 'short');
+            return buffer;
+        },
         289: (player, opcode, data) => {
             const buffer = new ByteBuffer(4);
             buffer.put(data.mapCoords.x, 'short');

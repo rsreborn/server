@@ -54,9 +54,14 @@ export const commandPacket: InboundPacket<CommandPacketData> = {
 
     },
     opcodes: {
+        254: 86,
         319: 192,
     },
     decoders: {
+        254: (opcode: number, data: ByteBuffer) => {
+            const input = data.getString(10);
+            return { input };
+        },
         319: (opcode: number, data: ByteBuffer) => {
             const input = data.getString(10);
             return { input };

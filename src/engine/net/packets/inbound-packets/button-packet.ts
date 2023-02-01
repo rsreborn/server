@@ -35,12 +35,17 @@ export const buttonPacket: InboundPacket<ButtonPacketData> = {
         }
     },
     opcodes: {
+        254: 244,
         289: 86,
         319: 189,
         357: 211,
         414: 189,
     },
     decoders: {
+        254: (opcode: number, data: ByteBuffer) => {
+            const buttonId = data.get('short', 'u');
+            return { buttonId };
+        },
         289: (opcode: number, data: ByteBuffer) => {
             const buttonId = data.get('short', 'u');
             return { buttonId };

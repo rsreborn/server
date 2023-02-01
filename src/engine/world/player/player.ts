@@ -73,8 +73,8 @@ export const playerLogin = (player: Player): boolean => {
     player.hasMembership = true;
 
     player.coords = player.movementQueue.lastMapRegionUpdateCoords = {
-        x: 2838,
-        y: 3285,
+        x: 2708,
+        y: 3492,
         plane: 0,
     };
 

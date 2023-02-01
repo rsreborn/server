@@ -127,7 +127,7 @@ const convertTheStuff = () => {
                     plane: parseInt(split[i + 3]),
                 }
             } as NpcSpawnData;
-            if (npcId <= 2291)
+            if (npcId <= 1162)
                 spawns.push(npc);
         }
     }

@@ -4,6 +4,7 @@ import { playerSyncEncoders } from './player-sync-encoder';
 import { getLocalPlayerIds } from '../../../../world/region';
 import { getWorld } from '../../../../world';
 import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '../../packets';
+import './builds/player-sync-254';
 import './builds/player-sync-289';
 import './builds/player-sync-319';
 import './builds/player-sync-357';

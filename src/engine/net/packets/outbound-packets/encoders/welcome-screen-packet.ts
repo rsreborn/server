@@ -7,11 +7,21 @@ interface WelcomeScreenData {
 export const welcomeScreenPacket: OutboundPacket<WelcomeScreenData> = {
     name: 'welcomeScreen',
     opcodes: {
+        254: 146,
         289: 253,
         319: 178,
         357: 39,
     },
     encoders: {
+        254: (player, opcode, data) => {
+            const buffer = new ByteBuffer(10);
+            buffer.put(77777, 'int');
+            buffer.put(0, 'short');
+            buffer.put(0, 'byte');
+            buffer.put(0, 'short');
+            buffer.put(0, 'byte');
+            return buffer;
+        },
         289: (player, opcode, data) => {
             const buffer = new ByteBuffer(10);
             buffer.put(77777, 'int');

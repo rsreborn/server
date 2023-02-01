@@ -38,7 +38,7 @@ export const handleInboundPacket = (
         return true;
     }
 
-    //logger.info(`Unhandled packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
+    logger.info(`Unhandled packet ${ opcode } received with size of ${ data?.length ?? 0 }.`);
 
     const knownPacket = INBOUND_PACKET_SIZES[String(buildNumber)]?.[String(opcode)] !== undefined;
     if (!knownPacket) {

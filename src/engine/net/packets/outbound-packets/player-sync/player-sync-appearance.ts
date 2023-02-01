@@ -56,7 +56,9 @@ export const appendAppearanceData = (
 
         appearanceData.put(encodeBase37Username(player.username), 'long'); // Username
         appearanceData.put(3); // @todo Combat Level - Kat 25/Oct/22
-        appearanceData.put(0, 'short'); // @todo Skill Level - Kat 25/Oct/22
+        if (buildNumber >= 289) {
+            appearanceData.put(0, 'short'); // @todo Skill Level - Kat 25/Oct/22
+        }
 
         player.sync.appearanceData = appearanceData.flipWriter();
     // }
