@@ -18,7 +18,6 @@ export const Action = <HOOK, HANDLER_FN>(
     return function (
         targetClass: any,
         propertyKey: string | symbol,
-        // propertyDescriptor: PropertyDescriptor
     ) {
         const pluginAction: IPluginAction<HOOK, HANDLER_FN> = {
             ...action,
