@@ -1,6 +1,12 @@
-import { startServer } from './net/server';
+import { handleButtonAction, pluginActions } from '@engine/actions';
+import { startServer } from '@engine/net/server';
+import { PluginLoader } from '@engine/plugin';
+import widgets from '@engine/widgets';
 
 (async () => {
+    const pluginLoader = new PluginLoader();
+    await pluginLoader.loadPlugins();
+
     await startServer(
         'RS-Reborn server',
         '0.0.0.0',
@@ -8,6 +14,10 @@ import { startServer } from './net/server';
         1,
         43595,
         80,
-        [289, 319, 357, 414],
+        [289, 319, 357, 410, 414, 498],
     );
+
+    await widgets.load();
+
+    handleButtonAction({ player: null, widget: 'rs:logout', button: 0 });
 })();

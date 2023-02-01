@@ -14,7 +14,13 @@
         "outDir": "./dist",
         "types": [
             "node"
-        ]
+        ],
+        "paths": {
+            "@engine/*": ["engine/*"],
+            "@engine": ["engine/index"],
+            "@plugins/*": ["plugins/*"],
+            "@plugins": ["plugins/index"]
+        }
     },
     "include": [ "src/" ],
     "exclude": [ "!src/" ]
