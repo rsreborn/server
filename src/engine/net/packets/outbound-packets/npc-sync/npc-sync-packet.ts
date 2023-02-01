@@ -6,6 +6,7 @@ import { npcSyncEncoders } from './npc-sync-encoder';
 import './builds/npc-sync-289';
 import './builds/npc-sync-319';
 import './builds/npc-sync-357';
+import './builds/npc-sync-498';
 import { getLocalNpcIds } from '../../../../world/region/chunk-manager';
 import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '../../packets';
 
@@ -87,7 +88,10 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
     }
 
     if (updateMaskData.writerIndex !== 0) {
-        packetData.putBits(14, 16383);
+
+        var bitsToSend = player.client.connection.buildNumber > 490 ? 15 : 14;
+        var bitValue = player.client.connection.buildNumber > 400 ? 32768 : 16383;
+        packetData.putBits(bitsToSend, bitValue); // double on higher 32768
         packetData.closeBitBuffer();
         packetData.putBytes(updateMaskData.flipWriter());
     } else {

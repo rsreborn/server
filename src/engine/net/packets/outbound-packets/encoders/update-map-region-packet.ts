@@ -73,13 +73,18 @@ export const updateMapRegionPacket: OutboundPacket<UpdateMapRegionData> = {
             // @todo xtea key support - Kat 29/Nov/22
             for (let mapX = startX; mapX <= endX; mapX++) {
                 for (let mapY = startY; mapY <= endY; mapY++) {
-                    for (let seeds = 0; seeds < 4; seeds++) {
-                        buffer.put(0, 'int');
-                    }
-                    // buffer.put(14881828, 'int', 'le');
-                    // buffer.put(-6662814, 'int', 'le');
-                    // buffer.put(58238456, 'int', 'le');
-                    // buffer.put(146761213 , 'int', 'le');
+                    // for (let seeds = 0; seeds < 4; seeds++) {
+                    //     buffer.put(0, 'int');
+                    // }
+                    // buffer.put(14881828, 'int');
+                    // buffer.put(-6662814, 'int');
+                    // buffer.put(58238456, 'int');
+                    // buffer.put(146761213 , 'int');
+
+                    buffer.put(-329250188, 'int');
+                    buffer.put(-245862849, 'int');
+                    buffer.put(-94022035, 'int');
+                    buffer.put(-1987970363 , 'int');
                 }
             }
 
