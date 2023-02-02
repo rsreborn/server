@@ -229,10 +229,11 @@ export const sendCloseWidgets = (player: Player): void => {
     handleOutboundPacket(player, 'closeWidgets', {});
 };
 
-export const sendSideBarWidget = (player: Player, sidebarId: number, widgetId: number): void => {
+export const sendSideBarWidget = (player: Player, sidebarId: number, widgetId: number, window?: number): void => {
     handleOutboundPacket(player, 'sidebarWidget', {
         widgetId,
         sidebarId,
+        window,
     });
 };
 

@@ -15,6 +15,7 @@ export enum PlayerRights {
 
 export interface WidgetState {
     sideBarData: number[];
+    windowPositionData?: number[];
 }
 
 export interface Player {
@@ -82,6 +83,11 @@ export const playerLogin = (player: Player): boolean => {
         player.widgetState = {
             sideBarData: [ 2423, 3917, 638, 3213, 1644, 5608, 1151, 65535, 5065, 5715, 2449, 904, 147, 962 ]
         };
+    } else if (player?.client?.connection?.buildNumber >= 484) { //TODO verify starting rev for interface system changeover
+        player.widgetState = {
+            sideBarData: [ 137, 92, 320, 274, 149, 387, 271, 192, 662, 550, 551, 589, 261, 464, 187, 182 ],
+            windowPositionData: [ 121, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142]
+        };    
     } else {
         player.widgetState = {
             sideBarData: [ 92, 320, 274, 149, 387, 271, 192, 65535, 131, 148, 182, 261, 262, 239 ]
@@ -92,9 +98,16 @@ export const playerLogin = (player: Player): boolean => {
     
     sendWindowPane(player, 548);
     
-    player.widgetState.sideBarData.forEach((id, index) => {
-        sendSideBarWidget(player, index, id);
-    });
+    if (player?.client?.connection?.buildNumber < 484) {
+        player.widgetState.sideBarData.forEach((id, index) => {
+            sendSideBarWidget(player, index, id);
+        });
+    } else {
+        player.widgetState.sideBarData.forEach((id, index) => {
+            sendSideBarWidget(player, player.widgetState?.windowPositionData[index], id, 548);
+        });
+    }
+
 
     sendChatboxMessage(player, `Welcome to RS-Reborn ${player.client.connection.buildNumber}!`);
     sendFriendsList(player, 2);
