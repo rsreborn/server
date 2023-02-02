@@ -108,7 +108,7 @@ export const playerLogin = (player: Player): boolean => {
     }
 
     // let hintCoord: Coord = coord(3222, 3223, 0);
-    // sendHintIcon(player, HintType.NPC, 461 + 32768);
+    // sendHintIcon(player, HintType.NPC, 462 + 32768);
 
     // sendChatboxWidget(player, 4882);
     // sendWidgetNpcHead(player, 4883, 13);

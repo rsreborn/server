@@ -25,7 +25,6 @@ export const showHintIconPacket: OutboundPacket<HintIconData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            console.log(data)
             if (data.hintType === 1 || data.hintType === 10) {
                 const buffer = new ByteBuffer(3);
                 buffer.put(data.hintType);
@@ -33,7 +32,6 @@ export const showHintIconPacket: OutboundPacket<HintIconData> = {
                 return buffer;
             } else if (data.hintType >= 2 && data.hintType <= 6) {
                 const buffer = new ByteBuffer(6);
-                buffer.put(data.hintType);
                 console.log(data.position)
                 buffer.put(data.position?.y, 'short');
                 buffer.put(data.position?.x, 'short');
