@@ -9,11 +9,18 @@ interface WidgetData {
 export const showWidgetNpcHeadPacket: OutboundPacket<WidgetData> = {
     name: 'widgetNpcHead',
     opcodes: {
+        254: 3,
         289: 244,
         319: 157,
         357: 18,
     },
     encoders: {
+        254: (player, opcode, data) => {
+            const buffer = new ByteBuffer(4);
+            buffer.put(data.widgetId, 'short');
+            buffer.put(data.npcId, 'short');
+            return buffer;
+        },
         289: (player, opcode, data) => {
             const buffer = new ByteBuffer(4);
             buffer.put(data.widgetId, 'short');

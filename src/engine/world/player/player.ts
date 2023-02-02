@@ -1,11 +1,12 @@
 import { Client } from '../../net/client';
-import { Coord } from '../coord';
-import { sendChatboxMessage, sendFriendsList, sendFullscreenWidget, sendLogout, sendSideBarWidget, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWindowPane, writePackets } from '../../net/packets';
+import { coord, Coord } from '../coord';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendFriendsList, sendFullscreenWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
 import { createMovementQueue, MovementQueue, movementTick } from '../movement-queue';
 import { updatePlayerChunk } from '../region';
+import { HintType } from '@engine/net/packets/outbound-packets/encoders/show-hint-icon-packet';
 
 export enum PlayerRights {
     USER = 0,
@@ -73,8 +74,8 @@ export const playerLogin = (player: Player): boolean => {
     player.hasMembership = true;
 
     player.coords = player.movementQueue.lastMapRegionUpdateCoords = {
-        x: 2708,
-        y: 3492,
+        x: 3222,
+        y: 3222,
         plane: 0,
     };
 
@@ -106,19 +107,22 @@ export const playerLogin = (player: Player): boolean => {
         }
     }
 
+    // let hintCoord: Coord = coord(3222, 3223, 0);
+    // sendHintIcon(player, HintType.NPC, 461 + 32768);
+
     // sendChatboxWidget(player, 4882);
-    // sendWidgetNpcHead(player, 4883, 1);
-    // sendAnimateWidget(player, 4883, 591);
-    // sendWidgetString(player, 4884, "NPC Name Goes here")
+    // sendWidgetNpcHead(player, 4883, 13);
+    // sendAnimateWidget(player, 4883, 595);
+    // sendWidgetString(player, 4884, "Wizard")
     // sendWidgetString(player, 4885, "We've got some text here!");
 
-    // sendChatboxWidget(player, 968);
-    // sendWidgetPlayerHead(player, 969);
-    // sendAnimateWidget(player, 969, 591);
-    // sendWidgetString(player, 970, "Brian")
-    // sendWidgetString(player, 971, "We've got some text here!");
+    //  sendChatboxWidget(player, 968);
+    //  sendWidgetPlayerHead(player, 969);
+    //  sendAnimateWidget(player, 969, 591);
+    //  sendWidgetString(player, 970, "Brian")
+    //  sendWidgetString(player, 971, "We've got some text here!");
     
-    sendWelcomeScreen(player);
+    //sendWelcomeScreen(player);
     sendFullscreenWidget(player, 15244, 5993);
 
     return addPlayer(player);

@@ -1,10 +1,11 @@
 import { ByteBuffer, logger } from '@runejs/common';
 import { Player } from '../../world/player';
-import { getLocalCoord, getMapCoord } from '../../world';
+import { Coord, getLocalCoord, getMapCoord } from '../../world';
 import inboundPackets from './inbound-packets';
 import outboundPackets from './outbound-packets';
 import INBOUND_PACKET_SIZES from './inbound-packet-sizes';
 import { InboundPacket, OutboundPacket, PacketQueueType, PacketSize } from './packets';
+import { HintType } from './outbound-packets/encoders/show-hint-icon-packet';
 
 export const handleInboundPacket = (
     player: Player,
@@ -182,6 +183,14 @@ export const sendWidget = (player: Player, widgetId: number): void => {
 export const sendChatboxWidget = (player: Player, widgetId: number): void => {
     handleOutboundPacket(player, 'chatboxWidget', {
         widgetId,
+    }); 
+};
+
+export const sendHintIcon = (player: Player, hintType: HintType, entityIndex: number, position?: Coord): void => {
+    handleOutboundPacket(player, 'showHintIcon', {
+        hintType,
+        entityIndex,
+        position,
     }); 
 };
 

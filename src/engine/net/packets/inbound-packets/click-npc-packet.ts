@@ -16,9 +16,14 @@ export const npcClickPacket: InboundPacket<NpcClickPacketData> = {
         console.log(`npc click handler ${data.npcIndex}`);
     },
     opcodes: {
+        254: 195,
         319: 111,
     },
     decoders: {
+        254: (opcode: number, data: ByteBuffer) => {
+            const npcIndex = data.get('short');
+            return { npcIndex };
+        },
         319: (opcode: number, data: ByteBuffer) => {
             const npcIndex = data.get('short', 'u', 'le');
             return { npcIndex };
