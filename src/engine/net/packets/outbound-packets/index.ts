@@ -21,6 +21,7 @@ import { showFullscreenWidget } from './encoders/fullscreen-widget-packet';
 import { playerDetailsPacket } from './encoders/player-details-packet';
 import { windowPanePacket } from './encoders/window-pane-packet';
 import { OutboundPacket } from '../packets';
+import { showHintIconPacket } from './encoders/show-hint-icon-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -45,6 +46,7 @@ const outboundPackets: OutboundPacket[] = [
     showFullscreenWidget,
     playerDetailsPacket,
     windowPanePacket,
+    showHintIconPacket,
 ];
 
 export default outboundPackets;

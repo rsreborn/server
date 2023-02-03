@@ -10,11 +10,18 @@ export const updateWidgetString: OutboundPacket<WidgetData> = {
     name: 'updateWidgetString',
     size: PacketSize.VAR_SHORT,
     opcodes: {
+        254: 41,
         289: 59,
         319: 127,
         357: 239
     },
     encoders: {
+        254: (player, opcode, data) => {
+            const buffer = new ByteBuffer(data.message.length + 3);
+            buffer.put(data.widgetId, 'short');
+            buffer.putString(data.message, 10);
+            return buffer;
+        },
         289: (player, opcode, data) => {
             const buffer = new ByteBuffer(data.message.length + 3);
             buffer.put(data.widgetId, 'short');
