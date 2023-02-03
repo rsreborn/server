@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendFriendsList, sendFullscreenWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendSystemUpdate, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
