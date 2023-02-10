@@ -180,6 +180,12 @@ export const sendWidget = (player: Player, widgetId: number): void => {
     }); 
 };
 
+export const sendChatboxWidgetOnly = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'chatboxWidgetOnly', {
+        widgetId,
+    }); 
+};
+
 export const sendChatboxWidget = (player: Player, widgetId: number): void => {
     handleOutboundPacket(player, 'chatboxWidget', {
         widgetId,

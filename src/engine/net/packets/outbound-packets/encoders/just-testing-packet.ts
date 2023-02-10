@@ -10,11 +10,12 @@ interface UpdateSkillData {
 export const justTestingPacket: OutboundPacket<UpdateSkillData> = {
     name: 'justTesting',
     opcodes: {
-        254: 5,
+        254: 239,
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(0);
+            const buffer = new ByteBuffer(2);
+            buffer.put(0, 'short');
             return buffer;
         }
     },

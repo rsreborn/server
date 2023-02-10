@@ -8,10 +8,7 @@ interface WidgetData {
 export const showChatboxWidgetPacket: OutboundPacket<WidgetData> = {
     name: 'chatboxWidget',
     opcodes: {
-        254: 141,
-        289: 81,
-        319: 200,
-        357: 124,
+        254: 239,
     },
     encoders: {
         254: (player, opcode, data) => {
@@ -19,20 +16,5 @@ export const showChatboxWidgetPacket: OutboundPacket<WidgetData> = {
             buffer.put(data.widgetId, 'short');
             return buffer;
         },
-        289: (player, opcode, data) => {
-            const buffer = new ByteBuffer(2);
-            buffer.put(data.widgetId, 'short');
-            return buffer;
-        },
-        319: (player, opcode, data) => {
-            const buffer = new ByteBuffer(2);
-            buffer.put(data.widgetId, 'short');
-            return buffer;
-        },
-        357: (player, opcode, data) => {
-            const buffer = new ByteBuffer(2);
-            buffer.put(data.widgetId, 'short', 'le');
-            return buffer;
-        }
     },
 };

@@ -8,7 +8,7 @@ import { updateSkillPacket } from './encoders/update-skill-packet';
 import { playerSyncPacket } from './player-sync/player-sync-packet';
 import { npcSyncPacket } from './npc-sync/npc-sync-packet';
 import { showWidgetPacket } from './encoders/show-widget-packet';
-import { showChatboxWidgetPacket } from './encoders/show-chatbox-widget-packet';
+import { showChatboxWidgetOnlyPacket } from './encoders/show-chatbox-widget-only-packet';
 import { animateWidgetPacket } from './encoders/animate-widget-packet';
 import { showWidgetPlayerHeadPacket } from './encoders/show-widget-player-head-packet';
 import { showWidgetNpcHeadPacket } from './encoders/show-widget-npc-head-packet';
@@ -26,6 +26,7 @@ import { justTestingPacket } from './encoders/just-testing-packet';
 import { showWidgetItemPacket } from './encoders/show-widget-item-packet';
 import { gameScreenAndSidebarPacket } from './encoders/show-game-screen-and-sidebar-widget-packet';
 import { enterAmountPacket } from './encoders/enter-amount-packet';
+import { showChatboxWidgetPacket } from './encoders/show-chatbox-widget-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -38,7 +39,7 @@ const outboundPackets: OutboundPacket[] = [
     playerSyncPacket,
     npcSyncPacket,
     showWidgetPacket,
-    showChatboxWidgetPacket,
+    showChatboxWidgetOnlyPacket,
     animateWidgetPacket,
     showWidgetPlayerHeadPacket,
     showWidgetNpcHeadPacket,
@@ -54,6 +55,7 @@ const outboundPackets: OutboundPacket[] = [
     showWidgetItemPacket,
     gameScreenAndSidebarPacket,
     enterAmountPacket,
+    showChatboxWidgetPacket,
     justTestingPacket,
 ];
 

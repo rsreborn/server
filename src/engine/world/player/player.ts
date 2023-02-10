@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -124,10 +124,13 @@ export const playerLogin = (player: Player): boolean => {
     
     //sendWelcomeScreen(player);
     sendFullscreenWidget(player, 15244, 5993);
-    sendEnterAmount(player);
+    //sendEnterAmount(player);
     //sendGameScreenAndSidebarWidget(player, 0, 1151)
+    sendTestPacket(player);
 
-    //sendTestPacket(player);635
+    sendWidget(player, 0);
+    sendChatboxWidget(player, 0)
+    sendChatboxWidgetOnly(player, 147);
     return addPlayer(player);
 };
 
