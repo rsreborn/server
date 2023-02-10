@@ -23,8 +23,9 @@ import { windowPanePacket } from './encoders/window-pane-packet';
 import { OutboundPacket } from '../packets';
 import { showHintIconPacket } from './encoders/show-hint-icon-packet';
 import { justTestingPacket } from './encoders/just-testing-packet';
-import { showWidgetItem } from './encoders/show-widget-item-packet';
-import { gameScreenAndSidebar } from './encoders/show-game-screen-and-sidebar-widget-packet';
+import { showWidgetItemPacket } from './encoders/show-widget-item-packet';
+import { gameScreenAndSidebarPacket } from './encoders/show-game-screen-and-sidebar-widget-packet';
+import { enterAmountPacket } from './encoders/enter-amount-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -50,8 +51,9 @@ const outboundPackets: OutboundPacket[] = [
     playerDetailsPacket,
     windowPanePacket,
     showHintIconPacket,
-    showWidgetItem,
-    gameScreenAndSidebar,
+    showWidgetItemPacket,
+    gameScreenAndSidebarPacket,
+    enterAmountPacket,
     justTestingPacket,
 ];
 

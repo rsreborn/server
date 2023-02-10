@@ -7,7 +7,7 @@ interface ShowItemData {
     itemZoom: number;
 }
 
-export const showWidgetItem: OutboundPacket<ShowItemData> = {
+export const showWidgetItemPacket: OutboundPacket<ShowItemData> = {
     name: 'widgetItem',
     opcodes: {
         254: 222,

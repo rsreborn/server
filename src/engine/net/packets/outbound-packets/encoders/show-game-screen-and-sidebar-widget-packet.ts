@@ -6,7 +6,7 @@ interface WidgetData {
     sidebarWidgetId: number;
 }
 
-export const gameScreenAndSidebar: OutboundPacket<WidgetData> = {
+export const gameScreenAndSidebarPacket: OutboundPacket<WidgetData> = {
     name: 'gameScreenAndSidebar',
     opcodes: {
         254: 249,
