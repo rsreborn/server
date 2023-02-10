@@ -5,6 +5,7 @@ import { updateRegionPacket } from './update-region-packet';
 import { commandPacket } from './command-packet';
 import { npcClickPacket } from './click-npc-packet';
 import { InboundPacket } from '../packets';
+import { objectClickPacket } from './click-object-packet';
 
 const inboundPackets: InboundPacket[] = [
     buttonPacket,
@@ -13,6 +14,7 @@ const inboundPackets: InboundPacket[] = [
     updateRegionPacket,
     commandPacket,
     npcClickPacket,
+    objectClickPacket
 ];
 
 export default inboundPackets;

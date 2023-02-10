@@ -278,3 +278,17 @@ export const sendSkill = (player: Player, skillId: number, skillLevel: number, s
         skillExperience,
     });
 };
+
+export const sendWidgetItem = (player: Player, widgetId: number, itemId: number, itemZoom: number): void => {
+    handleOutboundPacket(player, 'widgetItem', {
+        widgetId,
+        itemId,
+        itemZoom
+    });
+};
+
+export const sendTestPacket = (player: Player): void => {
+    handleOutboundPacket(player, 'justTesting', {
+
+    });
+}

@@ -19,17 +19,7 @@ export const buttonPacket: InboundPacket<ButtonPacketData> = {
         try {
             console.log(`button packet handler ${data.widgetId} ${data.buttonId}`);
             const widget = !!data.widgetId ? widgets.getName(data.widgetId, (player?.client?.connection?.buildNumber ?? 0) < 400 ? 'old' : 'new') : undefined;
-            if (!handleButtonAction({ player, widget, button: data.buttonId })) {
-                // Todo Don't actually use a switch in here. Just wanted to enable logout. - Brian 10-26-22
-                switch(data.widgetId) {
-                    case 153:
-                        player.running = true;
-                        break;
-                    case 152:
-                        player.running = false;
-                        break;
-                }
-            }
+            if (!handleButtonAction({ player, widget, button: data.buttonId })) { }
         } catch (e) {
             logger.error(e);
         }
