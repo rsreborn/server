@@ -24,6 +24,7 @@ import { OutboundPacket } from '../packets';
 import { showHintIconPacket } from './encoders/show-hint-icon-packet';
 import { justTestingPacket } from './encoders/just-testing-packet';
 import { showWidgetItem } from './encoders/show-widget-item-packet';
+import { gameScreenAndSidebar } from './encoders/show-game-screen-and-sidebar-widget-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -50,6 +51,7 @@ const outboundPackets: OutboundPacket[] = [
     windowPanePacket,
     showHintIconPacket,
     showWidgetItem,
+    gameScreenAndSidebar,
     justTestingPacket,
 ];
 

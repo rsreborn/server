@@ -287,6 +287,13 @@ export const sendWidgetItem = (player: Player, widgetId: number, itemId: number,
     });
 };
 
+export const sendGameScreenAndSidebarWidget = (player: Player, widgetId: number, sidebarWidgetId: number): void => {
+    handleOutboundPacket(player, 'gameScreenAndSidebar', {
+        widgetId,
+        sidebarWidgetId,
+    });
+};
+
 export const sendTestPacket = (player: Player): void => {
     handleOutboundPacket(player, 'justTesting', {
 
