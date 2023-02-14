@@ -128,9 +128,13 @@ export const playerLogin = (player: Player): boolean => {
     //sendEnterAmount(player);
     //sendGameScreenAndSidebarWidget(player, 0, 1151)
     //sendTestPacket(player);
-    sendWidgetStringColor(player, 7332, ColorConverter.getHsl(80, 240, 120))
-    sendWidgetString(player, 7333, "@gre@A Different Green@gre@");
-    sendChatboxMessage(player, `Color: ${ColorConverter.rgbToJagex(0, 255, 0)}`);
+    sendWidgetStringColor(player, 7332, JagexColor.RED);
+    sendWidgetStringColor(player, 7333, JagexColor.YELLOW);
+    sendWidgetStringColor(player, 7334, JagexColor.GREEN);
+    sendWidgetStringColor(player, 7336, JagexColor.CYAN);
+    sendWidgetStringColor(player, 7383, JagexColor.BLACK);
+    sendWidgetStringColor(player, 7339, JagexColor.WHITE);
+    sendChatboxMessage(player, `Color: ${ColorConverter.rgbToJagex(255, 255, 255)}`);
     //sendWidget(player, 0);
     //sendChatboxWidget(player, 0)
     //sendChatboxWidgetOnly(player, 147);
