@@ -240,6 +240,13 @@ export const sendWidgetString = (player: Player, widgetId: number, message: stri
     });
 };
 
+export const sendWidgetStringColor = (player: Player, widgetId: number, widgetColor: number): void => {
+    handleOutboundPacket(player, 'widgetStringDisabledColor', {
+        widgetId,
+        widgetColor,
+    });
+};
+
 export const sendCloseWidgets = (player: Player): void => {
     handleOutboundPacket(player, 'closeWidgets', {});
 };

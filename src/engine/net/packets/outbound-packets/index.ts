@@ -27,6 +27,7 @@ import { showWidgetItemPacket } from './encoders/show-widget-item-packet';
 import { gameScreenAndSidebarPacket } from './encoders/show-game-screen-and-sidebar-widget-packet';
 import { enterAmountPacket } from './encoders/enter-amount-packet';
 import { showChatboxWidgetPacket } from './encoders/show-chatbox-widget-packet';
+import { updateWidgetStringDisabledColorPacket } from './encoders/update-widget-string-disabled-color-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -56,6 +57,7 @@ const outboundPackets: OutboundPacket[] = [
     gameScreenAndSidebarPacket,
     enterAmountPacket,
     showChatboxWidgetPacket,
+    updateWidgetStringDisabledColorPacket,
     justTestingPacket,
 ];
 

@@ -1,13 +1,14 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
 import { createMovementQueue, MovementQueue, movementTick } from '../movement-queue';
 import { updatePlayerChunk } from '../region';
 import { HintType } from '@engine/net/packets/outbound-packets/encoders/show-hint-icon-packet';
-
+import { updateWidgetStringDisabledColorPacket } from '@engine/net/packets/outbound-packets/encoders/update-widget-string-disabled-color-packet';
+import {ColorConverter, JagexColor} from '../../util/color';
 export enum PlayerRights {
     USER = 0,
     MOD = 1,
@@ -126,11 +127,13 @@ export const playerLogin = (player: Player): boolean => {
     sendFullscreenWidget(player, 15244, 5993);
     //sendEnterAmount(player);
     //sendGameScreenAndSidebarWidget(player, 0, 1151)
-    sendTestPacket(player);
-
-    sendWidget(player, 0);
-    sendChatboxWidget(player, 0)
-    sendChatboxWidgetOnly(player, 147);
+    //sendTestPacket(player);
+    sendWidgetStringColor(player, 7332, ColorConverter.getHsl(80, 240, 120))
+    sendWidgetString(player, 7333, "@gre@A Different Green@gre@");
+    sendChatboxMessage(player, `Color: ${ColorConverter.rgbToJagex(0, 255, 0)}`);
+    //sendWidget(player, 0);
+    //sendChatboxWidget(player, 0)
+    //sendChatboxWidgetOnly(player, 147);
     return addPlayer(player);
 };
 
