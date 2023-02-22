@@ -41,6 +41,7 @@ import { updateScrollbarPositionPacket } from './encoders/update-scrollbar-posit
 import { updateWeightPacket } from './encoders/update-weight-packet';
 import { clearItemContainerPacket } from './encoders/clear-item-container-packet';
 import { resetButtonStatePacket } from './encoders/reset-button-state-packet';
+import { hideWidgetComponentPacket } from './encoders/hide-widget-component-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -84,6 +85,7 @@ const outboundPackets: OutboundPacket[] = [
     updateWeightPacket,
     clearItemContainerPacket,
     resetButtonStatePacket,
+    hideWidgetComponentPacket,
     justTestingPacket,
 ];
 

@@ -316,6 +316,13 @@ export const sendWidgetItem = (player: Player, widgetId: number, itemId: number,
     });
 };
 
+export const sendHideWidgetComponent = (player: Player, widgetId: number, shouldHideComponent: boolean): void => {
+    handleOutboundPacket(player, 'hideWidgetComponent', {
+        widgetId,
+        shouldHideComponent,
+    });
+};
+
 export const sendGameScreenAndSidebarWidget = (player: Player, widgetId: number, sidebarWidgetId: number): void => {
     handleOutboundPacket(player, 'gameScreenAndSidebar', {
         widgetId,
