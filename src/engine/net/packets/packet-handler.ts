@@ -354,6 +354,13 @@ export const sendUpdateCamera = (player: Player): void => {
     });
 }
 
+export const sendUpdateCoords = (player: Player, xCoord, yCoord): void => {
+    handleOutboundPacket(player, 'updateCoords', {
+        xCoord,
+        yCoord,
+    });
+}
+
 export const sendUpdatePlayerOption = (player: Player, optionNumber: number, optionText: string, shouldDisplayAsTopOfList: boolean): void => {
     handleOutboundPacket(player, 'updatePlayerOption', {
         optionNumber,
@@ -408,6 +415,15 @@ export const sendUpdateScrollbarPosition = (player: Player, widgetId: number, pi
     handleOutboundPacket(player, 'updateScrollbarPosition', {
         widgetId,
         pixelsToMove
+     });
+}
+
+export const sendAddGroundItem = (player: Player, position: Coord, itemId: number, itemAmount: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'addGroundItem', {
+        position,
+        itemId,
+        itemAmount,
+        positionOffset,
      });
 }
 

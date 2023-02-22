@@ -1,11 +1,11 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHideWidgetComponent, sendHintIcon, sendLogout, sendMultiwayIcon, sendResetButtonState, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateChatSettings, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWeight, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAddGroundItem, sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHideWidgetComponent, sendHintIcon, sendLogout, sendMultiwayIcon, sendResetButtonState, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateChatSettings, sendUpdateCoords, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWeight, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
 import { createMovementQueue, MovementQueue, movementTick } from '../movement-queue';
-import { updatePlayerChunk } from '../region';
+import { getRegionCoords, updatePlayerChunk } from '../region';
 import { HintType } from '@engine/net/packets/outbound-packets/encoders/show-hint-icon-packet';
 import { updateWidgetStringDisabledColorPacket } from '@engine/net/packets/outbound-packets/encoders/update-widget-string-disabled-color-packet';
 import {ColorConverter, JagexColor} from '../../util/color';
@@ -130,12 +130,17 @@ export const playerLogin = (player: Player): boolean => {
     // sendFullscreenWidget(player, 15244, 5993);
     //sendEnterAmount(player);
     //sendGameScreenAndSidebarWidget(player, 0, 1151)
-     sendWidget(player, 6575);
+     //sendWidget(player, 6575);
     //sendUpdateScrollbarPosition(player, 8143, 600)
     // sendUpdateWidgetPosition(player, 154, 10, 10);
     sendConfig(player, 286, 1);
-   sendTestPacket(player);
-   sendUpdateChatSettings(player, ChatSettings.ON, ChatSettings.FRIENDS, ChatSettings.OFF)
+    const regionData = getRegionCoords(player.coords);
+    console.log(regionData)
+
+
+    sendAddGroundItem(player, coord(3223, 3223, 0), 3140, 1)
+    //sendTestPacket(player);
+   //sendUpdateChatSettings(player, ChatSettings.ON, ChatSettings.FRIENDS, ChatSettings.OFF)
 
 
     // sendWidgetStringColor(player, 7332, JagexColor.RED);
