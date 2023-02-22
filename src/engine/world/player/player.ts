@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendMultiwayIcon, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendMultiwayIcon, sendResetButtonState, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWeight, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -129,12 +129,12 @@ export const playerLogin = (player: Player): boolean => {
     // sendFullscreenWidget(player, 15244, 5993);
     //sendEnterAmount(player);
     //sendGameScreenAndSidebarWidget(player, 0, 1151)
-    // sendWidget(player, 0);
-    sendWidget(player, 8134);
-   sendTestPacket(player);
+     sendWidget(player, 6575);
     //sendUpdateScrollbarPosition(player, 8143, 600)
     // sendUpdateWidgetPosition(player, 154, 10, 10);
-    sendConfig(player, 166, 4);
+    sendConfig(player, 286, 1);
+   sendTestPacket(player);
+
 
     // sendWidgetStringColor(player, 7332, JagexColor.RED);
     // sendWidgetStringColor(player, 7333, JagexColor.YELLOW);

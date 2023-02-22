@@ -38,6 +38,9 @@ import { updateActiveSidebarPacket } from './encoders/update-active-sidebar-pack
 import { showMultiwayIconPacket } from './encoders/show-multiway-icon-packet';
 import { updateRunEnergyPacket } from './encoders/update-run-energy-packet';
 import { updateScrollbarPositionPacket } from './encoders/update-scrollbar-position-packet';
+import { updateWeightPacket } from './encoders/update-weight-packet';
+import { clearItemContainerPacket } from './encoders/clear-item-container-packet';
+import { resetButtonStatePacket } from './encoders/reset-button-state-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -78,6 +81,9 @@ const outboundPackets: OutboundPacket[] = [
     showMultiwayIconPacket,
     updateRunEnergyPacket,
     updateScrollbarPositionPacket,
+    updateWeightPacket,
+    clearItemContainerPacket,
+    resetButtonStatePacket,
     justTestingPacket,
 ];
 

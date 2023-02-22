@@ -180,6 +180,12 @@ export const sendWidget = (player: Player, widgetId: number): void => {
     }); 
 };
 
+export const sendClearItemContainer = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'clearItemContainer', {
+        widgetId,
+    }); 
+};
+
 export const sendChatboxWidgetOnly = (player: Player, widgetId: number): void => {
     handleOutboundPacket(player, 'chatboxWidgetOnly', {
         widgetId,
@@ -284,6 +290,10 @@ export const sendWelcomeScreen = (player: Player): void => {
     handleOutboundPacket(player, 'welcomeScreen', {});
 };
 
+export const sendResetButtonState = (player: Player): void => {
+    handleOutboundPacket(player, 'resetButtonState', {});
+};
+
 export const sendFriendsList = (player: Player, friendListStatus: number): void => {
     handleOutboundPacket(player, 'friendsList', {
         friendListStatus,
@@ -369,6 +379,14 @@ export const sendUpdateRunEnergy = (player: Player, runEnergy: number): void => 
         runEnergy
      });
 }
+
+export const sendUpdateWeight = (player: Player, weight: number): void => {
+    handleOutboundPacket(player, 'updateWeight', {
+        weight
+     });
+}
+
+
 
 export const sendUpdateScrollbarPosition = (player: Player, widgetId: number, pixelsToMove: number): void => {
     handleOutboundPacket(player, 'updateScrollbarPosition', {

@@ -6,6 +6,7 @@ const closeWidgetsEncoder = () => new ByteBuffer(0);
 export const closeWidgetsPacket: OutboundPacket = {
     name: 'closeWidgets',
     opcodes: {
+        254: 174,
         289: 23,
         319: 143
     },
