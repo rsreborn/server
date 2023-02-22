@@ -42,6 +42,7 @@ import { updateWeightPacket } from './encoders/update-weight-packet';
 import { clearItemContainerPacket } from './encoders/clear-item-container-packet';
 import { resetButtonStatePacket } from './encoders/reset-button-state-packet';
 import { hideWidgetComponentPacket } from './encoders/hide-widget-component-packet';
+import { updateChatSettingsPacket } from './encoders/update-chat-settings-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -86,6 +87,7 @@ const outboundPackets: OutboundPacket[] = [
     clearItemContainerPacket,
     resetButtonStatePacket,
     hideWidgetComponentPacket,
+    updateChatSettingsPacket,
     justTestingPacket,
 ];
 

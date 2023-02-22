@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHideWidgetComponent, sendHintIcon, sendLogout, sendMultiwayIcon, sendResetButtonState, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWeight, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHideWidgetComponent, sendHintIcon, sendLogout, sendMultiwayIcon, sendResetButtonState, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateChatSettings, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWeight, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -11,6 +11,7 @@ import { updateWidgetStringDisabledColorPacket } from '@engine/net/packets/outbo
 import {ColorConverter, JagexColor} from '../../util/color';
 import { showMultiwayIconPacket } from '@engine/net/packets/outbound-packets/encoders/show-multiway-icon-packet';
 import { updateScrollbarPositionPacket } from '@engine/net/packets/outbound-packets/encoders/update-scrollbar-position-packet';
+import { ChatSettings } from '@engine/net/packets/outbound-packets/encoders/update-chat-settings-packet';
 export enum PlayerRights {
     USER = 0,
     MOD = 1,
@@ -134,6 +135,7 @@ export const playerLogin = (player: Player): boolean => {
     // sendUpdateWidgetPosition(player, 154, 10, 10);
     sendConfig(player, 286, 1);
    sendTestPacket(player);
+   sendUpdateChatSettings(player, ChatSettings.ON, ChatSettings.FRIENDS, ChatSettings.OFF)
 
 
     // sendWidgetStringColor(player, 7332, JagexColor.RED);

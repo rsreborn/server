@@ -6,6 +6,7 @@ import outboundPackets from './outbound-packets';
 import INBOUND_PACKET_SIZES from './inbound-packet-sizes';
 import { InboundPacket, OutboundPacket, PacketQueueType, PacketSize } from './packets';
 import { HintType } from './outbound-packets/encoders/show-hint-icon-packet';
+import { ChatSettings } from './outbound-packets/encoders/update-chat-settings-packet';
 
 export const handleInboundPacket = (
     player: Player,
@@ -320,6 +321,14 @@ export const sendHideWidgetComponent = (player: Player, widgetId: number, should
     handleOutboundPacket(player, 'hideWidgetComponent', {
         widgetId,
         shouldHideComponent,
+    });
+};
+
+export const sendUpdateChatSettings = (player: Player, publicChatValue: ChatSettings, privateChatValue: ChatSettings, tradeChatValue: ChatSettings): void => {
+    handleOutboundPacket(player, 'updateChatSettings', {
+        publicChatValue,
+        privateChatValue,
+        tradeChatValue,
     });
 };
 
