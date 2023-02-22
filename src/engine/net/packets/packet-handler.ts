@@ -364,6 +364,19 @@ export const sendMultiwayIcon = (player: Player, showMultiwayIcon: boolean): voi
      });
 }
 
+export const sendUpdateRunEnergy = (player: Player, runEnergy: number): void => {
+    handleOutboundPacket(player, 'updateRunEnergy', {
+        runEnergy
+     });
+}
+
+export const sendUpdateScrollbarPosition = (player: Player, widgetId: number, pixelsToMove: number): void => {
+    handleOutboundPacket(player, 'updateScrollbarPosition', {
+        widgetId,
+        pixelsToMove
+     });
+}
+
 export const sendTestPacket = (player: Player): void => {
     handleOutboundPacket(player, 'justTesting', {
 

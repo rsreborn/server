@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendMultiwayIcon, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendMultiwayIcon, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -10,6 +10,7 @@ import { HintType } from '@engine/net/packets/outbound-packets/encoders/show-hin
 import { updateWidgetStringDisabledColorPacket } from '@engine/net/packets/outbound-packets/encoders/update-widget-string-disabled-color-packet';
 import {ColorConverter, JagexColor} from '../../util/color';
 import { showMultiwayIconPacket } from '@engine/net/packets/outbound-packets/encoders/show-multiway-icon-packet';
+import { updateScrollbarPositionPacket } from '@engine/net/packets/outbound-packets/encoders/update-scrollbar-position-packet';
 export enum PlayerRights {
     USER = 0,
     MOD = 1,
@@ -129,7 +130,9 @@ export const playerLogin = (player: Player): boolean => {
     //sendEnterAmount(player);
     //sendGameScreenAndSidebarWidget(player, 0, 1151)
     // sendWidget(player, 0);
-    //sendTestPacket(player);
+    sendWidget(player, 8134);
+   sendTestPacket(player);
+    //sendUpdateScrollbarPosition(player, 8143, 600)
     // sendUpdateWidgetPosition(player, 154, 10, 10);
     sendConfig(player, 166, 4);
 

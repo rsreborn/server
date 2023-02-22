@@ -36,6 +36,8 @@ import { configHighPacket } from './encoders/config-high-packet';
 import { updateWidgetPositionPacket } from './encoders/update-widget-position-packet';
 import { updateActiveSidebarPacket } from './encoders/update-active-sidebar-packet';
 import { showMultiwayIconPacket } from './encoders/show-multiway-icon-packet';
+import { updateRunEnergyPacket } from './encoders/update-run-energy-packet';
+import { updateScrollbarPositionPacket } from './encoders/update-scrollbar-position-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -74,6 +76,8 @@ const outboundPackets: OutboundPacket[] = [
     updateWidgetPositionPacket,
     updateActiveSidebarPacket,
     showMultiwayIconPacket,
+    updateRunEnergyPacket,
+    updateScrollbarPositionPacket,
     justTestingPacket,
 ];
 
