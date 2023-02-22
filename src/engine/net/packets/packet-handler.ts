@@ -427,6 +427,14 @@ export const sendAddGroundItem = (player: Player, position: Coord, itemId: numbe
      });
 }
 
+export const sendRemoveGroundItem = (player: Player, position: Coord, itemId: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'removeGroundItem', {
+        position,
+        itemId,
+        positionOffset,
+     });
+}
+
 export const sendTestPacket = (player: Player): void => {
     handleOutboundPacket(player, 'justTesting', {
 

@@ -45,6 +45,7 @@ import { hideWidgetComponentPacket } from './encoders/hide-widget-component-pack
 import { updateChatSettingsPacket } from './encoders/update-chat-settings-packet';
 import { updateCoordsPacket } from './encoders/update-coords-packet';
 import { addGroundItemPacket } from './encoders/add-ground-item-packet';
+import { removeGroundItemPacket } from './encoders/remove-ground-item-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -92,6 +93,7 @@ const outboundPackets: OutboundPacket[] = [
     updateChatSettingsPacket,
     updateCoordsPacket,
     addGroundItemPacket,
+    removeGroundItemPacket,
     justTestingPacket,
 ];
 

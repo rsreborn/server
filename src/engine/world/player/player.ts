@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAddGroundItem, sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHideWidgetComponent, sendHintIcon, sendLogout, sendMultiwayIcon, sendResetButtonState, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateChatSettings, sendUpdateCoords, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWeight, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAddGroundItem, sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHideWidgetComponent, sendHintIcon, sendLogout, sendMultiwayIcon, sendRemoveGroundItem, sendResetButtonState, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateChatSettings, sendUpdateCoords, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWeight, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -139,7 +139,8 @@ export const playerLogin = (player: Player): boolean => {
 
 
     sendAddGroundItem(player, coord(3223, 3223, 0), 3140, 1)
-    //sendTestPacket(player);
+    sendRemoveGroundItem(player, coord(3223, 3223) , 3140)
+   // sendTestPacket(player);
    //sendUpdateChatSettings(player, ChatSettings.ON, ChatSettings.FRIENDS, ChatSettings.OFF)
 
 
