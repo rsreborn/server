@@ -264,6 +264,12 @@ export const sendFlashSidebarIcon = (player: Player, sidebarId: number): void =>
     });
 };
 
+export const sendUpdateActiveSidebar = (player: Player, sidebarId: number): void => {
+    handleOutboundPacket(player, 'updateActiveSidebar', {
+        sidebarId,
+    });
+};
+
 export const sendSystemUpdate = (player: Player, time: number): void => {
     handleOutboundPacket(player, 'systemUpdate', {
         time,
@@ -330,7 +336,7 @@ export const sendUpdatePlayerOption = (player: Player, optionNumber: number, opt
     });
 }
 
-export const sendConfig = (player: Player, configId: number, configValue: number) :void => {
+export const sendConfig = (player: Player, configId: number, configValue: number): void => {
     if (configValue < 128) {
         handleOutboundPacket(player, 'configLow', {
             configId,
@@ -342,6 +348,20 @@ export const sendConfig = (player: Player, configId: number, configValue: number
             configValue,
         });
     }
+}
+
+export const sendUpdateWidgetPosition = (player: Player, widgetId: number, xOffset: number, yOffset: number): void => {
+    handleOutboundPacket(player, 'updateWidgetPosition', {
+        widgetId,
+        xOffset,
+        yOffset,
+    });
+}
+
+export const sendMultiwayIcon = (player: Player, showMultiwayIcon: boolean): void => {
+    handleOutboundPacket(player, 'showMultiwayIcon', {
+        showMultiwayIcon
+     });
 }
 
 export const sendTestPacket = (player: Player): void => {

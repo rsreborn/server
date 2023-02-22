@@ -33,6 +33,9 @@ import { updateCameraPacket } from './encoders/update-camera-packet';
 import { updatePlayerOptionPacket } from './encoders/update-player-option';
 import { configLowPacket } from './encoders/config-low-packet';
 import { configHighPacket } from './encoders/config-high-packet';
+import { updateWidgetPositionPacket } from './encoders/update-widget-position-packet';
+import { updateActiveSidebarPacket } from './encoders/update-active-sidebar-packet';
+import { showMultiwayIconPacket } from './encoders/show-multiway-icon-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -68,6 +71,9 @@ const outboundPackets: OutboundPacket[] = [
     updatePlayerOptionPacket,
     configLowPacket,
     configHighPacket,
+    updateWidgetPositionPacket,
+    updateActiveSidebarPacket,
+    showMultiwayIconPacket,
     justTestingPacket,
 ];
 
