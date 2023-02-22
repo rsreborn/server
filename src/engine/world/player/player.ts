@@ -1,6 +1,6 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
@@ -124,20 +124,25 @@ export const playerLogin = (player: Player): boolean => {
     //  sendWidgetString(player, 971, "We've got some text here!");
     
     //sendWelcomeScreen(player);
-    sendFullscreenWidget(player, 15244, 5993);
+    // sendFullscreenWidget(player, 15244, 5993);
     //sendEnterAmount(player);
     //sendGameScreenAndSidebarWidget(player, 0, 1151)
-    //sendTestPacket(player);
-    sendWidgetStringColor(player, 7332, JagexColor.RED);
-    sendWidgetStringColor(player, 7333, JagexColor.YELLOW);
-    sendWidgetStringColor(player, 7334, JagexColor.GREEN);
-    sendWidgetStringColor(player, 7336, JagexColor.CYAN);
-    sendWidgetStringColor(player, 7383, JagexColor.BLACK);
-    sendWidgetStringColor(player, 7339, JagexColor.WHITE);
-    sendChatboxMessage(player, `Color: ${ColorConverter.rgbToJagex(255, 255, 255)}`);
+    // sendWidget(player, 0);
+    sendTestPacket(player);
+    // sendWidgetStringColor(player, 7332, JagexColor.RED);
+    // sendWidgetStringColor(player, 7333, JagexColor.YELLOW);
+    // sendWidgetStringColor(player, 7334, JagexColor.GREEN);
+    // sendWidgetStringColor(player, 7336, JagexColor.CYAN);
+    // sendWidgetStringColor(player, 7383, JagexColor.BLACK);
+    // sendWidgetStringColor(player, 7339, JagexColor.WHITE);
+    // sendChatboxMessage(player, `Color: ${ColorConverter.rgbToJagex(255, 255, 255)}`);
+
+    //sendUpdatePlayerOption(player, 2, "Follow", true);
     //sendWidget(player, 0);
     //sendChatboxWidget(player, 0)
     //sendChatboxWidgetOnly(player, 147);
+
+
     return addPlayer(player);
 };
 

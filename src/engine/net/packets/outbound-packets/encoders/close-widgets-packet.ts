@@ -10,7 +10,7 @@ export const closeWidgetsPacket: OutboundPacket = {
         319: 143
     },
     encoders: {
-        23: closeWidgetsEncoder,
+        289: closeWidgetsEncoder,
         319: closeWidgetsEncoder
     },
 };

@@ -28,6 +28,11 @@ import { gameScreenAndSidebarPacket } from './encoders/show-game-screen-and-side
 import { enterAmountPacket } from './encoders/enter-amount-packet';
 import { showChatboxWidgetPacket } from './encoders/show-chatbox-widget-packet';
 import { updateWidgetStringDisabledColorPacket } from './encoders/update-widget-string-disabled-color-packet';
+import { resetCameraPacket } from './encoders/reset-camera-packet';
+import { updateCameraPacket } from './encoders/update-camera-packet';
+import { updatePlayerOptionPacket } from './encoders/update-player-option';
+import { configLowPacket } from './encoders/config-low-packet';
+import { configHighPacket } from './encoders/config-high-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -58,6 +63,11 @@ const outboundPackets: OutboundPacket[] = [
     enterAmountPacket,
     showChatboxWidgetPacket,
     updateWidgetStringDisabledColorPacket,
+    resetCameraPacket,
+    updateCameraPacket,
+    updatePlayerOptionPacket,
+    configLowPacket,
+    configHighPacket,
     justTestingPacket,
 ];
 

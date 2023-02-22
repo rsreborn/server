@@ -311,6 +311,39 @@ export const sendEnterAmount = (player: Player): void => {
     handleOutboundPacket(player, 'enterAmount', { });
 }
 
+export const sendResetCamera = (player: Player): void => {
+    handleOutboundPacket(player, 'resetCamera', { });
+}
+
+// Todo: figure out the params for this packet.
+export const sendUpdateCamera = (player: Player): void => {
+    handleOutboundPacket(player, 'updateCamera', {
+
+    });
+}
+
+export const sendUpdatePlayerOption = (player: Player, optionNumber: number, optionText: string, shouldDisplayAsTopOfList: boolean): void => {
+    handleOutboundPacket(player, 'updatePlayerOption', {
+        optionNumber,
+        optionText,
+        shouldDisplayAsTopOfList,
+    });
+}
+
+export const sendConfig = (player: Player, configId: number, configValue: number) :void => {
+    if (configValue < 128) {
+        handleOutboundPacket(player, 'configLow', {
+            configId,
+            configValue,
+        });
+    } else {
+        handleOutboundPacket(player, 'configHigh', {
+            configId,
+            configValue,
+        });
+    }
+}
+
 export const sendTestPacket = (player: Player): void => {
     handleOutboundPacket(player, 'justTesting', {
 
