@@ -46,6 +46,8 @@ import { updateChatSettingsPacket } from './encoders/update-chat-settings-packet
 import { updateCoordsPacket } from './encoders/update-coords-packet';
 import { addGroundItemPacket } from './encoders/add-ground-item-packet';
 import { removeGroundItemPacket } from './encoders/remove-ground-item-packet';
+import { addObjectPacket } from './encoders/add-object-packet';
+import { animateObjectPacket } from './encoders/animate-object-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -94,6 +96,8 @@ const outboundPackets: OutboundPacket[] = [
     updateCoordsPacket,
     addGroundItemPacket,
     removeGroundItemPacket,
+    addObjectPacket,
+    animateObjectPacket,
     justTestingPacket,
 ];
 

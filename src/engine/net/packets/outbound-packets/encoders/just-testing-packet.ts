@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { sendUpdateCoords } from '../../packet-handler';
 import { OutboundPacket } from '../../packets';
 
 interface UpdateSkillData {
@@ -10,14 +11,15 @@ interface UpdateSkillData {
 export const justTestingPacket: OutboundPacket<UpdateSkillData> = {
     name: 'justTesting',
     opcodes: {
-        254: 115,
+        254: 30,
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(3);
+            sendUpdateCoords(player, 3219, 3222)
+            const buffer = new ByteBuffer(4);
             buffer.put(0, 'byte');
-
-            buffer.put(3140, 'short');
+            buffer.put((10 << 2) + (3 & 3), 'byte'); // Object Type and Orientation
+            buffer.put(521, 'short');
             //   buffer.put(1, 'byte');
             //   buffer.put(2, 'byte');
             // buffer.put(2);

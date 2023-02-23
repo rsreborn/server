@@ -435,6 +435,26 @@ export const sendRemoveGroundItem = (player: Player, position: Coord, itemId: nu
      });
 }
 
+export const sendAddObject = (player: Player, position: Coord, objectId: number, objectType: number, objectOrientation: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'addObject', {
+        position,
+        objectId,
+        objectType,
+        objectOrientation,
+        positionOffset,
+     });
+}
+
+export const sendAnimateObject = (player: Player, position: Coord, animationId: number, objectType: number, objectOrientation: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'animateObject', {
+        position,
+        animationId,
+        objectType,
+        objectOrientation,
+        positionOffset,
+     });
+}
+
 export const sendTestPacket = (player: Player): void => {
     handleOutboundPacket(player, 'justTesting', {
 
