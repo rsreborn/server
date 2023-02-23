@@ -455,6 +455,12 @@ export const sendAnimateObject = (player: Player, position: Coord, animationId: 
      });
 }
 
+export const sendProjectile = (player: Player): void => {
+    handleOutboundPacket(player, 'projectile', {
+
+    });
+}
+
 export const sendTestPacket = (player: Player): void => {
     handleOutboundPacket(player, 'justTesting', {
 

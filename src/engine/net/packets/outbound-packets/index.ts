@@ -48,6 +48,7 @@ import { addGroundItemPacket } from './encoders/add-ground-item-packet';
 import { removeGroundItemPacket } from './encoders/remove-ground-item-packet';
 import { addObjectPacket } from './encoders/add-object-packet';
 import { animateObjectPacket } from './encoders/animate-object-packet';
+import { projectilePacket } from './encoders/projectile-packet';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -98,6 +99,7 @@ const outboundPackets: OutboundPacket[] = [
     removeGroundItemPacket,
     addObjectPacket,
     animateObjectPacket,
+    projectilePacket,
     justTestingPacket,
 ];
 

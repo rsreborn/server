@@ -16,8 +16,8 @@ interface ProjectileData {
     distanceFromSource: number;
 }
 
-export const justTestingPacket: OutboundPacket<ProjectileData> = {
-    name: 'justTesting',
+export const projectilePacket: OutboundPacket<ProjectileData> = {
+    name: 'projectile',
     opcodes: {
         254: 37,
     },
@@ -48,10 +48,6 @@ export const justTestingPacket: OutboundPacket<ProjectileData> = {
             buffer.put(data.speed, 'short');
             buffer.put(data.slope, 'byte');
             buffer.put(data.distanceFromSource, 'byte');
-
-            //   buffer.put(1, 'byte');
-            //   buffer.put(2, 'byte');
-            // buffer.put(2);
             return buffer;
         }
     },

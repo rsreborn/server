@@ -1,6 +1,6 @@
 import { ByteBuffer } from '@runejs/common';
 import { Player } from '../../../world/player';
-import { sendAnimateObject, sendChatboxMessage, sendTestPacket, sendUpdatePlayerOption, sendWidget } from '../packet-handler';
+import { sendAnimateObject, sendChatboxMessage, sendProjectile, sendTestPacket, sendUpdatePlayerOption, sendWidget } from '../packet-handler';
 import { getChunkByCoords, getRegionCoords, getChunkCoordByCoords } from '../../../world/region';
 import { coord, getWorld } from '../../../world';
 import { facePlayer } from '../outbound-packets/npc-sync/npc-sync-face';
@@ -48,8 +48,14 @@ export const commandPacket: InboundPacket<CommandPacketData> = {
             player.coords.y = y;
             player.coords.plane = plane;
             player.sync.mapRegion = true;
-        } else if (command === 'test') {
+        } else if (command === 'objanim') {
             sendAnimateObject(player, coord(3219, 3222), 521, 10, 3, 0);
+        } else if (command === 'proj') {
+            sendProjectile(player);
+        } else if (command === 'test') {
+            sendTestPacket(player);
+        } else if (command === 'pindex') {
+            sendChatboxMessage(player, `Your Index is: ${player.worldIndex}`);
         }
     },
     opcodes: {
