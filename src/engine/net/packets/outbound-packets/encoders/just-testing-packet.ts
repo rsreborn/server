@@ -12,14 +12,15 @@ interface ProjectileData {
 export const justTestingPacket: OutboundPacket<ProjectileData> = {
     name: 'justTesting',
     opcodes: {
-        254: 85,
+        254: 88,
     },
     encoders: {
         254: (player, opcode, data) => {
-           // sendUpdateCoords(player, 3222, 3220)
+            sendUpdateCoords(player, 3219, 3222)
            
             const buffer = new ByteBuffer(2);
-            buffer.put(200, 'short');
+            buffer.put(0, 'byte');
+            buffer.put((10 << 2) + (3 & 3), 'byte');
             //buffer.put(86, 'short');
            // buffer.put(0, 'short');
 

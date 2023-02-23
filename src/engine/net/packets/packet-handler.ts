@@ -451,6 +451,15 @@ export const sendAddObject = (player: Player, position: Coord, objectId: number,
      });
 }
 
+export const sendRemoveObject = (player: Player, position: Coord, objectType: number, objectOrientation: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'removeObject', {
+        position,
+        objectType,
+        objectOrientation,
+        positionOffset,
+     });
+}
+
 export const sendAnimateObject = (player: Player, position: Coord, animationId: number, objectType: number, objectOrientation: number, positionOffset?: number): void => {
     handleOutboundPacket(player, 'animateObject', {
         position,
