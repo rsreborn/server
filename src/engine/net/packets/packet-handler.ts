@@ -455,6 +455,16 @@ export const sendAnimateObject = (player: Player, position: Coord, animationId: 
      });
 }
 
+export const sendStationaryGraphic = (player: Player, position: Coord, graphicId: number, height: number, delay: number, offset?: number): void => {
+    handleOutboundPacket(player, 'stationaryGraphic', {
+        position,
+        graphicId,
+        height,
+        delay,
+        offset,
+    });
+}
+
 export const sendProjectile = (player: Player): void => {
     handleOutboundPacket(player, 'projectile', {
 
