@@ -181,6 +181,12 @@ export const sendWidget = (player: Player, widgetId: number): void => {
     }); 
 };
 
+export const sendWalkableWidget = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'walkableWidget', {
+        widgetId,
+    }); 
+};
+
 export const sendClearItemContainer = (player: Player, widgetId: number): void => {
     handleOutboundPacket(player, 'clearItemContainer', {
         widgetId,

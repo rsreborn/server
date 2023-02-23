@@ -130,7 +130,8 @@ export const playerLogin = (player: Player): boolean => {
     // sendFullscreenWidget(player, 15244, 5993);
     //sendEnterAmount(player);
     //sendGameScreenAndSidebarWidget(player, 0, 1151)
-    //  sendWidget(player, 3559);
+    //  sendWidget(player, 200                     );
+      sendWidgetString(player, 199, "Level 1");
     //  sendWidgetString(player, 3697, "Body Type");
     //  sendWidgetString(player, 3700, "Masculine");
     //  sendWidgetString(player, 3701, "Feminine");

@@ -50,6 +50,7 @@ import { addObjectPacket } from './encoders/add-object-packet';
 import { animateObjectPacket } from './encoders/animate-object-packet';
 import { projectilePacket } from './encoders/projectile-packet';
 import { stationaryGraphic } from './encoders/stationary-graphic-pacaket';
+import { walkableWidgetPacket } from './encoders/show-walkable-widget';
 
 const outboundPackets: OutboundPacket[] = [
     chatboxMessagePacket,
@@ -102,6 +103,7 @@ const outboundPackets: OutboundPacket[] = [
     animateObjectPacket,
     projectilePacket,
     stationaryGraphic,
+    walkableWidgetPacket,
     justTestingPacket,
 ];
 
