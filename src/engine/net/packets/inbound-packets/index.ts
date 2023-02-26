@@ -10,6 +10,8 @@ import { groundItemClickPacket } from './click-ground-item-packet';
 import { containerItemClickPacket } from './click-container-item-packet';
 import { moveContainerItemPacket } from './move-container-item-packet';
 import { useItemOnItemPacket } from './use-item-on-item-packet';
+import { useItemOnGroundItemPacket } from './use-item-on-ground-item-packet';
+import { useItemOnNpcPacket } from './use-item-on-npc-packe';
 
 const inboundPackets: InboundPacket[] = [
     buttonPacket,
@@ -23,6 +25,8 @@ const inboundPackets: InboundPacket[] = [
     containerItemClickPacket,
     moveContainerItemPacket,
     useItemOnItemPacket,
+    useItemOnGroundItemPacket,
+    useItemOnNpcPacket,
 ];
 
 export default inboundPackets;

@@ -485,6 +485,12 @@ INBOUND_PACKET_SIZES[254] = {
     // Use Item On Item
     200: 12,
 
+    // Use Item On Ground Item
+    245: 12,
+
+    // Use Item On Npc
+    119: 8,
+
     // Swap Container Item
     176: 7,
 

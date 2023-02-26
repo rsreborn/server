@@ -20,7 +20,7 @@ export const justTestingPacket: OutboundPacket<ProjectileData> = {
            // sendUpdateCoords(player, 3219, 3222)
            
             const buffer = new ByteBuffer(114);
-            buffer.put(5382, 'short');
+            buffer.put(3214, 'short');
 
             for (let i = 0; i < 28; i++) {
                 buffer.put(i, 'byte');
