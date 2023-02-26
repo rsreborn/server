@@ -141,10 +141,11 @@ export const playerLogin = (player: Player): boolean => {
     // sendUpdateWidgetPosition(player, 154, 10, 10);
     sendConfig(player, 286, 1);
 
-    sendAddGroundItem(player, coord(3223, 3223, 0), 3140, 1)
+    sendAddGroundItem(player, coord(3223, 3222, 0), 3140, 1)
     sendAddObject(player, coord(3219, 3222, 0), 6, 10, 3);
     sendAddObject(player, coord(3224, 3222, 0), 683, 10, 0);
     //sendTestPacket(player);
+    sendWidget(player, 5292)
 
    //sendUpdateChatSettings(player, ChatSettings.ON, ChatSettings.FRIENDS, ChatSettings.OFF)
 
