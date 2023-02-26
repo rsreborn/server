@@ -17,7 +17,7 @@ export const buttonPacket: InboundPacket<ButtonPacketData> = {
         data: ButtonPacketData,
     ): void => {
         try {
-            sendChatboxMessage(player, `Button Id: ${data.widgetId} ${data.buttonId}`);
+            sendChatboxMessage(player, `Button Id: ${data.widgetId ?? ''} ${data.buttonId}`);
             const widget = !!data.widgetId ? widgets.getName(data.widgetId, (player?.client?.connection?.buildNumber ?? 0) < 400 ? 'old' : 'new') : undefined;
             if (!handleButtonAction({ player, widget, button: data.buttonId })) { }
         } catch (e) {
