@@ -11,7 +11,9 @@ import { containerItemClickPacket } from './click-container-item-packet';
 import { moveContainerItemPacket } from './move-container-item-packet';
 import { useItemOnItemPacket } from './use-item-on-item-packet';
 import { useItemOnGroundItemPacket } from './use-item-on-ground-item-packet';
-import { useItemOnNpcPacket } from './use-item-on-npc-packe';
+import { useItemOnNpcPacket } from './use-item-on-npc-packet';
+import { useItemOnPlayerPacket } from './use-item-on-player-packet';
+import { useItemOnObjectPacket } from './use-item-on-object-packet';
 
 const inboundPackets: InboundPacket[] = [
     buttonPacket,
@@ -27,6 +29,8 @@ const inboundPackets: InboundPacket[] = [
     useItemOnItemPacket,
     useItemOnGroundItemPacket,
     useItemOnNpcPacket,
+    useItemOnPlayerPacket,
+    useItemOnObjectPacket,
 ];
 
 export default inboundPackets;
