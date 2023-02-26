@@ -492,13 +492,25 @@ INBOUND_PACKET_SIZES[254] = {
     240: 12,
 
     // Use Item On Npc
-    119: 8,
-
-    // Use Item On Npc
     113: 8,
 
     // Swap Container Item
     176: 7,
+
+    // Magic on NPC
+    231: 4,
+
+    // Magic on Player
+    68: 4,
+
+    // Magic on Inventory Item
+    102: 8,
+
+    // Magic on Ground Item
+    202: 8,
+
+    // Magic on Object
+    26: 8,
 
     // Container Item Click Packets
     243: 6,

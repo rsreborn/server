@@ -14,6 +14,11 @@ import { useItemOnGroundItemPacket } from './use-item-on-ground-item-packet';
 import { useItemOnNpcPacket } from './use-item-on-npc-packet';
 import { useItemOnPlayerPacket } from './use-item-on-player-packet';
 import { useItemOnObjectPacket } from './use-item-on-object-packet';
+import { useMagicOnNpcPacket } from './use-magic-on-npc-packet';
+import { useMagicOnPlayerPacket } from './use-magic-on-player-packet';
+import { useMagicOnItemPacket } from './use-magic-on-item-packet';
+import { useMagicOnGroundItemPacket } from './use-magic-on-ground-item-packet';
+import { useMagicOnObjectPacket } from './use-magic-on-object-packet';
 
 const inboundPackets: InboundPacket[] = [
     buttonPacket,
@@ -31,6 +36,11 @@ const inboundPackets: InboundPacket[] = [
     useItemOnNpcPacket,
     useItemOnPlayerPacket,
     useItemOnObjectPacket,
+    useMagicOnNpcPacket,
+    useMagicOnPlayerPacket,
+    useMagicOnItemPacket,
+    useMagicOnGroundItemPacket,
+    useMagicOnObjectPacket,
 ];
 
 export default inboundPackets;
