@@ -482,6 +482,9 @@ INBOUND_PACKET_SIZES[254] = {
     244: 2,
     234: 4,
 
+    // Character Design
+    13: 13,
+
     // Use Item On Item
     200: 12,
 
