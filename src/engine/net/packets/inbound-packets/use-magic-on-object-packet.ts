@@ -18,7 +18,7 @@ export const useMagicOnObjectPacket: InboundPacket<MagicOnObjectPacketData> = {
         data: MagicOnObjectPacketData,
     ): void => {
         sendChatboxMessage(player, 
-            `Used Spell ${data.spellId} on item id ${data.objectId} at ${data.objectX}, ${data.objectY}`);
+            `Used Spell ${data.spellId} on object id ${data.objectId} at ${data.objectX}, ${data.objectY}`);
     },
     opcodes: {
         254: 26,
