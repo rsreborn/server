@@ -3,18 +3,20 @@ import { OutboundPacket } from '../../packets';
 
 interface WidgetData {
     widgetId: number;
+    sidebarWidgetId: number;
 }
 
-export const showChatboxWidgetPacket: OutboundPacket<WidgetData> = {
-    name: 'chatboxWidget',
+export const gameScreenAndSidebarPacket: OutboundPacket<WidgetData> = {
+    name: 'gameScreenAndSidebar',
     opcodes: {
-        254: 239,
+        254: 249,
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(2);
+            const buffer = new ByteBuffer(4);
             buffer.put(data.widgetId, 'short');
+            buffer.put(data.sidebarWidgetId, 'short');
             return buffer;
-        },
+        }
     },
 };

@@ -1,13 +1,17 @@
 import { Client } from '../../net/client';
 import { coord, Coord } from '../coord';
-import { sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendHintIcon, sendLogout, sendSideBarWidget, sendSkill, sendSystemUpdate, sendUpdateMapRegionPacket, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWindowPane, writePackets } from '../../net/packets';
+import { sendAddGroundItem, sendAddObject, sendAnimateWidget, sendChatboxMessage, sendChatboxWidget, sendChatboxWidgetOnly, sendConfig, sendEnterAmount, sendFlashSidebarIcon, sendFriendsList, sendFullscreenWidget, sendGameScreenAndSidebarWidget, sendHideWidgetComponent, sendHintIcon, sendLogout, sendMultiwayIcon, sendRemoveGroundItem, sendResetButtonState, sendSideBarWidget, sendSkill, sendSystemUpdate, sendTestPacket, sendUpdateActiveSidebar, sendUpdateChatSettings, sendUpdateCoords, sendUpdateMapRegionPacket, sendUpdatePlayerOption, sendUpdateRunEnergy, sendUpdateScrollbarPosition, sendUpdateWeight, sendUpdateWidgetPosition, sendWelcomeScreen, sendWidget, sendWidgetNpcHead, sendWidgetPlayerHead, sendWidgetString, sendWidgetStringColor, sendWindowPane, writePackets } from '../../net/packets';
 import { addPlayer, removePlayer } from '../world';
 import { createPlayerSyncState, PlayerSyncState, resetPlayerSyncState } from './player-sync';
 import { Appearance, defaultAppearance } from './appearance';
 import { createMovementQueue, MovementQueue, movementTick } from '../movement-queue';
-import { updatePlayerChunk } from '../region';
+import { getRegionCoords, updatePlayerChunk } from '../region';
 import { HintType } from '@engine/net/packets/outbound-packets/encoders/show-hint-icon-packet';
-
+import { updateWidgetStringDisabledColorPacket } from '@engine/net/packets/outbound-packets/encoders/update-widget-string-disabled-color-packet';
+import {ColorConverter, JagexColor} from '../../util/color';
+import { showMultiwayIconPacket } from '@engine/net/packets/outbound-packets/encoders/show-multiway-icon-packet';
+import { updateScrollbarPositionPacket } from '@engine/net/packets/outbound-packets/encoders/update-scrollbar-position-packet';
+import { ChatSettings } from '@engine/net/packets/outbound-packets/encoders/update-chat-settings-packet';
 export enum PlayerRights {
     USER = 0,
     MOD = 1,
@@ -123,7 +127,42 @@ export const playerLogin = (player: Player): boolean => {
     //  sendWidgetString(player, 971, "We've got some text here!");
     
     //sendWelcomeScreen(player);
-    sendFullscreenWidget(player, 15244, 5993);
+    // sendFullscreenWidget(player, 15244, 5993);
+    //sendEnterAmount(player);
+    //sendGameScreenAndSidebarWidget(player, 0, 1151)
+    //  sendWidget(player, 200                     );
+      sendWidgetString(player, 199, "Level 1");
+    //  sendWidgetString(player, 3697, "Body Type");
+    //  sendWidgetString(player, 3700, "Masculine");
+    //  sendWidgetString(player, 3701, "Feminine");
+    //  sendUpdateWidgetPosition(player, 3700, -15, 0);
+    //  sendUpdateWidgetPosition(player, 3701, -6, 0);
+    //sendUpdateScrollbarPosition(player, 8143, 600)
+    // sendUpdateWidgetPosition(player, 154, 10, 10);
+    sendConfig(player, 286, 1);
+
+    sendAddGroundItem(player, coord(3223, 3222, 0), 3140, 1)
+    sendAddObject(player, coord(3219, 3222, 0), 6, 10, 3);
+    sendAddObject(player, coord(3224, 3222, 0), 683, 10, 0);
+    //sendTestPacket(player);
+    sendWidget(player, 5292)
+
+   //sendUpdateChatSettings(player, ChatSettings.ON, ChatSettings.FRIENDS, ChatSettings.OFF)
+
+
+    // sendWidgetStringColor(player, 7332, JagexColor.RED);
+    // sendWidgetStringColor(player, 7333, JagexColor.YELLOW);
+    // sendWidgetStringColor(player, 7334, JagexColor.GREEN);
+    // sendWidgetStringColor(player, 7336, JagexColor.CYAN);
+    // sendWidgetStringColor(player, 7383, JagexColor.BLACK);
+    // sendWidgetStringColor(player, 7339, JagexColor.WHITE);
+    // sendChatboxMessage(player, `Color: ${ColorConverter.rgbToJagex(255, 255, 255)}`);
+
+    //sendUpdatePlayerOption(player, 2, "Follow", true);
+    //sendWidget(player, 0);
+    //sendChatboxWidget(player, 0)
+    //sendChatboxWidgetOnly(player, 147);
+
 
     return addPlayer(player);
 };

@@ -1,20 +1,20 @@
 import { ByteBuffer } from '@runejs/common';
 import { OutboundPacket } from '../../packets';
 
-interface WidgetData {
-    widgetId: number;
+interface WeightData {
+    weight: number;
 }
 
-export const showChatboxWidgetPacket: OutboundPacket<WidgetData> = {
-    name: 'chatboxWidget',
+export const updateWeightPacket: OutboundPacket<WeightData> = {
+    name: 'updateWeight',
     opcodes: {
-        254: 239,
+        254: 164,
     },
     encoders: {
         254: (player, opcode, data) => {
             const buffer = new ByteBuffer(2);
-            buffer.put(data.widgetId, 'short');
+             buffer.put(data.weight, 'short');
             return buffer;
-        },
+        }
     },
 };

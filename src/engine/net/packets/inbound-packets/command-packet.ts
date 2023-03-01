@@ -1,8 +1,8 @@
 import { ByteBuffer } from '@runejs/common';
 import { Player } from '../../../world/player';
-import { sendChatboxMessage, sendWidget } from '../packet-handler';
+import { sendAnimateObject, sendChatboxMessage, sendProjectile, sendStationaryGraphic, sendTestPacket, sendUpdatePlayerOption, sendWidget } from '../packet-handler';
 import { getChunkByCoords, getRegionCoords, getChunkCoordByCoords } from '../../../world/region';
-import { getWorld } from '../../../world';
+import { coord, getWorld } from '../../../world';
 import { facePlayer } from '../outbound-packets/npc-sync/npc-sync-face';
 import { InboundPacket } from '../packets';
 
@@ -39,9 +39,7 @@ export const commandPacket: InboundPacket<CommandPacketData> = {
             sendChatboxMessage(player, `Chunk: ${chunkData.chunkId}, ${chunkData.regionChunkLocalX}, ${chunkData.regionChunkLocalY}`);
         } else if (command === 'face') {
             facePlayer(player, getWorld().npcs[590]);
-        }
-
-        if (command === 'tele') {
+        } else if (command === 'tele') {
             const x =  parseInt(args[1]);
             const y = parseInt(args[2]);
             const plane = parseInt(args[3]) ?? 0;
@@ -50,8 +48,20 @@ export const commandPacket: InboundPacket<CommandPacketData> = {
             player.coords.y = y;
             player.coords.plane = plane;
             player.sync.mapRegion = true;
+        } else if (command === 'objanim') {
+            sendAnimateObject(player, coord(3219, 3222), 521, 10, 3, 0);
+        } else if (command === 'proj') {
+            sendProjectile(player);
+        } else if (command === 'sgraphic') {
+            const graphicId =  parseInt(args[1]);
+            sendStationaryGraphic(player, 
+                coord(player.coords.x + 1, player.coords.y, player.coords.plane), 
+                graphicId, 64, 0);
+        } else if (command === 'test') {
+            sendTestPacket(player);
+        } else if (command === 'pindex') {
+            sendChatboxMessage(player, `Your Index is: ${player.worldIndex}`);
         }
-
     },
     opcodes: {
         254: 86,

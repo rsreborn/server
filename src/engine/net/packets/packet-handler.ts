@@ -6,6 +6,7 @@ import outboundPackets from './outbound-packets';
 import INBOUND_PACKET_SIZES from './inbound-packet-sizes';
 import { InboundPacket, OutboundPacket, PacketQueueType, PacketSize } from './packets';
 import { HintType } from './outbound-packets/encoders/show-hint-icon-packet';
+import { ChatSettings } from './outbound-packets/encoders/update-chat-settings-packet';
 
 export const handleInboundPacket = (
     player: Player,
@@ -180,6 +181,24 @@ export const sendWidget = (player: Player, widgetId: number): void => {
     }); 
 };
 
+export const sendWalkableWidget = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'walkableWidget', {
+        widgetId,
+    }); 
+};
+
+export const sendClearItemContainer = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'clearItemContainer', {
+        widgetId,
+    }); 
+};
+
+export const sendChatboxWidgetOnly = (player: Player, widgetId: number): void => {
+    handleOutboundPacket(player, 'chatboxWidgetOnly', {
+        widgetId,
+    }); 
+};
+
 export const sendChatboxWidget = (player: Player, widgetId: number): void => {
     handleOutboundPacket(player, 'chatboxWidget', {
         widgetId,
@@ -234,6 +253,13 @@ export const sendWidgetString = (player: Player, widgetId: number, message: stri
     });
 };
 
+export const sendWidgetStringColor = (player: Player, widgetId: number, widgetColor: number): void => {
+    handleOutboundPacket(player, 'widgetStringDisabledColor', {
+        widgetId,
+        widgetColor,
+    });
+};
+
 export const sendCloseWidgets = (player: Player): void => {
     handleOutboundPacket(player, 'closeWidgets', {});
 };
@@ -247,6 +273,12 @@ export const sendSideBarWidget = (player: Player, sidebarId: number, widgetId: n
 
 export const sendFlashSidebarIcon = (player: Player, sidebarId: number): void => {
     handleOutboundPacket(player, 'flashSideBarIcon', {
+        sidebarId,
+    });
+};
+
+export const sendUpdateActiveSidebar = (player: Player, sidebarId: number): void => {
+    handleOutboundPacket(player, 'updateActiveSidebar', {
         sidebarId,
     });
 };
@@ -265,6 +297,10 @@ export const sendWelcomeScreen = (player: Player): void => {
     handleOutboundPacket(player, 'welcomeScreen', {});
 };
 
+export const sendResetButtonState = (player: Player): void => {
+    handleOutboundPacket(player, 'resetButtonState', {});
+};
+
 export const sendFriendsList = (player: Player, friendListStatus: number): void => {
     handleOutboundPacket(player, 'friendsList', {
         friendListStatus,
@@ -278,3 +314,180 @@ export const sendSkill = (player: Player, skillId: number, skillLevel: number, s
         skillExperience,
     });
 };
+
+export const sendWidgetItem = (player: Player, widgetId: number, itemId: number, itemZoom: number): void => {
+    handleOutboundPacket(player, 'widgetItem', {
+        widgetId,
+        itemId,
+        itemZoom
+    });
+};
+
+export const sendHideWidgetComponent = (player: Player, widgetId: number, shouldHideComponent: boolean): void => {
+    handleOutboundPacket(player, 'hideWidgetComponent', {
+        widgetId,
+        shouldHideComponent,
+    });
+};
+
+export const sendUpdateChatSettings = (player: Player, publicChatValue: ChatSettings, privateChatValue: ChatSettings, tradeChatValue: ChatSettings): void => {
+    handleOutboundPacket(player, 'updateChatSettings', {
+        publicChatValue,
+        privateChatValue,
+        tradeChatValue,
+    });
+};
+
+export const sendGameScreenAndSidebarWidget = (player: Player, widgetId: number, sidebarWidgetId: number): void => {
+    handleOutboundPacket(player, 'gameScreenAndSidebar', {
+        widgetId,
+        sidebarWidgetId,
+    });
+};
+
+export const sendEnterAmount = (player: Player): void => {
+    handleOutboundPacket(player, 'enterAmount', { });
+}
+
+export const sendResetCamera = (player: Player): void => {
+    handleOutboundPacket(player, 'resetCamera', { });
+}
+
+// Todo: figure out the params for this packet.
+export const sendUpdateCamera = (player: Player): void => {
+    handleOutboundPacket(player, 'updateCamera', {
+
+    });
+}
+
+export const sendUpdateCoords = (player: Player, xCoord, yCoord): void => {
+    handleOutboundPacket(player, 'updateCoords', {
+        xCoord,
+        yCoord,
+    });
+}
+
+export const sendUpdatePlayerOption = (player: Player, optionNumber: number, optionText: string, shouldDisplayAsTopOfList: boolean): void => {
+    handleOutboundPacket(player, 'updatePlayerOption', {
+        optionNumber,
+        optionText,
+        shouldDisplayAsTopOfList,
+    });
+}
+
+export const sendConfig = (player: Player, configId: number, configValue: number): void => {
+    if (configValue < 128) {
+        handleOutboundPacket(player, 'configLow', {
+            configId,
+            configValue,
+        });
+    } else {
+        handleOutboundPacket(player, 'configHigh', {
+            configId,
+            configValue,
+        });
+    }
+}
+
+export const sendUpdateWidgetPosition = (player: Player, widgetId: number, xOffset: number, yOffset: number): void => {
+    handleOutboundPacket(player, 'updateWidgetPosition', {
+        widgetId,
+        xOffset,
+        yOffset,
+    });
+}
+
+export const sendMultiwayIcon = (player: Player, showMultiwayIcon: boolean): void => {
+    handleOutboundPacket(player, 'showMultiwayIcon', {
+        showMultiwayIcon
+     });
+}
+
+export const sendUpdateRunEnergy = (player: Player, runEnergy: number): void => {
+    handleOutboundPacket(player, 'updateRunEnergy', {
+        runEnergy
+     });
+}
+
+export const sendUpdateWeight = (player: Player, weight: number): void => {
+    handleOutboundPacket(player, 'updateWeight', {
+        weight
+     });
+}
+
+
+
+export const sendUpdateScrollbarPosition = (player: Player, widgetId: number, pixelsToMove: number): void => {
+    handleOutboundPacket(player, 'updateScrollbarPosition', {
+        widgetId,
+        pixelsToMove
+     });
+}
+
+export const sendAddGroundItem = (player: Player, position: Coord, itemId: number, itemAmount: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'addGroundItem', {
+        position,
+        itemId,
+        itemAmount,
+        positionOffset,
+     });
+}
+
+export const sendRemoveGroundItem = (player: Player, position: Coord, itemId: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'removeGroundItem', {
+        position,
+        itemId,
+        positionOffset,
+     });
+}
+
+export const sendAddObject = (player: Player, position: Coord, objectId: number, objectType: number, objectOrientation: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'addObject', {
+        position,
+        objectId,
+        objectType,
+        objectOrientation,
+        positionOffset,
+     });
+}
+
+export const sendRemoveObject = (player: Player, position: Coord, objectType: number, objectOrientation: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'removeObject', {
+        position,
+        objectType,
+        objectOrientation,
+        positionOffset,
+     });
+}
+
+export const sendAnimateObject = (player: Player, position: Coord, animationId: number, objectType: number, objectOrientation: number, positionOffset?: number): void => {
+    handleOutboundPacket(player, 'animateObject', {
+        position,
+        animationId,
+        objectType,
+        objectOrientation,
+        positionOffset,
+     });
+}
+
+export const sendStationaryGraphic = (player: Player, position: Coord, graphicId: number, height: number, delay: number, offset?: number): void => {
+    handleOutboundPacket(player, 'stationaryGraphic', {
+        position,
+        graphicId,
+        height,
+        delay,
+        offset,
+    });
+}
+
+export const sendProjectile = (player: Player): void => {
+    handleOutboundPacket(player, 'projectile', {
+
+    });
+}
+
+export const sendTestPacket = (player: Player): void => {
+    handleOutboundPacket(player, 'justTesting', {
+
+    });
+}

@@ -1,5 +1,6 @@
 import { ByteBuffer } from '@runejs/common';
 import { Player } from '../../../world/player';
+import { sendChatboxMessage } from '../packet-handler';
 import { InboundPacket } from '../packets';
 
 interface NpcClickPacketData {
@@ -13,10 +14,10 @@ export const npcClickPacket: InboundPacket<NpcClickPacketData> = {
         data: NpcClickPacketData,
     ): void => {
        
-        console.log(`npc click handler ${data.npcIndex}`);
+        sendChatboxMessage(player, `Npc Index: ${data.npcIndex}`);
     },
     opcodes: {
-        254: 195,
+        254: [143, 195, 69, 122, 118],
         319: 111,
     },
     decoders: {

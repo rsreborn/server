@@ -467,26 +467,81 @@ INBOUND_PACKET_SIZES[289] = {
 INBOUND_PACKET_SIZES[254] = {
     6: -1,
     8: 1,
-    33: 6,
     51: -1,
     58: 0,
-    69: 2,
     86: -1,
     91: 4,
     100: 0,
-    118: 2,
-    122: 2,
     127: -1,
     134: 0,
-    143: 2,
     144: 0,
     182: 0,
-    195: 2,
     220: -1,
     226: 1,
-    234: 4,
     239: 0,
     244: 2,
+    234: 4,
+
+    // Character Design
+    13: 13,
+
+    // Use Item On Item
+    200: 12,
+
+    // Use Item On Ground Item
+    245: 12,
+
+    // Use Item On Object
+    240: 12,
+
+    // Use Item On Npc
+    113: 8,
+
+    // Swap Container Item
+    176: 7,
+
+    // Magic on NPC
+    231: 4,
+
+    // Magic on Player
+    68: 4,
+
+    // Magic on Inventory Item
+    102: 8,
+
+    // Magic on Ground Item
+    202: 8,
+
+    // Magic on Object
+    26: 8,
+
+    // Container Item Click Packets
+    243: 6,
+    228: 6,
+    163: 6,
+    74: 6,
+    80: 6,
+
+    // Ground Item Click Packets
+    141: 6, 
+    67: 6, 
+    178: 6,
+    47: 6,
+    97: 6,
+
+    // NPC Click Packets
+    143: 2,
+    195: 2,
+    69: 2,
+    122: 2,
+    118: 2,
+
+    // Object Click Packets
+    33: 6,
+    213: 6,
+    98: 6,
+    87: 6,
+    147: 6,
 };
 
 export default INBOUND_PACKET_SIZES;
