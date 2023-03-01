@@ -131,7 +131,7 @@ export const playerLogin = (player: Player): boolean => {
     //sendEnterAmount(player);
     //sendGameScreenAndSidebarWidget(player, 0, 1151)
     //  sendWidget(player, 200                     );
-      sendWidgetString(player, 199, "Level 1");
+   //   sendWidgetString(player, 199, "Level 1");
     //  sendWidgetString(player, 3697, "Body Type");
     //  sendWidgetString(player, 3700, "Masculine");
     //  sendWidgetString(player, 3701, "Feminine");
@@ -141,11 +141,12 @@ export const playerLogin = (player: Player): boolean => {
     // sendUpdateWidgetPosition(player, 154, 10, 10);
     sendConfig(player, 286, 1);
 
-    sendAddGroundItem(player, coord(3223, 3222, 0), 3140, 1)
+    sendAddGroundItem(player, coord(3223, 3222, 0), 1105, 1)
     sendAddObject(player, coord(3219, 3222, 0), 6, 10, 3);
     sendAddObject(player, coord(3224, 3222, 0), 683, 10, 0);
     //sendTestPacket(player);
     sendWidget(player, 5292)
+    sendUpdatePlayerOption(player, 1, "Get Text", false)
 
    //sendUpdateChatSettings(player, ChatSettings.ON, ChatSettings.FRIENDS, ChatSettings.OFF)
 

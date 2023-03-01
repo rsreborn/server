@@ -120,7 +120,6 @@ const constructPlayerSyncPacket = (player: Player): ByteBuffer => {
     } else {
         packetData.closeBitBuffer();
     }
-
     return packetData.flipWriter();
 };
 

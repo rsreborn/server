@@ -19,13 +19,13 @@ export const justTestingPacket: OutboundPacket<ProjectileData> = {
         254: (player, opcode, data) => {
            // sendUpdateCoords(player, 3219, 3222)
            
-            const buffer = new ByteBuffer(114);
-            buffer.put(3214, 'short');
+            const buffer = new ByteBuffer(300);
+            buffer.put(3214, 'short'); // Widget Id
 
             for (let i = 0; i < 28; i++) {
-                buffer.put(i, 'byte');
-                buffer.put(1039 + i, 'short');
-                buffer.put(1, 'byte');
+                buffer.put(i, 'byte'); // Slot Id
+                buffer.put(0 + (Math.random() * 3140), 'short'); // Item Id
+                buffer.put(1 + (Math.random() * 50), 'byte'); // Amount
             }
             return buffer;
         }

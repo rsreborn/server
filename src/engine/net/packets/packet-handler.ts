@@ -83,8 +83,10 @@ export const handleOutboundPacket = <T = any>(
 
     let packetSize = PacketSize.FIXED;
     if (outboundPacket.size !== undefined) {
+        console.log("Packet Size " + outboundPacket.size)
         packetSize = outboundPacket.size;
     } else if (outboundPacket.sizes !== undefined) {
+        console.log("Packet Sizes " + JSON.stringify(outboundPacket.sizes))
         packetSize = outboundPacket.sizes[String(buildNumber)] ?? PacketSize.FIXED;
     }
 
@@ -105,26 +107,29 @@ export const queuePacket = (
     packetType: PacketSize = PacketSize.FIXED,
     queueType: PacketQueueType = PacketQueueType.PACKET,
 ): void => {
-    let size = packetData.length;
+    const packetSize = packetData.writerIndex === 0 ? packetData.length : packetData.writerIndex;
+    let bufferSize = packetSize + 1;
+
+    console.log(`Packet Id: ${opcode} Packet Size: ${bufferSize} Packet Writer Index: ${packetData.writerIndex} PacketData Length: ${packetData.length}`);
 
     if (packetType !== PacketSize.FIXED) {
-        size += packetType;
+        bufferSize += packetType;
     }
 
-    const packet = new ByteBuffer(size + 1);
+    const packet = new ByteBuffer(bufferSize);
     packet.put((opcode + player.client.outCipher.rand()) & 0xff);
 
     let copyStart = 1;
 
     if (packetType === PacketSize.VAR_BYTE) {
-        packet.put(packetData.length, 'byte');
+        packet.put(packetSize, 'byte');
         copyStart = 2;
     } else if (packetType === PacketSize.VAR_SHORT) {
-        packet.put(packetData.length, 'short');
+        packet.put(packetSize, 'short');
         copyStart = 3;
     }
 
-    packetData.copy(packet, copyStart, 0, size);
+    packetData.copy(packet, copyStart, 0, packetSize);
 
     if (queueType === PacketQueueType.PACKET) {
         player.client.outboundPacketQueue.push(packet.toNodeBuffer());
