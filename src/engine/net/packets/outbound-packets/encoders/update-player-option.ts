@@ -1,5 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket } from '../../packets';
+import { OutboundPacket, PacketSize } from '../../packets';
 
 interface UpdatePlayerOptionData {
     optionNumber: number;
@@ -9,6 +9,7 @@ interface UpdatePlayerOptionData {
 
 export const updatePlayerOptionPacket: OutboundPacket<UpdatePlayerOptionData> = {
     name: 'updatePlayerOption',
+    size: PacketSize.VAR_BYTE,
     opcodes: {
         254: 204,
     },
