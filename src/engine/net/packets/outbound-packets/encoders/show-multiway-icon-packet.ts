@@ -12,7 +12,7 @@ export const showMultiwayIconPacket: OutboundPacket<MultiwayData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const packet = new Packet(1);
+            const packet = new Packet(75);
             packet.put(Number(data.showMultiwayIcon));
             return packet;
         }

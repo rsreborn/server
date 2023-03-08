@@ -23,38 +23,38 @@ export const welcomeScreenPacket: OutboundPacket<WelcomeScreenData> = {
             packet.put(0, 'byte');
             return packet;
         },
-        // 289: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(10);
-        //     buffer.put(77777, 'int');
-        //     buffer.put(0, 'short');
-        //     buffer.put(0, 'byte');
-        //     buffer.put(0, 'short');
-        //     buffer.put(0, 'byte');
-        //     return buffer;
-        // },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(10);
-        //     buffer.put(0, 'short');
-        //     buffer.put(77777, 'int');
-        //     buffer.put(0, 'byte');
-        //     buffer.put(0, 'byte');
-        //     buffer.put(0, 'short', 'le');
-        //     return buffer;
-        // },
-        // 357: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(23);
-        //     buffer.put(0, 'short');
-        //     buffer.put(0, 'short');
-        //     buffer.put(0, 'short', 'le');
-        //     buffer.put(0, 'short');
-        //     buffer.put(0, 'short');
-        //     buffer.put(0, 'short', 'le');
-        //     buffer.put(77777, 'int', 'le');
-        //     buffer.put(0, 'short');
-        //     buffer.put(0, 'short', 'le');
-        //     buffer.put(0, 'short', 'le');
-        //     buffer.put(0, 'byte');
-        //     return buffer;
-        // }
+        289: (player, opcode, data) => {
+            const packet = new Packet(253);
+            packet.put(77777, 'int');
+            packet.put(0, 'short');
+            packet.put(0, 'byte');
+            packet.put(0, 'short');
+            packet.put(0, 'byte');
+            return packet;
+        },
+        319: (player, opcode, data) => {
+            const packet = new Packet(178);
+            packet.put(0, 'short');
+            packet.put(77777, 'int');
+            packet.put(0, 'byte');
+            packet.put(0, 'byte');
+            packet.put(0, 'short', 'le');
+            return packet;
+        },
+        357: (player, opcode, data) => {
+            const packet = new Packet(39);
+            packet.put(0, 'short');
+            packet.put(0, 'short');
+            packet.put(0, 'short', 'le');
+            packet.put(0, 'short');
+            packet.put(0, 'short');
+            packet.put(0, 'short', 'le');
+            packet.put(77777, 'int', 'le');
+            packet.put(0, 'short');
+            packet.put(0, 'short', 'le');
+            packet.put(0, 'short', 'le');
+            packet.put(0, 'byte');
+            return packet;
+        }
     },
 };

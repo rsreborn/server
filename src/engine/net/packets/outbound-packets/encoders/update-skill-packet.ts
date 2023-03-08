@@ -25,27 +25,27 @@ export const updateSkillPacket: OutboundPacket<UpdateSkillData> = {
 
             return packet;
         },
-        // 289: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(6);
-        //     buffer.put(data.skillId, 'byte');
-        //     buffer.put(data.skillExperience, 'int');
-        //     buffer.put(data.skillLevel, 'byte');
+        289: (player, opcode, data) => {
+            const packet = new Packet(154);
+            packet.put(data.skillId, 'byte');
+            packet.put(data.skillExperience, 'int');
+            packet.put(data.skillLevel, 'byte');
 
-        //     return buffer;
-        // },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(6);
-        //     buffer.put(data.skillExperience, 'int');
-        //     buffer.put(data.skillLevel, 'byte');
-        //     buffer.put(data.skillId, 'byte');
-        //     return buffer;
-        // },
-        // 357: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(6);
-        //     buffer.put(data.skillId, 'byte');
-        //     buffer.put(data.skillLevel, 'byte');
-        //     buffer.put(data.skillExperience, 'int', 'le');
-        //     return buffer;
-        // },        
+            return packet;
+        },
+        319: (player, opcode, data) => {
+            const packet = new Packet(211);
+            packet.put(data.skillExperience, 'int');
+            packet.put(data.skillLevel, 'byte');
+            packet.put(data.skillId, 'byte');
+            return packet;
+        },
+        357: (player, opcode, data) => {
+            const packet = new Packet(200);
+            packet.put(data.skillId, 'byte');
+            packet.put(data.skillLevel, 'byte');
+            packet.put(data.skillExperience, 'int', 'le');
+            return packet;
+        },        
     },
 };

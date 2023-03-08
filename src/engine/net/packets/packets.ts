@@ -7,12 +7,6 @@ export enum PacketQueueType {
     SYNC = 'sync',
 }
 
-// export interface Packet {
-//     opcode: number | null;
-//     size: number | null;
-//     buffer: ByteBuffer;
-// }
-
 export type PacketOpcodeMap = { [key: number]: number | number[] };
 export type PacketDecoder<T = any> = (opcode: number, data: ByteBuffer) => T;
 export type PacketDecoderMap<T = any> = { [key: number]: PacketDecoder<T> };

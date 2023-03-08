@@ -1,4 +1,3 @@
-import { ByteBuffer } from '@runejs/common';
 import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
@@ -18,10 +17,10 @@ export const sidebarWidgetWithDisabledTabsPacket: OutboundPacket<WidgetData> = {
             packet.put(data.widgetId, 'short');
             return packet;
         },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(2);
-        //     buffer.put(data.widgetId, 'short', 'le');
-        //     return buffer;
-        // }
+        319: (player, opcode, data) => {
+            const packet = new Packet(253);
+            packet.put(data.widgetId, 'short', 'le');
+            return packet;
+        }
     },
 };

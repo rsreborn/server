@@ -20,20 +20,20 @@ export const showWidgetPacket: OutboundPacket<WidgetData> = {
             packet.put(data.widgetId, 'short');
             return packet;
         },
-        // 289: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(2);
-        //     buffer.put(data.widgetId, 'short');
-        //     return buffer;
-        // },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(2);
-        //     buffer.put(data.widgetId, 'short', 'le');
-        //     return buffer;
-        // },
-        // 357: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(2);
-        //     buffer.put(data.widgetId, 'short', 'le');
-        //     return buffer;
-        // }
+        289: (player, opcode, data) => {
+            const packet = new Packet(119);
+            packet.put(data.widgetId, 'short');
+            return packet;
+        },
+        319: (player, opcode, data) => {
+            const packet = new Packet(188);
+            packet.put(data.widgetId, 'short', 'le');
+            return packet;
+        },
+        357: (player, opcode, data) => {
+            const packet = new Packet(255);
+            packet.put(data.widgetId, 'short', 'le');
+            return packet;
+        }
     },
 };

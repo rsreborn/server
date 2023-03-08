@@ -1,4 +1,3 @@
-import { ByteBuffer } from '@runejs/common';
 import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
@@ -17,28 +16,28 @@ export const animateWidgetPacket: OutboundPacket<WidgetData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const packet = new Packet(95);
+            const packet = new Packet(opcode);
             packet.put(data.widgetId, 'short');
             packet.put(data.animationId, 'short');
             return packet;
         },
-        // 289: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(4);
-        //     buffer.put(data.widgetId, 'short');
-        //     buffer.put(data.animationId, 'short');
-        //     return buffer;
-        // },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(4);
-        //     buffer.put(data.widgetId, 'short');
-        //     buffer.put(data.animationId, 'short');
-        //     return buffer;
-        // },
-        // 357: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(4);
-        //     buffer.put(data.animationId, 'short', 'le');
-        //     buffer.put(data.widgetId, 'short');
-        //     return buffer;
-        // }
+        289: (player, opcode, data) => {
+            const packet = new Packet(opcode);
+            packet.put(data.widgetId, 'short');
+            packet.put(data.animationId, 'short');
+            return packet;
+        },
+        319: (player, opcode, data) => {
+            const packet = new Packet(opcode);
+            packet.put(data.widgetId, 'short');
+            packet.put(data.animationId, 'short');
+            return packet;
+        },
+        357: (player, opcode, data) => {
+            const packet = new Packet(opcode);
+            packet.put(data.animationId, 'short', 'le');
+            packet.put(data.widgetId, 'short');
+            return packet;
+        }
     },
 };

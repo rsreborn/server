@@ -12,16 +12,16 @@ export const playerDetailsPacket: OutboundPacket<void> = {
     },
     encoders: {
         254: player => {
-            const packet = new Packet(3);
+            const packet = new Packet(213);
             packet.put(player.worldIndex, 'short', 'le');
             packet.put(player.hasMembership ? 1 : 0);
             return packet;
         },
-        // 319: player => {
-        //     const buffer = new ByteBuffer(3);
-        //     buffer.put(player.hasMembership ? 1 : 0);
-        //     buffer.put(player.worldIndex, 'short');
-        //     return buffer;
-        // }
+        319: player => {
+            const packet = new Packet(55);
+            packet.put(player.hasMembership ? 1 : 0);
+            packet.put(player.worldIndex, 'short');
+            return packet;
+        }
     },
 };

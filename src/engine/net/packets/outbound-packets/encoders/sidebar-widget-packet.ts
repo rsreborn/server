@@ -1,4 +1,3 @@
-import { ByteBuffer } from '@runejs/common';
 import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
@@ -23,29 +22,29 @@ export const sidebarWidgetPacket: OutboundPacket<SidebarWidgetData> = {
             packet.put(data.sidebarId, 'byte');
             return packet;
         },
-        // 289: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(3);
-        //     buffer.put(data.widgetId, 'short');
-        //     buffer.put(data.sidebarId, 'byte');
-        //     return buffer;
-        // },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(3);
-        //     buffer.put(data.widgetId, 'short');
-        //     buffer.put(data.sidebarId, 'byte');
-        //     return buffer;
-        // },
-        // 357: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(3);
-        //     buffer.put(data.widgetId, 'short');
-        //     buffer.put(data.sidebarId, 'byte');
-        //     return buffer;
-        // },
-        // 414: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(3);
-        //     buffer.put(data.widgetId, 'short');
-        //     buffer.put(data.sidebarId, 'byte');
-        //     return buffer;
-        // }
+        289: (player, opcode, data) => {
+            const packet = new Packet(63);
+            packet.put(data.widgetId, 'short');
+            packet.put(data.sidebarId, 'byte');
+            return packet;
+        },
+        319: (player, opcode, data) => {
+            const packet = new Packet(229);
+            packet.put(data.widgetId, 'short');
+            packet.put(data.sidebarId, 'byte');
+            return packet;
+        },
+        357: (player, opcode, data) => {
+            const packet = new Packet(163);
+            packet.put(data.widgetId, 'short');
+            packet.put(data.sidebarId, 'byte');
+            return packet;
+        },
+        414: (player, opcode, data) => {
+            const packet = new Packet(242);
+            packet.put(data.widgetId, 'short');
+            packet.put(data.sidebarId, 'byte');
+            return packet;
+        }
     },
 };

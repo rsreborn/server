@@ -1,4 +1,3 @@
-import { ByteBuffer } from '@runejs/common';
 import { Coord } from '../../../../world';
 import { Packet, PacketType } from '../../packet';
 import { OutboundPacket } from '../../packets';
@@ -25,84 +24,83 @@ export const updateMapRegionPacket: OutboundPacket<UpdateMapRegionData> = {
     encoders: {
         254: (player, opcode, data) => {
             const packet = new Packet(209);
-           // const buffer = new ByteBuffer(4);
             packet.put(data.mapCoords.x, 'short');
             packet.put(data.mapCoords.y, 'short');
             return packet;
         },
-        // 289: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(4);
-        //     buffer.put(data.mapCoords.x, 'short');
-        //     buffer.put(data.mapCoords.y, 'short');
-        //     return buffer;
-        // },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(4);
-        //     buffer.put(data.mapCoords.x, 'short');
-        //     buffer.put(data.mapCoords.y, 'short', 'le');
-        //     return buffer;
-        // },
-        // 357: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(4);
-        //     buffer.put(data.mapCoords.y, 'short', 'le');
-        //     buffer.put(data.mapCoords.x, 'short');
-        //     return buffer;
-        // },
-        // 414: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(500);
-        //     buffer.put(data.mapCoords.x, 'short', 'le');
-        //     buffer.put(data.localCoords.x, 'short', 'le');
-        //     buffer.put(data.mapCoords.y, 'short', 'le');
+        289: (player, opcode, data) => {
+            const packet = new Packet(219);
+            packet.put(data.mapCoords.x, 'short');
+            packet.put(data.mapCoords.y, 'short');
+            return packet;
+        },
+        319: (player, opcode, data) => {
+            const packet = new Packet(228);
+            packet.put(data.mapCoords.x, 'short');
+            packet.put(data.mapCoords.y, 'short', 'le');
+            return packet;
+        },
+        357: (player, opcode, data) => {
+            const packet = new Packet(121);
+            packet.put(data.mapCoords.y, 'short', 'le');
+            packet.put(data.mapCoords.x, 'short');
+            return packet;
+        },
+        414: (player, opcode, data) => {
+            const packet = new Packet(127, PacketType.VAR_SHORT);
+            packet.put(data.mapCoords.x, 'short', 'le');
+            packet.put(data.localCoords.x, 'short', 'le');
+            packet.put(data.mapCoords.y, 'short', 'le');
 
-        //     const startX = Math.floor((data.mapCoords.x - 6) / 8);
-        //     const endX = Math.floor((data.mapCoords.x + 6) / 8);
-        //     const startY = Math.floor((data.mapCoords.y - 6) / 8);
-        //     const endY = Math.floor((data.mapCoords.y + 6) / 8);
+            const startX = Math.floor((data.mapCoords.x - 6) / 8);
+            const endX = Math.floor((data.mapCoords.x + 6) / 8);
+            const startY = Math.floor((data.mapCoords.y - 6) / 8);
+            const endY = Math.floor((data.mapCoords.y + 6) / 8);
 
-        //     // @todo xtea key support - Kat 13/Nov/22
-        //     for (let mapX = startX; mapX <= endX; mapX++) {
-        //         for (let mapY = startY; mapY <= endY; mapY++) {
-        //             for (let seeds = 0; seeds < 4; seeds++) {
-        //                 buffer.put(0, 'int', 'le');
-        //             }
-        //         }
-        //     }
-        //     buffer.put(data.mapCoords.plane, 'byte');
-        //     buffer.put(data.localCoords.y, 'short', 'le');
-        //     return buffer.flipWriter();
-        // },
-        // 498: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(500);
+            // @todo xtea key support - Kat 13/Nov/22
+            for (let mapX = startX; mapX <= endX; mapX++) {
+                for (let mapY = startY; mapY <= endY; mapY++) {
+                    for (let seeds = 0; seeds < 4; seeds++) {
+                        packet.put(0, 'int', 'le');
+                    }
+                }
+            }
+            packet.put(data.mapCoords.plane, 'byte');
+            packet.put(data.localCoords.y, 'short', 'le');
+            return packet;
+        },
+        498: (player, opcode, data) => {
+            const packet = new Packet(44, PacketType.VAR_SHORT);
 
-        //     const startX = Math.floor((data.mapCoords.x - 6) / 8);
-        //     const endX = Math.floor((data.mapCoords.x + 6) / 8);
-        //     const startY = Math.floor((data.mapCoords.y - 6) / 8);
-        //     const endY = Math.floor((data.mapCoords.y + 6) / 8);
+            const startX = Math.floor((data.mapCoords.x - 6) / 8);
+            const endX = Math.floor((data.mapCoords.x + 6) / 8);
+            const startY = Math.floor((data.mapCoords.y - 6) / 8);
+            const endY = Math.floor((data.mapCoords.y + 6) / 8);
 
-        //     // @todo xtea key support - Kat 29/Nov/22
-        //     for (let mapX = startX; mapX <= endX; mapX++) {
-        //         for (let mapY = startY; mapY <= endY; mapY++) {
-        //             // for (let seeds = 0; seeds < 4; seeds++) {
-        //             //     buffer.put(0, 'int');
-        //             // }
-        //             // buffer.put(14881828, 'int');
-        //             // buffer.put(-6662814, 'int');
-        //             // buffer.put(58238456, 'int');
-        //             // buffer.put(146761213 , 'int');
+            // @todo xtea key support - Kat 29/Nov/22
+            for (let mapX = startX; mapX <= endX; mapX++) {
+                for (let mapY = startY; mapY <= endY; mapY++) {
+                    // for (let seeds = 0; seeds < 4; seeds++) {
+                    //     buffer.put(0, 'int');
+                    // }
+                    // buffer.put(14881828, 'int');
+                    // buffer.put(-6662814, 'int');
+                    // buffer.put(58238456, 'int');
+                    // buffer.put(146761213 , 'int');
 
-        //             buffer.put(-329250188, 'int');
-        //             buffer.put(-245862849, 'int');
-        //             buffer.put(-94022035, 'int');
-        //             buffer.put(-1987970363 , 'int');
-        //         }
-        //     }
+                    packet.put(-329250188, 'int');
+                    packet.put(-245862849, 'int');
+                    packet.put(-94022035, 'int');
+                    packet.put(-1987970363 , 'int');
+                }
+            }
 
-        //     buffer.put(data.mapCoords.y, 'short');
-        //     buffer.put(data.mapCoords.x, 'short');
-        //     buffer.put(data.localCoords.x, 'short');
-        //     buffer.put(data.mapCoords.plane, 'byte');
-        //     buffer.put(data.localCoords.y, 'short');
-        //     return buffer.flipWriter();
-        // },
+            packet.put(data.mapCoords.y, 'short');
+            packet.put(data.mapCoords.x, 'short');
+            packet.put(data.localCoords.x, 'short');
+            packet.put(data.mapCoords.plane, 'byte');
+            packet.put(data.localCoords.y, 'short');
+            return packet;
+        },
     },
 };

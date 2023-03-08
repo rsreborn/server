@@ -22,23 +22,23 @@ export const showWidgetNpcHeadPacket: OutboundPacket<WidgetData> = {
             packet.put(data.npcId, 'short');
             return packet;
         },
-        // 289: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(4);
-        //     buffer.put(data.widgetId, 'short');
-        //     buffer.put(data.npcId, 'short');
-        //     return buffer;
-        // },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(4);
-        //     buffer.put(data.npcId, 'short');
-        //     buffer.put(data.widgetId, 'short', 'le');
-        //     return buffer;
-        // },
-        // 357: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(4);
-        //     buffer.put(data.widgetId, 'short');
-        //     buffer.put(data.npcId, 'short', 'le');
-        //     return buffer;
-        // }
+        289: (player, opcode, data) => {
+            const packet = new Packet(244);
+            packet.put(data.widgetId, 'short');
+            packet.put(data.npcId, 'short');
+            return packet;
+        },
+        319: (player, opcode, data) => {
+            const packet = new Packet(157);
+            packet.put(data.npcId, 'short');
+            packet.put(data.widgetId, 'short', 'le');
+            return packet;
+        },
+        357: (player, opcode, data) => {
+            const packet = new Packet(18);
+            packet.put(data.widgetId, 'short');
+            packet.put(data.npcId, 'short', 'le');
+            return packet;
+        }
     },
 };

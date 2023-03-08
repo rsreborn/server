@@ -1,4 +1,3 @@
-import { ByteBuffer } from '@runejs/common';
 import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
@@ -20,20 +19,20 @@ export const systemUpdatePacket: OutboundPacket<SystemUpdateData> = {
             packet.put(data.time, 'short');
             return packet;
         },
-        // 289: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(2);
-        //     buffer.put(data.time, 'short');
-        //     return buffer;
-        // },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(2);
-        //     buffer.put(data.time, 'short');
-        //     return buffer;
-        // },
-        // 357: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(2);
-        //     buffer.put(data.time, 'short', 'le');
-        //     return buffer;
-        // }
+        289: (player, opcode, data) => {
+            const packet = new Packet(204);
+            packet.put(data.time, 'short');
+            return packet;
+        },
+        319: (player, opcode, data) => {
+            const packet = new Packet(103);
+            packet.put(data.time, 'short');
+            return packet;
+        },
+        357: (player, opcode, data) => {
+            const packet = new Packet(10);
+            packet.put(data.time, 'short', 'le');
+            return packet;
+        }
     },
 };

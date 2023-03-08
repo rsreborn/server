@@ -20,20 +20,20 @@ export const friendsListPacket: OutboundPacket<FriendsListData> = {
             packet.put(data.friendListStatus, 'byte');
             return packet;
         },
-        // 289: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(1);
-        //     buffer.put(data.friendListStatus, 'byte');
-        //     return buffer;
-        // },
-        // 319: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(1);
-        //     buffer.put(data.friendListStatus, 'byte');
-        //     return buffer;
-        // },
-        // 357: (player, opcode, data) => {
-        //     const buffer = new ByteBuffer(1);
-        //     buffer.put(data.friendListStatus, 'byte');
-        //     return buffer;
-        // }
+        289: (player, opcode, data) => {
+            const packet = new Packet(235);
+            packet.put(data.friendListStatus, 'byte');
+            return packet;
+        },
+        319: (player, opcode, data) => {
+            const packet = new Packet(78);
+            packet.put(data.friendListStatus, 'byte');
+            return packet;
+        },
+        357: (player, opcode, data) => {
+            const packet = new Packet(152);
+            packet.put(data.friendListStatus, 'byte');
+            return packet;
+        }
     },
 };
