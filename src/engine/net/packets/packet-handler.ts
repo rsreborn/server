@@ -4,10 +4,52 @@ import { Coord, getLocalCoord, getMapCoord } from '../../world';
 import inboundPackets from './inbound-packets';
 import outboundPackets from './outbound-packets';
 import INBOUND_PACKET_SIZES from './inbound-packet-sizes';
-import { InboundPacket, OutboundPacket, PacketQueueType } from './packets';
+import { InboundPacket, OutboundPacket, OutboundPacket2, PacketQueueType } from './packets';
 import { HintType } from './outbound-packets/encoders/show-hint-icon-packet';
 import { ChatSettings } from './outbound-packets/encoders/update-chat-settings-packet';
 import { Packet, PacketType } from './packet';
+import { join } from 'path';
+import { getFiles } from '@runejs/common/fs';
+
+var fs = require('fs');
+const registeredBuilds = [ 254, 319 ]
+const outboundPackets2 = [];
+
+
+export const loadOutboundPackets = () => {
+
+    const pluginDir = join('.', 'dist', '/engine/net/packets/outbound-packets/254/');
+    const relativeDir = join('..', '..', '/engine/net/packets/outbound-packets/254/');
+
+    // TODO: Register Build Numbers in a place we can access.
+    fs.readdir(`./src/engine/net/packets/outbound-packets/254`, (err, files) => {
+        if (err) {
+            console.log(err);
+            return;
+        } 
+        // Read files
+        // Taking files and making a map of them
+        files.forEach(fileName => {
+            if (fileName !== "index.ts") {
+                // const location = join(relativeDir, fileName.replace('.ts', ''));
+                // console.log("Printing Location " + location)
+                const encoder = require("C:/Users/Brian/Documents/RSPS/rs-reborn/server/" + pluginDir + fileName.replace('.ts', ''));
+                console.log(encoder)
+                outboundPackets2.push(fileName);
+            }
+        });
+
+    });
+}
+
+/*
+
+map<buildnumber, map<outboundpackets>>
+
+
+const encoder = require('.\254\' + fileName);
+
+*/
 
 export const handleInboundPacket = (
     player: Player,

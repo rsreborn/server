@@ -22,7 +22,7 @@ export class PluginLoader {
     
         for await (const path of getFiles(pluginDir, { type: 'whitelist', list: ['.plugin.js', 'index.js'] })) {
             const location = join(relativeDir, path.substring(pluginDir.length).replace('.js', ''));
-    
+            console.log(location)
             try {
                 let plugin = require(location);
                 if (!plugin) {

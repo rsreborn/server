@@ -4,6 +4,7 @@ import { connectionCreated } from './connection';
 import { closeWorld, openWorld, World } from '../world';
 import { loadCaches } from '../cache';
 import { getFileServer, startFileServer } from './file-server';
+import { loadOutboundPackets } from './packets';
 
 export interface SocketOptions {
     noDelay?: boolean;
@@ -64,6 +65,8 @@ export const startServer = async (
     await loadCaches(buildNumbers);
 
     startFileServer(hostName, jaggrabPort, webPort, fileServerSocketOptions);
+
+    loadOutboundPackets();
 
     const server = createServer(
         socket => connectionCreated(socket, socketOptions)

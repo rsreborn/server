@@ -33,3 +33,9 @@ export interface OutboundPacket<T = any> {
     opcodes: PacketOpcodeMap;
     encoders: PacketEncoderMap<T>;
 }
+
+export interface OutboundPacket2<T = any> {
+    name: string;
+    queue?: PacketQueueType;
+    encoder: PacketEncoder;
+}
