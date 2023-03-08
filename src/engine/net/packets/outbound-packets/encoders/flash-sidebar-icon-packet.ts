@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface SideBarData {
@@ -15,24 +16,24 @@ export const flashSidebarIconPacket: OutboundPacket<SideBarData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(data.sidebarId, 'byte');
-            return buffer;
+            const packet = new Packet(1);
+            packet.put(data.sidebarId, 'byte');
+            return packet;
         },
-        289: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(data.sidebarId, 'byte');
-            return buffer;
-        },
-        319: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(data.sidebarId, 'byte');
-            return buffer;
-        },
-        357: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(data.sidebarId, 'byte');
-            return buffer;
-        }
+        // 289: (player, opcode, data) => {
+        //     const buffer = new ByteBuffer(1);
+        //     buffer.put(data.sidebarId, 'byte');
+        //     return buffer;
+        // },
+        // 319: (player, opcode, data) => {
+        //     const buffer = new ByteBuffer(1);
+        //     buffer.put(data.sidebarId, 'byte');
+        //     return buffer;
+        // },
+        // 357: (player, opcode, data) => {
+        //     const buffer = new ByteBuffer(1);
+        //     buffer.put(data.sidebarId, 'byte');
+        //     return buffer;
+        // }
     },
 };

@@ -1,6 +1,5 @@
-import { encodeBase37Username } from '@engine/util/base37';
-import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket, PacketSize } from '../../packets';
+import { Packet } from '../../packet';
+import { OutboundPacket } from '../../packets';
 
 interface MultiwayData {
     showMultiwayIcon: boolean;
@@ -13,9 +12,9 @@ export const showMultiwayIconPacket: OutboundPacket<MultiwayData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(Number(data.showMultiwayIcon));
-            return buffer;
+            const packet = new Packet(1);
+            packet.put(Number(data.showMultiwayIcon));
+            return packet;
         }
     },
 };

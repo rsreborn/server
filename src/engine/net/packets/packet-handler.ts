@@ -4,9 +4,10 @@ import { Coord, getLocalCoord, getMapCoord } from '../../world';
 import inboundPackets from './inbound-packets';
 import outboundPackets from './outbound-packets';
 import INBOUND_PACKET_SIZES from './inbound-packet-sizes';
-import { InboundPacket, OutboundPacket, PacketQueueType, PacketSize } from './packets';
+import { InboundPacket, OutboundPacket, PacketQueueType } from './packets';
 import { HintType } from './outbound-packets/encoders/show-hint-icon-packet';
 import { ChatSettings } from './outbound-packets/encoders/update-chat-settings-packet';
+import { Packet, PacketType } from './packet';
 
 export const handleInboundPacket = (
     player: Player,
@@ -81,60 +82,30 @@ export const handleOutboundPacket = <T = any>(
         return;
     }
 
-    let packetSize = PacketSize.FIXED;
-    if (outboundPacket.size !== undefined) {
-        console.log("Packet Size " + outboundPacket.size)
-        packetSize = outboundPacket.size;
-    } else if (outboundPacket.sizes !== undefined) {
-        console.log("Packet Sizes " + JSON.stringify(outboundPacket.sizes))
-        packetSize = outboundPacket.sizes[String(buildNumber)] ?? PacketSize.FIXED;
+    let packetSize = PacketType.FIXED;
+    if (outboundPacket.type !== undefined) {
+        packetSize = outboundPacket.type;
+    } else if (outboundPacket.types !== undefined) {
+        packetSize = outboundPacket.types[String(buildNumber)] ?? PacketType.FIXED;
     }
 
-    const buffer = encoder(player, opcode, data);
+    const packet = encoder(player, opcode, data);
     queuePacket(
         player,
-        opcode,
-        buffer,
-        packetSize,
+        packet,
         outboundPacket.queue ?? PacketQueueType.PACKET
     );
 };
 
 export const queuePacket = (
     player: Player,
-    opcode: number,
-    packetData: ByteBuffer,
-    packetType: PacketSize = PacketSize.FIXED,
+    packet: Packet,
     queueType: PacketQueueType = PacketQueueType.PACKET,
 ): void => {
-    const packetSize = packetData.writerIndex === 0 ? packetData.length : packetData.writerIndex;
-    let bufferSize = packetSize + 1;
-
-    console.log(`Packet Id: ${opcode} Packet Size: ${bufferSize} Packet Writer Index: ${packetData.writerIndex} PacketData Length: ${packetData.length}`);
-
-    if (packetType !== PacketSize.FIXED) {
-        bufferSize += packetType;
-    }
-
-    const packet = new ByteBuffer(bufferSize);
-    packet.put((opcode + player.client.outCipher.rand()) & 0xff);
-
-    let copyStart = 1;
-
-    if (packetType === PacketSize.VAR_BYTE) {
-        packet.put(packetSize, 'byte');
-        copyStart = 2;
-    } else if (packetType === PacketSize.VAR_SHORT) {
-        packet.put(packetSize, 'short');
-        copyStart = 3;
-    }
-
-    packetData.copy(packet, copyStart, 0, packetSize);
-
     if (queueType === PacketQueueType.PACKET) {
-        player.client.outboundPacketQueue.push(packet.toNodeBuffer());
+        player.client.outboundPacketQueue.push(packet.toBuffer(player.client.outCipher));
     } else if (queueType === PacketQueueType.SYNC) {
-        player.client.outboundSyncQueue.push(packet.toNodeBuffer());
+        player.client.outboundSyncQueue.push(packet.toBuffer(player.client.outCipher));
     }
 };
 

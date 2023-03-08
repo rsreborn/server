@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface WidgetData {
@@ -13,10 +14,10 @@ export const showFullscreenWidget: OutboundPacket<WidgetData> = {
     },
     encoders: {
         357: (player, opcode, data) => {
-            const buffer = new ByteBuffer(4);
-            buffer.put(data.fullscreenWidgetId, 'short');
-            buffer.put(data.widgetId, 'short', 'le');
-            return buffer;
+            const packet = new Packet(9);
+            packet.put(data.fullscreenWidgetId, 'short');
+            packet.put(data.widgetId, 'short', 'le');
+            return packet;
         }
     },
 };

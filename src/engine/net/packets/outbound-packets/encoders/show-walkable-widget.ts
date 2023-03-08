@@ -1,5 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
-import { sendUpdateCoords } from '../../packet-handler';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface WidgetData {
@@ -13,9 +13,9 @@ export const walkableWidgetPacket: OutboundPacket<WidgetData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(2);
-            buffer.put(data.widgetId, 'short');
-            return buffer;
+            const packet = new Packet(85);
+            packet.put(data.widgetId, 'short');
+            return packet;
         }
     },
 };

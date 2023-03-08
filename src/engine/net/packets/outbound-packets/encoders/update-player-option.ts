@@ -1,5 +1,6 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket, PacketSize } from '../../packets';
+import { Packet, PacketType } from '../../packet';
+import { OutboundPacket } from '../../packets';
 
 interface UpdatePlayerOptionData {
     optionNumber: number;
@@ -9,18 +10,17 @@ interface UpdatePlayerOptionData {
 
 export const updatePlayerOptionPacket: OutboundPacket<UpdatePlayerOptionData> = {
     name: 'updatePlayerOption',
-    size: PacketSize.VAR_BYTE,
     opcodes: {
         254: 204,
     },
     encoders: {
         254: (player, opcode, data) => {
             console.log(data.optionText.length);
-            const buffer = new ByteBuffer(data.optionText.length + 3);
-            buffer.put(data.optionNumber);
-            buffer.put((Number(data.shouldDisplayAsTopOfList)));
-            buffer.putString(data.optionText, 10);
-            return buffer;
+            const packet = new Packet(204, PacketType.VAR_BYTE);
+            packet.put(data.optionNumber);
+            packet.put((Number(data.shouldDisplayAsTopOfList)));
+            packet.putString(data.optionText, 10);
+            return packet;
         }
     },
 };

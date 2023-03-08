@@ -1,5 +1,6 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket, PacketSize } from '../../packets';
+import { Packet } from '../../packet';
+import { OutboundPacket } from '../../packets';
 
 interface WidgetPositionData {
     widgetId: number;
@@ -14,11 +15,11 @@ export const updateWidgetPositionPacket: OutboundPacket<WidgetPositionData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(6);
-            buffer.put(data.widgetId, 'short');
-            buffer.put(data.xOffset, 'short');
-            buffer.put(data.yOffset, 'short');
-            return buffer;
+            const packet = new Packet(27);
+            packet.put(data.widgetId, 'short');
+            packet.put(data.xOffset, 'short');
+            packet.put(data.yOffset, 'short');
+            return packet;
         }
     },
 };

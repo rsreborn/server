@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface RunEnergyData {
@@ -12,9 +13,9 @@ export const updateRunEnergyPacket: OutboundPacket<RunEnergyData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-             buffer.put(data.runEnergy);
-            return buffer;
+            const packet = new Packet(94);
+             packet.put(data.runEnergy);
+            return packet;
         }
     },
 };

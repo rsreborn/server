@@ -1,7 +1,8 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
-const resetCameraEncoder = () => new ByteBuffer(0);
+const resetCameraEncoder = () => new Packet(225);
 
 export const resetCameraPacket: OutboundPacket = {
     name: 'resetCamera',
@@ -9,6 +10,6 @@ export const resetCameraPacket: OutboundPacket = {
         254: 225,
     },
     encoders: {
-        23: resetCameraEncoder,
+        254: resetCameraEncoder,
     },
 };

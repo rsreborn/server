@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { BYTE_LENGTH, ByteBuffer, DataType, Endianness, Signedness } from '@runejs/common';
 
-export enum PacketType {
+export enum PacketDirection {
     INBOUND = 'inbound',
     OUTBOUND = 'outbound',
 }
@@ -22,7 +22,7 @@ export interface PacketStructure {
     fields?: PacketDataField[];
     name?: string;
     size?: number;
-    type?: PacketType;
+    type?: PacketDirection;
 }
 
 export const packetStructures: PacketStructure[] = [];
@@ -69,7 +69,7 @@ const parsePacketData = (data: PacketData[]): {
     return { fields, size };
 };
 
-const readPacketDir = (dir: string, packetType: PacketType): void => {
+const readPacketDir = (dir: string, packetType: PacketDirection): void => {
     const packetDir = join(dir, packetType);
 
     if (!existsSync(packetDir)) {
@@ -105,13 +105,13 @@ export const readPacketFiles = (buildNumber: number): void => {
         throw new Error(`Packet directory ${packetDir} was not found!`);
     }
 
-    readPacketDir(packetDir, PacketType.INBOUND);
-    readPacketDir(packetDir, PacketType.OUTBOUND);
+    readPacketDir(packetDir, PacketDirection.INBOUND);
+    readPacketDir(packetDir, PacketDirection.OUTBOUND);
 };
 
 export const decodePacket = (
     name: string,
-    type: PacketType,
+    type: PacketDirection,
     data: ByteBuffer | null,
 ): { [key: string]: any } => {
     if (!data?.length) {

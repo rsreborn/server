@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface WeightData {
@@ -12,9 +13,9 @@ export const updateWeightPacket: OutboundPacket<WeightData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(2);
-             buffer.put(data.weight, 'short');
-            return buffer;
+            const packet = new Packet(164);
+             packet.put(data.weight, 'short');
+            return packet;
         }
     },
 };

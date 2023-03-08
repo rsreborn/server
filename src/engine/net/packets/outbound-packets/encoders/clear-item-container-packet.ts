@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface ClearItemContainerData {
@@ -12,9 +13,9 @@ export const clearItemContainerPacket: OutboundPacket<ClearItemContainerData> = 
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(2);
-             buffer.put(data.widgetId, 'short');
-            return buffer;
+            const packet = new Packet(168);
+            packet.put(data.widgetId, 'short');
+            return packet;
         }
     },
 };

@@ -3,13 +3,14 @@ import { getBuildNumber, Player, playerUpdateRequired } from '../../../../world/
 import { playerSyncEncoders } from './player-sync-encoder';
 import { getLocalPlayerIds } from '../../../../world/region';
 import { getWorld } from '../../../../world';
-import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '../../packets';
+import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType } from '../../packets';
 import './builds/player-sync-254';
 import './builds/player-sync-289';
 import './builds/player-sync-319';
 import './builds/player-sync-357';
 import './builds/player-sync-414';
 import './builds/player-sync-498';
+import { Packet, PacketType } from '../../packet';
 
 const appendUpdateMasks = (
     player: Player,
@@ -27,72 +28,72 @@ const appendUpdateMasks = (
 const appendMapRegionUpdate = (
     player: Player,
     buildNumber: string,
-    data: ByteBuffer,
-): void => playerSyncEncoders[buildNumber]?.mapRegionUpdateEncoder?.(player, data);
+    packet: Packet,
+): void => playerSyncEncoders[buildNumber]?.mapRegionUpdateEncoder?.(player, packet);
 
 const appendNewlyTrackedPlayer = (
     player: Player,
     otherPlayer: Player,
-    data: ByteBuffer,
-): void => playerSyncEncoders[getBuildNumber(player)]?.appendNewlyTrackedPlayer?.(data, player, otherPlayer);
+    packet: Packet,
+): void => playerSyncEncoders[getBuildNumber(player)]?.appendNewlyTrackedPlayer?.(packet, player, otherPlayer);
 
 const appendMovement = (
     player: Player,
-    data: ByteBuffer,
+    packet: Packet,
 ): void => {
     const updateBlockRequired = playerUpdateRequired(player);
     if (player.sync.walkDir !== -1) {
         // Player is walking/running
-        data.putBits(1, 1); // Update required
+        packet.putBits(1, 1); // Update required
         if (player.sync.runDir === -1) {
             // Player is walking
-            data.putBits(2, 1); // Player walking
-            data.putBits(3, player.sync.walkDir);
+            packet.putBits(2, 1); // Player walking
+            packet.putBits(3, player.sync.walkDir);
         } else {
             // Player is running
-            data.putBits(2, 2); // Player running
-            data.putBits(3, player.sync.walkDir);
-            data.putBits(3, player.sync.runDir);
+            packet.putBits(2, 2); // Player running
+            packet.putBits(3, player.sync.walkDir);
+            packet.putBits(3, player.sync.runDir);
         }
-        data.putBits(1, updateBlockRequired ? 1 : 0); // Whether an update flag block follows
+        packet.putBits(1, updateBlockRequired ? 1 : 0); // Whether an update flag block follows
     } else {
         // Did not move
         if (updateBlockRequired) {
-            data.putBits(1, 1); // Update required
-            data.putBits(2, 0); // Signify the player did not move
+            packet.putBits(1, 1); // Update required
+            packet.putBits(2, 0); // Signify the player did not move
         } else {
-            data.putBits(1, 0); // No update required
+            packet.putBits(1, 0); // No update required
         }
     }
 };
 
 const constructPlayerSyncPacket = (player: Player): ByteBuffer => {
-    const packetData = new ByteBuffer(5000);
-    const updateMaskData = new ByteBuffer(5000);
     const buildNumber = getBuildNumber(player);
+    const packet = new Packet(playerSyncEncoders[String(buildNumber)]?.packetOpcode, PacketType.VAR_SHORT);
+    const updateMaskData = new ByteBuffer(5000);
 
-    packetData.openBitBuffer();
+    packet.openBitBuffer();
 
     const players = getLocalPlayerIds(player.coords).filter(index => index != player.worldIndex);
 
     if (player.sync.mapRegion || player.sync.teleporting) {
-        appendMapRegionUpdate(player, buildNumber, packetData);
+        appendMapRegionUpdate(player, buildNumber, packet);
     } else {
-        appendMovement(player, packetData);
+        appendMovement(player, packet);
     }
 
     appendUpdateMasks(player, buildNumber, updateMaskData);
 
-    packetData.putBits(8, player.trackedPlayerIndexes.length);
+    packet.putBits(8, player.trackedPlayerIndexes.length);
     player.trackedPlayerIndexes.forEach(trackedPlayerIndex => {
         const otherPlayer = getWorld().players[trackedPlayerIndex];
         if (otherPlayer != null && players.includes(trackedPlayerIndex) && !otherPlayer.sync.teleporting) {
-            appendMovement(otherPlayer, packetData);
+            appendMovement(otherPlayer, packet);
             appendUpdateMasks(otherPlayer, buildNumber, updateMaskData);
         } else {
             player.trackedPlayerIndexes = player.trackedPlayerIndexes.filter(index => index != trackedPlayerIndex)
-            packetData.putBits(1, 1);
-            packetData.putBits(2, 3);
+            packet.putBits(1, 1);
+            packet.putBits(2, 3);
         }
     });
 
@@ -109,18 +110,18 @@ const constructPlayerSyncPacket = (player: Player): ByteBuffer => {
         }
 
         player.trackedPlayerIndexes.push(otherPlayer.worldIndex);
-        appendNewlyTrackedPlayer?.(player, otherPlayer, packetData);
+        appendNewlyTrackedPlayer?.(player, otherPlayer, packet);
         appendUpdateMasks(otherPlayer, buildNumber, updateMaskData, true);
     }
 
     if (updateMaskData.writerIndex !== 0) {
-        packetData.putBits(11, 2047);
-        packetData.closeBitBuffer();
-        packetData.putBytes(updateMaskData.flipWriter());
+        packet.putBits(11, 2047);
+        packet.closeBitBuffer();
+        packet.putBytes(updateMaskData.flipWriter());
     } else {
-        packetData.closeBitBuffer();
+        packet.closeBitBuffer();
     }
-    return packetData.flipWriter();
+    return packet;
 };
 
 const opcodes: PacketOpcodeMap = {};
@@ -134,7 +135,7 @@ for (const buildNumber of buildNumbers) {
 
 export const playerSyncPacket: OutboundPacket = {
     name: 'playerSync',
-    size: PacketSize.VAR_SHORT,
+    type: PacketType.VAR_SHORT,
     queue: PacketQueueType.SYNC,
     opcodes,
     encoders,

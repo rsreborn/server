@@ -39,6 +39,7 @@ export interface Player {
     trackedNpcIndexes?: number[];
     lastChunkId?: number;
     running?: boolean;
+    animationId?: number;
 }
 
 export const playerTick = async (player: Player): Promise<void> => {
@@ -146,7 +147,12 @@ export const playerLogin = (player: Player): boolean => {
     sendAddObject(player, coord(3224, 3222, 0), 683, 10, 0);
     //sendTestPacket(player);
     sendWidget(player, 5292)
-    sendUpdatePlayerOption(player, 1, "Get Text", false)
+   // sendUpdatePlayerOption(player, 1, "Attack", true)
+    sendUpdatePlayerOption(player, 2, "Follow", false)
+    sendUpdatePlayerOption(player, 3, "Trade with", false)
+    // sendUpdatePlayerOption(player, 4, "Peek dem stats", false)
+    // sendUpdatePlayerOption(player, 5, "Extra special", false)
+
 
    //sendUpdateChatSettings(player, ChatSettings.ON, ChatSettings.FRIENDS, ChatSettings.OFF)
 

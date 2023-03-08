@@ -1,6 +1,7 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet, PacketType } from '../../packet';
 import { sendUpdateCoords } from '../../packet-handler';
-import { OutboundPacket, PacketSize } from '../../packets';
+import { OutboundPacket } from '../../packets';
 
 interface ProjectileData {
     offset: number;
@@ -11,7 +12,7 @@ interface ProjectileData {
 
 export const justTestingPacket: OutboundPacket<ProjectileData> = {
     name: 'justTesting',
-    size: PacketSize.VAR_SHORT,
+    type: PacketType.VAR_SHORT,
     opcodes: {
         254: 170,
     },
@@ -19,7 +20,7 @@ export const justTestingPacket: OutboundPacket<ProjectileData> = {
         254: (player, opcode, data) => {
            // sendUpdateCoords(player, 3219, 3222)
            
-            const buffer = new ByteBuffer(300);
+            const buffer = new Packet(170, PacketType.VAR_SHORT);
             buffer.put(3214, 'short'); // Widget Id
 
             for (let i = 0; i < 28; i++) {

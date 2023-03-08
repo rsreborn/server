@@ -1,4 +1,4 @@
-import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface WidgetData {
@@ -13,10 +13,10 @@ export const hideWidgetComponentPacket: OutboundPacket<WidgetData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(3);
-            buffer.put(data.widgetId, 'short');
-            buffer.put(Number(data.shouldHideComponent));
-            return buffer;
+            const packet = new Packet(227);
+            packet.put(data.widgetId, 'short');
+            packet.put(Number(data.shouldHideComponent));
+            return packet;
         }
     },
 };

@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface SideBarData {
@@ -12,9 +13,9 @@ export const updateActiveSidebarPacket: OutboundPacket<SideBarData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(data.sidebarId, 'byte');
-            return buffer;
+            const packet = new Packet(138);
+            packet.put(data.sidebarId, 'byte');
+            return packet;
         },
     },
 };

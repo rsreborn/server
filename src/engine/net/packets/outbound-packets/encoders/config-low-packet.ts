@@ -1,6 +1,5 @@
-import { encodeBase37Username } from '@engine/util/base37';
-import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket, PacketSize } from '../../packets';
+import { Packet } from '../../packet';
+import { OutboundPacket } from '../../packets';
 
 interface ConfigData {
     configId: number;
@@ -14,10 +13,10 @@ export const configLowPacket: OutboundPacket<ConfigData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(3);
-            buffer.put(data.configId, 'short');
-            buffer.put(data.configValue);
-            return buffer;
+            const packet = new Packet(186);
+            packet.put(data.configId, 'short');
+            packet.put(data.configValue);
+            return packet;
         }
     },
 };

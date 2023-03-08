@@ -1,5 +1,5 @@
 import { Coord } from '@engine/world';
-import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { sendUpdateCoords } from '../../packet-handler';
 import { OutboundPacket } from '../../packets';
 
@@ -19,12 +19,12 @@ export const stationaryGraphic: OutboundPacket<ProjectileData> = {
     encoders: {
         254: (player, opcode, data) => {
             sendUpdateCoords(player, data.position.x, data.position.y)
-            const buffer = new ByteBuffer(6);
-            buffer.put(data.offset ?? 0, 'byte');
-            buffer.put(data.graphicId, 'short');
-            buffer.put(data.height, 'byte');
-            buffer.put(data.delay, 'short');
-            return buffer;
+            const packet = new Packet(114);
+            packet.put(data.offset ?? 0, 'byte');
+            packet.put(data.graphicId, 'short');
+            packet.put(data.height, 'byte');
+            packet.put(data.delay, 'short');
+            return packet;
         }
     },
 };

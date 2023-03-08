@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface UpdateChatSettingsData {
@@ -20,11 +21,11 @@ export const updateChatSettingsPacket: OutboundPacket<UpdateChatSettingsData> = 
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(3);
-            buffer.put(data.publicChatValue, 'byte');
-            buffer.put(data.privateChatValue, 'byte');
-            buffer.put(data.tradeChatValue, 'byte');
-            return buffer;
+            const packet = new Packet(24);
+            packet.put(data.publicChatValue, 'byte');
+            packet.put(data.privateChatValue, 'byte');
+            packet.put(data.tradeChatValue, 'byte');
+            return packet;
         }
     },
 };

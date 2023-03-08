@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 export const resetButtonStatePacket: OutboundPacket = {
@@ -8,8 +9,8 @@ export const resetButtonStatePacket: OutboundPacket = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(0);
-            return buffer;
+            const packet = new Packet(140);
+            return packet;
         }
     },
 };

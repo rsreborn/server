@@ -9,14 +9,15 @@ import './builds/npc-sync-319';
 import './builds/npc-sync-357';
 import './builds/npc-sync-498';
 import { getLocalNpcIds } from '../../../../world/region/chunk-manager';
-import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType, PacketSize } from '../../packets';
+import { OutboundPacket, PacketEncoderMap, PacketOpcodeMap, PacketQueueType } from '../../packets';
+import { Packet, PacketType } from '../../packet';
 
 const appendNewlyTrackedNpcs = (
     player: Player,
     npc: Npc,
-    data: ByteBuffer,
+    packet: Packet,
 ): void => {
-    npcSyncEncoders[String(player.client.connection.buildNumber)]?.appendNewlyTrackedNpcs(player, npc, data);
+    npcSyncEncoders[String(player.client.connection.buildNumber)]?.appendNewlyTrackedNpcs(player, npc, packet);
 };
 
 const appendUpdateMasks = (
@@ -31,27 +32,27 @@ const appendUpdateMasks = (
     npcSyncEncoders[String(player.client.connection.buildNumber)]?.updateMaskEncoder(npc, player, data);
 };
 
-const appendMovement = (npc: Npc, data: ByteBuffer): void => {
+const appendMovement = (npc: Npc, packet: Packet): void => {
     const updateBlockRequired = npcUpdateRequired(npc);
 
     if (npc.sync.walkDir === -1) {
         if (updateBlockRequired) {
-            data.putBits(1, 1);
-            data.putBits(2, 0);
+            packet.putBits(1, 1);
+            packet.putBits(2, 0);
         } else {
-            data.putBits(1, 0);
+            packet.putBits(1, 0);
         }
     } else {
         // @todo support for running - Kat 6/Nov/22
-        data.putBits(1, 1);
-        data.putBits(2, 1);
-        data.putBits(3, npc.sync.walkDir);
-        data.putBits(1, updateBlockRequired ? 1 : 0);
+        packet.putBits(1, 1);
+        packet.putBits(2, 1);
+        packet.putBits(3, npc.sync.walkDir);
+        packet.putBits(1, updateBlockRequired ? 1 : 0);
     }
 };
 
 const constructNpcSyncPacket = (player: Player): ByteBuffer => {
-    const packetData = new ByteBuffer(5000);
+    const packetData = new Packet(npcSyncEncoders[String(player.client.connection.buildNumber)]?.packetOpcode, PacketType.VAR_SHORT);
     const updateMaskData = new ByteBuffer(5000);
 
     packetData.openBitBuffer();
@@ -99,7 +100,7 @@ const constructNpcSyncPacket = (player: Player): ByteBuffer => {
         packetData.closeBitBuffer();
     }
 
-    return packetData.flipWriter();
+    return packetData;
 };
 
 const opcodes: PacketOpcodeMap = {};
@@ -113,7 +114,7 @@ for (const buildNumber of buildNumbers) {
 
 export const npcSyncPacket: OutboundPacket = {
     name: 'npcSync',
-    size: PacketSize.VAR_SHORT,
+    type: PacketType.VAR_SHORT,
     queue: PacketQueueType.SYNC,
     opcodes,
     encoders,

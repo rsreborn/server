@@ -1,5 +1,6 @@
 import { Coord } from '@engine/world';
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface HintIconData {
@@ -26,17 +27,16 @@ export const showHintIconPacket: OutboundPacket<HintIconData> = {
     encoders: {
         254: (player, opcode, data) => {
             if (data.hintType === 1 || data.hintType === 10) {
-                const buffer = new ByteBuffer(3);
-                buffer.put(data.hintType);
-                buffer.put(data.entityIndex, 'short');
-                return buffer;
+                const packet = new Packet(64);
+                packet.put(data.hintType);
+                packet.put(data.entityIndex, 'short');
+                return packet;
             } else if (data.hintType >= 2 && data.hintType <= 6) {
-                const buffer = new ByteBuffer(6);
-                console.log(data.position)
-                buffer.put(data.position?.y, 'short');
-                buffer.put(data.position?.x, 'short');
-                buffer.put(data.position?.plane);
-                return buffer;
+                const packet = new Packet(64);
+                packet.put(data.position?.y, 'short');
+                packet.put(data.position?.x, 'short');
+                packet.put(data.position?.plane);
+                return packet;
             }
         }
     },

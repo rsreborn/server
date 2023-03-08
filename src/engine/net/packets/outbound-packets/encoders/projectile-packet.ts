@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { sendUpdateCoords } from '../../packet-handler';
 import { OutboundPacket } from '../../packets';
 
@@ -36,19 +37,19 @@ export const projectilePacket: OutboundPacket<ProjectileData> = {
             data.slope = 105;
             data.distanceFromSource = 0;
 
-            const buffer = new ByteBuffer(15);
-            buffer.put(data.angle, 'byte');
-            buffer.put(data.offsetX, 'byte');
-            buffer.put(data.offsetY, 'byte');
-            buffer.put(data.targetIndex, 'short');
-            buffer.put(data.graphicId, 'short');
-            buffer.put(data.heightStart, 'byte');
-            buffer.put(data.heightEnd, 'byte');
-            buffer.put(data.delay, 'short');
-            buffer.put(data.speed, 'short');
-            buffer.put(data.slope, 'byte');
-            buffer.put(data.distanceFromSource, 'byte');
-            return buffer;
+            const packet = new Packet(37);
+            packet.put(data.angle, 'byte');
+            packet.put(data.offsetX, 'byte');
+            packet.put(data.offsetY, 'byte');
+            packet.put(data.targetIndex, 'short');
+            packet.put(data.graphicId, 'short');
+            packet.put(data.heightStart, 'byte');
+            packet.put(data.heightEnd, 'byte');
+            packet.put(data.delay, 'short');
+            packet.put(data.speed, 'short');
+            packet.put(data.slope, 'byte');
+            packet.put(data.distanceFromSource, 'byte');
+            return packet;
         }
     },
 };

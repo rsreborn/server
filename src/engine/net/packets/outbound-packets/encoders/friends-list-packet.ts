@@ -1,4 +1,5 @@
 import { ByteBuffer } from '@runejs/common';
+import { Packet } from '../../packet';
 import { OutboundPacket } from '../../packets';
 
 interface FriendsListData {
@@ -15,24 +16,24 @@ export const friendsListPacket: OutboundPacket<FriendsListData> = {
     },
     encoders: {
         254: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(data.friendListStatus, 'byte');
-            return buffer;
+            const packet = new Packet(255);
+            packet.put(data.friendListStatus, 'byte');
+            return packet;
         },
-        289: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(data.friendListStatus, 'byte');
-            return buffer;
-        },
-        319: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(data.friendListStatus, 'byte');
-            return buffer;
-        },
-        357: (player, opcode, data) => {
-            const buffer = new ByteBuffer(1);
-            buffer.put(data.friendListStatus, 'byte');
-            return buffer;
-        }
+        // 289: (player, opcode, data) => {
+        //     const buffer = new ByteBuffer(1);
+        //     buffer.put(data.friendListStatus, 'byte');
+        //     return buffer;
+        // },
+        // 319: (player, opcode, data) => {
+        //     const buffer = new ByteBuffer(1);
+        //     buffer.put(data.friendListStatus, 'byte');
+        //     return buffer;
+        // },
+        // 357: (player, opcode, data) => {
+        //     const buffer = new ByteBuffer(1);
+        //     buffer.put(data.friendListStatus, 'byte');
+        //     return buffer;
+        // }
     },
 };

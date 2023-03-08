@@ -1,5 +1,6 @@
 import { ByteBuffer } from '@runejs/common';
-import { OutboundPacket, PacketSize } from '../../packets';
+import { Packet } from '../../packet';
+import { OutboundPacket } from '../../packets';
 
 interface WindowPaneData {
     windowId: number;
@@ -12,10 +13,10 @@ export const windowPanePacket: OutboundPacket<WindowPaneData> = {
     },
     encoders: {
         498: (player, opcode, data) => {
-            const buffer = new ByteBuffer(3);
-            buffer.put(data.windowId, 'short');
-            buffer.put(0); // ???
-            return buffer;
+            const packet = new Packet(222);
+            packet.put(data.windowId, 'short');
+            packet.put(0); // ???
+            return packet;
         }
     },
 };
