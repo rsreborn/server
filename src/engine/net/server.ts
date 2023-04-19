@@ -66,7 +66,7 @@ export const startServer = async (
 
     startFileServer(hostName, jaggrabPort, webPort, fileServerSocketOptions);
 
-    await loadOutboundPackets();
+    //await loadOutboundPackets();
 
     const server = createServer(
         socket => connectionCreated(socket, socketOptions)

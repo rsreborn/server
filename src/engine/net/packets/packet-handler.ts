@@ -10,6 +10,7 @@ import { ChatSettings } from './outbound-packets/encoders/update-chat-settings-p
 import { Packet, PacketType } from './packet';
 import { join } from 'path';
 import { getFiles } from '@runejs/common/fs';
+import UpdateMapRegionPacket from './outbound-packets/254/update-map-region-packet';
 
 var fs = require('fs');
 const registeredBuilds = [ 254, 319 ]
@@ -18,19 +19,29 @@ const outboundPackets2 = [];
 
 export const loadOutboundPackets = async () => {
 
-   // const pluginDir = join('.', 'dist', '/engine/net/packets/outbound-packets/254/');
-   // const relativeDir = join('..', '..', '/engine/net/packets/outbound-packets/254/');
+    const pluginDir = join('.', 'dist', '/engine/net/packets/outbound-packets/254');
+    const relativeDir = join('..', '..', '..', '/engine/net/packets/outbound-packets/254');
 
-    const pluginDir = join('.', 'dist', '/engine/net/packets/outbound-packets/254/');
-    const relativeDir = join('..', '..', '/engine/net/packets/outbound-packets/254/');
-
+    console.log("Is this even working?")
     for await (const path of getFiles(pluginDir, { type: 'whitelist', list: ['.js', 'index.js'] })) {
+        console.log("Loopin'")
         const location = join(relativeDir, path.substring(pluginDir.length).replace('.js', ''));
         console.log(location);
 
         try {
             let packet = require(location);
 
+            if (!packet) {
+                continue;
+            }
+
+            if (packet.default) {
+                packet = packet.default;
+            }
+
+            let woah = packet as OutboundPacket2;
+            outboundPackets2.push(woah.name);
+            console.log(outboundPackets2);
         } catch (error) {
             logger.error(`Error loading packet at ${location}`);
             logger.error(error);
@@ -120,11 +131,17 @@ export const handleOutboundPacket = <T = any>(
         return;
     }
     const outboundPacket: OutboundPacket = outboundPackets.find(p => p.name === packetName);
+    const outboundPacket2: OutboundPacket2 = outboundPackets2.find(p => p.name === packetName);
 
-    if (!outboundPacket) {
+    if (!outboundPacket && !outboundPacket2) {
         logger.error(`Outbound packet ${packetName} is not registered!`);
         return;
     }
+
+    // if (!outboundPacket2) {
+    //     logger.error(`Outbound packet ${packetName} is not registered!`);
+    //     return;
+    // }
 
     const buildNumber = player.client.connection.buildNumber;
     const opcode = outboundPacket.opcodes[String(buildNumber)];

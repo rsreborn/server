@@ -30,9 +30,10 @@ export class PluginLoader {
                 }
     
                 if (plugin.default) {
+                    console.log(plugin.default)
                     plugin = plugin.default;
                 }
-
+                console.log(plugin)
                 this.registerPlugin(plugin);
             } catch (error) {
                 logger.error(`Error loading plugin file at ${location}:`);
