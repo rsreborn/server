@@ -16,30 +16,47 @@ const registeredBuilds = [ 254, 319 ]
 const outboundPackets2 = [];
 
 
-export const loadOutboundPackets = () => {
+export const loadOutboundPackets = async () => {
+
+   // const pluginDir = join('.', 'dist', '/engine/net/packets/outbound-packets/254/');
+   // const relativeDir = join('..', '..', '/engine/net/packets/outbound-packets/254/');
 
     const pluginDir = join('.', 'dist', '/engine/net/packets/outbound-packets/254/');
     const relativeDir = join('..', '..', '/engine/net/packets/outbound-packets/254/');
 
-    // TODO: Register Build Numbers in a place we can access.
-    fs.readdir(`./src/engine/net/packets/outbound-packets/254`, (err, files) => {
-        if (err) {
-            console.log(err);
-            return;
-        } 
-        // Read files
-        // Taking files and making a map of them
-        files.forEach(fileName => {
-            if (fileName !== "index.ts") {
-                // const location = join(relativeDir, fileName.replace('.ts', ''));
-                // console.log("Printing Location " + location)
-                const encoder = require("C:/Users/Brian/Documents/RSPS/rs-reborn/server/" + pluginDir + fileName.replace('.ts', ''));
-                console.log(encoder)
-                outboundPackets2.push(fileName);
-            }
-        });
+    for await (const path of getFiles(pluginDir, { type: 'whitelist', list: ['.js', 'index.js'] })) {
+        const location = join(relativeDir, path.substring(pluginDir.length).replace('.js', ''));
+        console.log(location);
 
-    });
+        try {
+            let packet = require(location);
+
+        } catch (error) {
+            logger.error(`Error loading packet at ${location}`);
+            logger.error(error);
+        }
+    }
+
+    // TODO: Register Build Numbers in a place we can access.
+    // fs.readdir(`./dist/engine/net/packets/outbound-packets/254`, (err, files) => {
+    //     if (err) {
+    //         console.log(err);
+    //         return;
+    //     } 
+    //     // Read files
+    //     // Taking files and making a map of them
+    //     files.forEach(fileName => {
+    //         console.log(fileName);
+    //         if (fileName !== "index.ts") {
+    //             // const location = join(relativeDir, fileName.replace('.ts', ''));
+    //             // console.log("Printing Location " + location)
+    //             const encoder = require("C:/Users/Brian/Documents/RSPS/rs-reborn/server/" + pluginDir + fileName.replace('.ts', ''));
+    //             console.log(encoder)
+    //             outboundPackets2.push(fileName);
+    //         }
+    //     });
+
+    // });
 }
 
 /*
